@@ -12,7 +12,7 @@ app.use('/stocks', require('./routes/stocks'));
 app.use('/users', require('./routes/users'));
 
 app.use((error, req, res, next) => {
-  res.status(error.message || 500);
+  res.status(error.status || 500);
   res.send(error.message || '서버에서 일시적인 오류가 발생했습니다.');
 })
 

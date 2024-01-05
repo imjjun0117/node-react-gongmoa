@@ -11,7 +11,6 @@ router.get('/', (req, res, next) => {
   body.skip && value.push(Number(body.skip));
   body.limit && value.push(Number(body.limit));
 
-
   //메뉴 타입에 따라 쿼리 분기처리
   let column = 
   `
