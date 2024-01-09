@@ -41,11 +41,13 @@ const userSlice = createSlice({
     })
     .addCase(loginUser.fulfilled, (state, action) => {
       state.isLoading = false;
+
       if(action.payload.loginSuccess){
         state.userData = action.payload.userData;
         state.isAuth = true;
         localStorage.setItem('accessToken', action.payload.userData.accessToken);
       }
+
     })
     .addCase(loginUser.rejected, (state, action) => {
       state.isLoading = false;
@@ -56,6 +58,7 @@ const userSlice = createSlice({
     })
     .addCase(authUser.fulfilled, (state, action) => {
       state.isLoading = false;
+      console.log(action.payload.userData)
       state.userData = action.payload.userData;
       state.isAuth = true;
     })
@@ -84,6 +87,11 @@ const userSlice = createSlice({
     })
     .addCase(bookMark.fulfilled, (state, action) => {
       state.isLoading = false;
+      if(action.payload.addFlag === 'Y'){
+        state.userData.bookmark.push(action.payload.id);
+      }else{
+        state.userData.bookmark.splice(state.userData.bookmark.indexOf(action.payload.id), 1);
+      }
       toast.info(action.payload.message);
     })
     .addCase(bookMark.rejected, (state, action) => {

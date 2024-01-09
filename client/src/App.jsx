@@ -15,6 +15,7 @@ import { useEffect } from 'react';
 import { authUser } from './action/userAction';
 import KakaoRedirectHandler from './Pages/LoginPage/Kakao/KakaoRedirectHandler';
 import KakaoHtelAdd from './Pages/LoginPage/Kakao/KakaoHtelAdd';
+import StockCalendar from './Pages/StockCalendar';
 
 function Layout() {
   return (
@@ -48,6 +49,7 @@ function App(){
   useEffect(() => {
   
     if(isAuth){
+      console.log('실행');
       dispatch(authUser());
     }
 
@@ -58,6 +60,7 @@ function App(){
       <Route path="/" element={<Layout/>}>
         <Route index element={<StockPage/>}/>
         <Route path="stocks/:stockId" element={<StockDetail/>}/>
+        <Route path="stocks/calendar" element={<StockCalendar/>}/>
         <Route element={<ProtectedRoutes isAuth={isAuth}/>}>
           {/* 로그인한 사람만 갈 수 있는 경로 */}
           <Route path="/kakao/addTel" element={<KakaoHtelAdd/>}/>

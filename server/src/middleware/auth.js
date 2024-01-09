@@ -33,7 +33,8 @@ const auth = async(req, res, next) => {
         AND id=?
     `
 
-    if(decoded._id.indexOf('kakao_') !== -1){
+    //카카오 로그인일 경우
+    if(decoded._id.toString().indexOf('kakao_') !== -1){
       selectUser = 
       `
       SELECT 
@@ -60,10 +61,28 @@ const auth = async(req, res, next) => {
         return res.sendStatus(400).send("올바르지 않은 로그인 토큰입니다.");
       }
   
-      req.user = user[0];
-      req.accessToken = token;
-  
-      return next();
+      let selectBookMark = 
+      `
+        SELECT ipo_id
+        FROM bookmark
+        WHERE user_id = ?
+      `;
+    
+      db.query(selectBookMark, [decoded._id], (err2, bookmark) => {
+    
+        if(err2){
+          return next(err2);
+        }
+    
+        const list = bookmark.map(item => item.ipo_id);
+
+        user[0].bookmark = list;
+        req.user = user[0];
+        req.accessToken = token;
+    
+        return next();
+      })
+
   
     })  
 

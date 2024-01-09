@@ -1,63 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faStar } from '@fortawesome/free-solid-svg-icons';
+import React from 'react';
 import { addComma,setTagColor } from '../../../utils/jsUtils';
 import DdayMessage from './DdayMessage';
-import { Link, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { bookMark } from '../../../action/userAction';
-import axiosInstance from '../../../utils/axios';
+import { Link } from 'react-router-dom';
+import Bookmark from '../../../Layout/Bookmark/Bookmark';
 
 const StockItems = ({stocks}) => {
-  const isAuth = useSelector(state => state.user?.isAuth);
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const [bookmark, setBookmark] = useState([]);
-  const [flag, setFlag] = useState(true);
-
-  const fetchBookmark = async () => {
-  
-    const response = await axiosInstance.get(`/users/bookmark`);
-    setBookmark(response.data.bookmark);
-
-  }
-
-  const bookMarkHandler = (id) => {
-    
-    if(flag){
-
-      setFlag(false);
-
-      if(!isAuth){
-        if(window.confirm('로그인이 필요합니다. 로그인 페이지로 이동하시겠습니까?')){
-          navigate('/login');
-        }
-        return false;
-      }//end if
-  
-      
-      let body = {
-        id: id  
-      };
-
-      dispatch(bookMark(body)).then(() => {
-        setFlag(true);
-        fetchBookmark();
-      });
-
-    }else{
-      alert('진행중입니다. 잠시만 기다려주세요.');
-    }
-  
-  }
-
-  useEffect(() => {
-    
-    if(isAuth) {
-      
-      fetchBookmark();
-    }
-  }, [dispatch])
 
   return (
     <>
@@ -77,10 +24,7 @@ const StockItems = ({stocks}) => {
               <div className="flex space-x-2">
                 <div className={`text-sm ${stock.stock_type.trim() === '코스닥' ? 'bg-blue-700' : stock.stock_type.trim() === '거래소' ? 'bg-green-700' : 'bg-red-700'} px-2 py-1`}>{stock.stock_type}</div>  
               </div>
-              {/* 즐겨찾기 별 */}
-              <div className={`${bookmark.indexOf(stock.ipo_id) === -1 ? 'text-gray-300' : 'text-yellow-400'} cursor-pointer hover:text-yellow-600`} onClick={() => bookMarkHandler(stock.ipo_id)}>
-                <FontAwesomeIcon icon={faStar} />
-              </div>
+              <Bookmark id={stock.ipo_id}/>
             </div>
             {/* 카드 본문 */}
             <div className="py-2 px-4">

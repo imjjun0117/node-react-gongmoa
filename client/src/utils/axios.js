@@ -9,11 +9,16 @@ const axiosInstance = axios.create({
 //accessToken 헤더 세팅
 axiosInstance.interceptors.request.use(function(config){
   const accessToken = localStorage.getItem('accessToken');
+  const kakaoToken = localStorage.getItem('kakaoToken');
 
   if(accessToken){
-    config.headers.Authorization = 'Gongmoa_'+localStorage.getItem('accessToken');
+    config.headers.Authorization = 'Gongmoa_'+accessToken;
   }
   
+  if(kakaoToken){
+    config.headers.kakaoAuthorization = 'Gongmoa_'+kakaoToken;
+  }
+
 
   return config;
 

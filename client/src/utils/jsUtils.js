@@ -50,5 +50,5 @@ export const calculateDday = (targetDate) => {
   const timeDiff = target.getTime() - now.getTime();
   const dayDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
 
-  return dayDiff;
+  return dayDiff + 1;
 }

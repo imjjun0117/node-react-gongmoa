@@ -21,7 +21,8 @@ router.get('/auth', auth, (req, res, next) => {
       id: user.id,
       email: user.email,
       name: user.name,
-      htel: user.htel
+      htel: user.htel,
+      bookmark: user.bookmark
     
     }
 
@@ -197,9 +198,18 @@ router.post('/logout', auth, (req, res, next) => {
   try{
 
     //카카오 계정일 경우
-    if(req.user.id.indexOf('kakao_') !== -1){
-      axios.get(`https://kauth.kakao.com/oauth/logout?client_id=${process.env.REST_API_KEY}&logout_redirect_uri=${process.env.REDIRECT_URI}`)
-    }
+    // if(req.user.id.toString().indexOf('kakao_') !== -1){
+    //   let kakaoToken = req.headers.kakaoauthorization;
+    //   console.log(kakaoToken);
+    //   if(kakaoToken){
+    //     kakaoToken = kakaoToken.replaceAll('Gongmoa_','');
+    //     axios.post('https://kapi.kakao.com/v1/user/logout', {}, {Authorization: `Bearer ${kakaoToken}`,
+    //     }).then(res => {
+    //       console.log('dsa;lkd;lsa');
+    //     })
+
+    //   }
+    // }
 
     return res.sendStatus(200);
   }catch(error){
@@ -272,7 +282,9 @@ router.post('/bookmark', auth, (req, res, next) => {
         }
 
         return res.json({
-          success:true,
+          addFlag: 'N',
+          id: body.id,
+          success: true,
           message: '즐겨찾기에서 삭제하였습니다'
         })
 
@@ -286,6 +298,8 @@ router.post('/bookmark', auth, (req, res, next) => {
         }
 
         return res.json({
+          addFlag: 'Y',
+          id: body.id,
           success: true,
           message: '즐겨찾기에 추가하였습니다'
         })

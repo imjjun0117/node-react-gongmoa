@@ -49,6 +49,8 @@ const KakaoRedirectHandler = () => {
 
         dispatch(kakaoLogin(body)).then(res => {
           
+          localStorage.setItem('kakaoToken', access_token);
+
           if(res.payload.newUser){
             navigate('/kakao/addTel');
           }else if(res.payload.kakaoLoginSuccess){

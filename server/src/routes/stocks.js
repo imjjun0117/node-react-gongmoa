@@ -126,6 +126,60 @@ router.get('/', (req, res, next) => {
 
 })
 
+router.get(`/calendar`, (req, res, next) => {
+
+  let body = req.query;
+
+  let condition =   `
+      AND
+      i.list_dt >= DATE(?) AND i.list_dt <= DATE(?)
+    `;
+
+  if(body.type === 'S'){
+    //공모주 정보 반환
+    condition = `
+      AND
+      i.st_sub >= DATE(?) AND i.end_sub <= DATE(?)
+    `
+  }else if(body.type === 'R'){
+    condition = `
+      AND
+      i.refund_dt >= DATE(?) AND i.refund_dt <= DATE(?)
+    `
+  }
+
+  let selectQuery = 
+  `
+    SELECT
+      i.ipo_id,
+      i.corp_nm,
+      DATE_FORMAT(i.st_sub, '%Y-%m-%d') as st_sub_str,
+      DATE_FORMAT(DATE_ADD(i.end_sub, INTERVAL 1 DAY), '%Y-%m-%d') as end_sub_str,
+      DATE_FORMAT(i.st_forecast_dt, '%Y-%m-%d') as st_forecast_dt_str,
+      DATE_FORMAT(DATE_ADD(i.end_forecast_dt, INTERVAL 1 DAY), '%Y-%m-%d') as end_forecast_dt_str,
+      DATE_FORMAT(i.payment_dt, '%Y-%m-%d') as payment_dt_str,
+      DATE_FORMAT(i.refund_dt, '%Y-%m-%d') as refund_dt_str,
+      DATE_FORMAT(i.list_dt, '%Y-%m-%d') as list_dt_str
+    FROM
+      ipo i,
+      corp_info c
+    WHERE
+      i.ipo_id = c.ipo_id
+    ${condition}
+  `;
+
+  db.query(selectQuery, [body.str_dt, body.end_dt], (err, stocks) => {
+
+    if(err) return next(err);
+
+    return res.json({
+      stocks: stocks
+    })
+
+  })
+
+})
+
 //공모주 상세페이지 조회
 router.get('/:stockId', (req, res, next) => {
   
@@ -209,7 +263,6 @@ router.get('/:stockId', (req, res, next) => {
         return next(err2);
       }
 
-
       return res.json({
         success: true,
         stockDetail : stock[0],
@@ -224,5 +277,8 @@ router.get('/:stockId', (req, res, next) => {
 
 
 })
+
+
+
 
 module.exports = router;
