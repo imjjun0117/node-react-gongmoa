@@ -124,7 +124,7 @@ const LoginPage = () => {
               </div>
               <KakaoBtn/>
               <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-                회원정보가 없다면? <a href="#" className="font-medium text-blue-600 hover:underline dark:text-blue-500"> 회원가입</a>
+                회원정보가 없다면? <a href="./register" className="font-medium text-blue-600 hover:underline dark:text-blue-500"> 회원가입</a>
               </p>
             </form>
           </div>

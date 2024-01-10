@@ -100,7 +100,7 @@ const Main = () => {
   
   return (
     <div className="mt-auto mx-auto w-full bg-gray-200 p-4 min-h-screen flex flex-col lg:items-center md:items-center">
-      <div className="w-full max-w-md">
+      <div className="w-full md:max-w-md">
         <SearchForm onSearchHandler={(keyword) => onSearchHandler(keyword)} keyword = {keyword}/>
       </div>
       <div className='mb-5'>

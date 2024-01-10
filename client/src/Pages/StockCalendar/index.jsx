@@ -33,6 +33,7 @@ const StockCalendar = () => {
   const [selectedEvent, setSelectedEvent] = useState(null); //온클릭시 오픈 이벤트(모달용)
   const bookmark = useSelector(state => state.user?.userData.bookmark); // 즐겨찾기 목록
   const [bookmarkFlag, setBookmarkFlag] = useState(false); // 즐겨찾기 토글
+  const isAuth = useSelector(state => state.user?.isAuth);
 
   const handleEventClick = (arg) => {
     setSelectedEvent(arg.event._def);
@@ -55,6 +56,12 @@ const StockCalendar = () => {
   const listToggleHandler = () => {
     setListToggle((prev) => !prev);
   };
+
+  const handleBookmark = () => {
+
+    setBookmarkFlag((prev) => !prev);
+
+  }
 
   //호버관련 이벤트
   const handleEventMouseEnter = (arg) => {
@@ -80,7 +87,9 @@ const StockCalendar = () => {
     let params = {
       str_dt,
       end_dt,
-      type
+      type,
+      setBookmark : bookmarkFlag,
+      bookmark
     };
 
     try {
@@ -104,37 +113,35 @@ const StockCalendar = () => {
   };
 
   async function eventSet() {
+
     if (strDate && endDate) {
       let rtn_events = [];
 
-      setEvents([])
+      setEvents([]);
+
       if (subToggle) {
-        console.log('-----subToggle')
         const subEvents = await fetchStock({ str_dt: strDate, end_dt: endDate, type: 'S' });
         rtn_events = rtn_events.concat(subEvents);
       }
       if (refundToggle) {
-        console.log('-----refund')
         const refundEvents = await fetchStock({ str_dt: strDate, end_dt: endDate, type: 'R' });
         rtn_events = rtn_events.concat(refundEvents);
       }
       if (listToggle) {
-        console.log('-----listToggle')
         const listEvents = await fetchStock({ str_dt: strDate, end_dt: endDate, type: 'L' });
         rtn_events = rtn_events.concat(listEvents);
       }
 
-      console.log('Returned Events:', rtn_events);
-     
       setEvents(rtn_events);
+
     }
   }
 
   useEffect(() => {
     
-    eventSet();   
+    eventSet();
 
-  }, [strDate, endDate, subToggle, refundToggle, listToggle]);
+  }, [strDate, endDate, subToggle, refundToggle, listToggle, bookmarkFlag]);
 
   if (!events) {
     return (
@@ -165,9 +172,13 @@ const StockCalendar = () => {
             color="#0054FF"
           />
         </ToggleWrapper>
-        <span className={`${bookmarkFlag ? 'text-yellow-400' : 'text-gray-300'} hover:cursor-pointer hover:text-yellow-600`}>
-          <FontAwesomeIcon icon={faStar} size="sm" /> <span className='text-black text-sm'>즐겨찾기</span>
-        </span>
+        
+        {
+          isAuth &&
+          <span className={`${bookmarkFlag ? 'text-yellow-400' : 'text-gray-300'} hover:cursor-pointer hover:text-yellow-600`}  onClick={handleBookmark}>
+              <FontAwesomeIcon icon={faStar} size="sm" /> <span className='text-black text-sm'>즐겨찾기</span>
+          </span>
+        }
       </div>
       <StyledFullCalendar
         plugins={[dayGridPlugin, interactionPlugin]}

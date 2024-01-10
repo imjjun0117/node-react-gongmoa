@@ -89,7 +89,7 @@ const userSlice = createSlice({
       state.isLoading = false;
       if(action.payload.addFlag === 'Y'){
         state.userData.bookmark.push(action.payload.id);
-      }else{
+      }else if(action.payload.addFlag === 'N') {
         state.userData.bookmark.splice(state.userData.bookmark.indexOf(action.payload.id), 1);
       }
       toast.info(action.payload.message);

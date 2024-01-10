@@ -6,16 +6,32 @@ import { FaBell } from "react-icons/fa";
 import { MdOutlineLogin, MdOutlineLogout, MdPersonAdd } from "react-icons/md";
 import { logoutUser } from '../../action/userAction';
 import { FaChartLine } from 'react-icons/fa';
+import { VscAccount } from "react-icons/vsc";
+import styled, { css } from "styled-components";
+import { IoIosSettings } from "react-icons/io";
+// import {DropdownMenu} from './NavItems/DropdownMenu';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const isAuth = useSelector(state => state.user?.isAuth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [acctMenu, setAcctMenu] = useState(false);
+  const [alertMenu, setAlertMenu] = useState(false);
 
   const handleMenuToggle = () => {
     setIsMenuOpen(!isMenuOpen);
   };
+
+  const handleAcctMenu = () => {
+    setAcctMenu(!acctMenu);
+    setAlertMenu(false);
+  }
+
+  const handleAlertMenu = () => {
+    setAcctMenu(false);
+    setAlertMenu(!alertMenu);
+  }
 
   const onLogoutHandler = () => {
 
@@ -50,30 +66,51 @@ const Navbar = () => {
           <>
             <a
               href="/login"
-              className="flex items-center py-2 px-1 text-white rounded md:bg-transparent md:text-white-700 md:p-0 md:dark:text-white-500 md:mr-5"
+              className="flex items-center py-2 px-1 text-white text-sm rounded md:bg-transparent md:text-white-700 md:p-0 md:dark:text-white-500 md:mr-5"
               aria-current="page"
             >
-              <MdOutlineLogin />&nbsp;&nbsp;로그인
-            </a>
-            <a
-              href="/register"
-              className="flex items-center py-2 px-1 text-white rounded md:bg-transparent md:text-white-700 md:p-0 md:dark:text-white-500 md:mr-5"
-              aria-current="page"
-            >
-              <MdPersonAdd />&nbsp;&nbsp;회원가입
+              <MdOutlineLogin />&nbsp;&nbsp;로그인/회원가입
+
             </a>
           </> : 
           <>
-            <button className='flex items-center text-white mr-10' onClick={onLogoutHandler}><MdOutlineLogout />&nbsp;&nbsp;로그아웃</button>
-            <button>
+          {/* <button className='flex items-center text-white mr-10' onClick={onLogoutHandler}><MdOutlineLogout />&nbsp;&nbsp;로그아웃</button> */}
+          <button className='flex items-center text-white mr-5 text-2xl' onClick={handleAcctMenu}><VscAccount /></button>
+
+          {acctMenu && (
+            <AccountMenu>
+              <a href="/users/account" className="px-4 py-2 text-sm flex items-center text-white hover:bg-gray-700 transition duration-300 rounded-md">
+              <IoIosSettings />&nbsp;&nbsp;계정설정
+              </a>
+              <hr className="my-2 border-t border-gray-300 opacity-50" />
+
+              <a href="#" onClick={onLogoutHandler} className="px-4 py-2 text-sm flex items-center text-white hover:bg-gray-700 transition duration-300 rounded-md">
+              <MdOutlineLogout/>&nbsp;&nbsp;로그아웃
+              </a>
+            </AccountMenu>
+            
+          )} 
+            <button onClick={handleAlertMenu}>
               <span className='absolute top-3 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 border-2 rounded-full'>
-                    0
+                    2
               </span>
               <FaBell style={{ color: 'white', fontSize: '24px' }}/>
             </button>
-          </>}
-          
+          {alertMenu && (
+            <AlertMenu>
+              <span className="text-white px-2 py-2 text-lg mb-2 flex items-center"><FaBell style={{ color: 'white', fontSize: '12px' }}/>&nbsp;알림</span>
+              <a href="/users/account" className="px-4 py-2 text-sm flex items-center text-white hover:bg-gray-700 transition duration-300 rounded-md">
+              회원님이 즐겨찾기 하신 포스뱅크의 정보가 업데이트 됐습니다. 12분전
+              </a>
+              <hr className="my-2 border-t border-gray-300 opacity-50" />
 
+              <a href="#" onClick={onLogoutHandler} className="px-4 py-2 text-sm flex items-center text-white-100 hover:bg-gray-700 transition duration-300 rounded-md">
+              회원님의 게시글에 댓글이 남겨졌습니다. 18분전
+              </a>
+            </AlertMenu>  
+          )} 
+          </>}
+        
           <button
             data-collapse-toggle="navbar-sticky"
             type="button"
@@ -96,10 +133,90 @@ const Navbar = () => {
         </div>
         <div className={`items-center justify-between w-full md:flex md:w-auto md:order-1 ${isMenuOpen ? 'block' : 'hidden'}`} id="navbar-sticky">
           <NavItems/>
+          {/* <DropdownMenu/> */}
         </div>
       </div>
     </nav>
   );
 }
+const AccountMenu = styled.div`
+  position: absolute;
+  top: 100%;
+  transform: translateX(-50%);
+  width: 10rem;
+  padding: 0.5rem;
+  margin-top: 10px;
+  background-color: #4a5568;
+  color: white;
+  border-radius: 0.25rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: -20px;
+    left: 57%;
+    transform: translateX(-50%);
+    border-width: 10px;
+    border-style: solid;
+    border-color: transparent transparent #4a5568 transparent;
+  }
+
+  .dropdown-link {
+    display: block;
+    padding: 0.5rem;
+    text-decoration: none;
+    color: white;
+    transition: background-color 0.3s;
+
+    &:hover {
+      background-color: #2d3748;
+    }
+  }
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
+`;
+
+const AlertMenu = styled.div`
+  position: absolute;
+  top: 100%;
+  transform: translateX(-50%);
+  width: 18rem;
+  left: 87.5%;
+  padding: 0.5rem;
+  margin-top: 10px;
+  background-color: #4a5568;
+  color: white;
+  border-radius: 0.25rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  
+  &::before {
+    content: "";
+    position: absolute;
+    top: -20px;
+    left: 91%;
+    transform: translateX(-50%);
+    border-width: 10px;
+    border-style: solid;
+    border-color: transparent transparent #4a5568 transparent;
+  }
+
+  .dropdown-link {
+    display: block;
+    padding: 0.5rem;
+    text-decoration: none;
+    color: white;
+    transition: background-color 0.3s;
+
+    &:hover {
+      background-color: #2d3748;
+    }
+  }
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
+`;
+
 
 export default Navbar;

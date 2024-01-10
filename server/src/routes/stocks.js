@@ -130,6 +130,8 @@ router.get(`/calendar`, (req, res, next) => {
 
   let body = req.query;
 
+  console.log(body)
+
   let condition =   `
       AND
       i.list_dt >= DATE(?) AND i.list_dt <= DATE(?)
@@ -145,6 +147,14 @@ router.get(`/calendar`, (req, res, next) => {
     condition = `
       AND
       i.refund_dt >= DATE(?) AND i.refund_dt <= DATE(?)
+    `
+  }
+
+  //즐겨찾기만 셀렉트
+  if( JSON.parse( body.setBookmark ) ){
+    condition += 
+    `
+      AND i.ipo_id IN (?)
     `
   }
 
@@ -168,10 +178,12 @@ router.get(`/calendar`, (req, res, next) => {
     ${condition}
   `;
 
-  db.query(selectQuery, [body.str_dt, body.end_dt], (err, stocks) => {
+  db.query(selectQuery, [body.str_dt, body.end_dt, body.bookmark], (err, stocks) => {
 
-    if(err) return next(err);
-
+    if(err) {
+      // console.log(err);
+      return next(err);
+    }
     return res.json({
       stocks: stocks
     })
