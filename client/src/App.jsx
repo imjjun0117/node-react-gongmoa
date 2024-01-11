@@ -9,6 +9,7 @@ import StockDetail from './Pages/StockDetail';
 import LoginPage from './Pages/LoginPage';
 import RegisterPage from './Pages/RegisterPage';
 import ProtectedRoutes from './components/ProtectedRoutes'
+import CheckPwdRoutes from './components/CheckPwdRoutes';
 import NotAuthRoutes from './components/NotAuthRoutes'
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
@@ -16,6 +17,8 @@ import { authUser } from './action/userAction';
 import KakaoRedirectHandler from './Pages/LoginPage/Kakao/KakaoRedirectHandler';
 import KakaoHtelAdd from './Pages/LoginPage/Kakao/KakaoHtelAdd';
 import StockCalendar from './Pages/StockCalendar';
+import CheckPassword from './Pages/AccountPage/CheckPassword/CheckPassword';
+import AccountPage from './Pages/AccountPage/index';
 
 function Layout() {
   return (
@@ -43,13 +46,13 @@ function Layout() {
 function App(){
 
   const isAuth = useSelector(state => state.user?.isAuth);
+  const isCheckedPwd = useSelector(state => state.user?.isCheckedPwd);
   const {pathname} = useLocation();
   const dispatch = useDispatch();
 
   useEffect(() => {
   
     if(isAuth){
-      console.log('실행');
       dispatch(authUser());
     }
 
@@ -59,18 +62,22 @@ function App(){
     <Routes>
       <Route path="/" element={<Layout/>}>
         <Route index element={<StockPage/>}/>
-        <Route path="stocks/:stockId" element={<StockDetail/>}/>
-        <Route path="stocks/calendar" element={<StockCalendar/>}/>
+        <Route path="/stocks/:stockId" element={<StockDetail/>}/>
+        <Route path="/stocks/calendar" element={<StockCalendar/>}/>
         <Route element={<ProtectedRoutes isAuth={isAuth}/>}>
           {/* 로그인한 사람만 갈 수 있는 경로 */}
           <Route path="/kakao/addTel" element={<KakaoHtelAdd/>}/>
+          <Route path="/users/checkPwd" element={<CheckPassword/>}/>
+          <Route element={<CheckPwdRoutes isCheckedPwd={isCheckedPwd}/>}>
+            <Route path="/users/account" element={<AccountPage/>}/>
+          </Route>
         </Route>
 
         {/* 로그인한 사람은 갈 수 없는 경로 */}
         <Route element={<NotAuthRoutes isAuth={isAuth}/>}>
-          <Route path="/login" element={<LoginPage/>}/>
-          <Route path="/register" element={<RegisterPage/>}/>
-          <Route path="/kakao/callback" element={<KakaoRedirectHandler/>}/>
+          <Route path="login" element={<LoginPage/>}/>
+          <Route path="register" element={<RegisterPage/>}/>
+          <Route path="kakao/callback" element={<KakaoRedirectHandler/>}/>
         </Route>
       </Route>
 

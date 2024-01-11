@@ -79,7 +79,7 @@ const Navbar = () => {
 
           {acctMenu && (
             <AccountMenu>
-              <a href="/users/account" className="px-4 py-2 text-sm flex items-center text-white hover:bg-gray-700 transition duration-300 rounded-md">
+              <a href="/users/checkPwd" className="px-4 py-2 text-sm flex items-center text-white hover:bg-gray-700 transition duration-300 rounded-md">
               <IoIosSettings />&nbsp;&nbsp;계정설정
               </a>
               <hr className="my-2 border-t border-gray-300 opacity-50" />

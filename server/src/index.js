@@ -4,8 +4,10 @@ const path = require('path');
 const db = require('./databases/config/mysql.js');
 const cors = require('cors');
 
+
 app.use(cors());
 app.use(express.json());
+
 
 //라우터 설정
 app.use('/stocks', require('./routes/stocks'));

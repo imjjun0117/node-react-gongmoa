@@ -127,8 +127,6 @@ router.post('/register', enc, (req, res, next) => {
 
   })
 
-
-
 })
 
 //로그인관련 로직
@@ -231,7 +229,7 @@ router.post('/bookmark', auth, (req, res, next) => {
   }
 
   let data = [
-    user.id,
+    user.id.toString(),
     body.id
   ];
 
@@ -455,6 +453,154 @@ router.post('/kakao/addTel', auth, (req, res, next) => {
   })
   
 
+
+})
+
+
+router.post(`/checkPwd`, auth, async (req, res, next) => {
+
+  let body = req.body;
+
+  if(!body.password){
+    return res.json({
+      success: false,
+      message: '비밀번호를 입력해주세요.'
+    })
+  }//end if
+
+  let selectUser = 
+  `
+    SELECT * 
+    FROM users
+    WHERE id = ?
+  `;
+
+
+  db.query(selectUser, [req.user.id], async (err, user) => {
+
+    
+    if(err) return next(err);
+
+    if(!user[0]){
+      return res.json({
+        success: false,
+        message: '회원정보가 존재하지 않습니다.'
+      })
+    }
+
+    const isMatch = await bcrypt.compare(body.password, user[0].password);
+    
+    if(!isMatch){
+      return res.json({
+        success: false,
+        message: "비밀번호가 일치하지 않습니다."
+      })
+    }
+
+    return res.json({
+      success: true,
+      message: "비밀번호 확인이 되었습니다."
+    })
+
+
+  })
+
+})
+
+
+//회원가입관련 로직
+router.post('/register', enc, (req, res, next) => {
+
+  let userInfo = {...req.body};
+
+  if(!userInfo.email || !userInfo.name || !userInfo.password || !userInfo.htel){
+    return res.json({
+      success: false,
+      message: "필수 입력값이 누락되었습니다."
+    })
+  }
+
+  let selectUser =
+  `
+    SELECT * 
+    FROM users
+    WHERE email=?
+  `
+
+  db.query(selectUser, [userInfo.email], (err, user) => {
+
+    if(err){
+      return next(err);
+    }
+
+    if(user[0]){
+      return res.json({
+        success: false,
+        message: "해당 이메일로 가입된 정보가 존재합니다."
+      })
+    }//end if
+
+    let selectMaxId = 
+    `
+      SELECT 
+        IFNULL(MAX(id),0)+1 as id
+      FROM users;
+    `
+
+    
+    db.query(selectMaxId, (err2, id) => {
+      
+      if(err2){
+        return next(err2);
+      }
+    
+      
+      let maxId = id[0].id;
+    
+      let insertUser = 
+      `
+        INSERT INTO
+          users
+          (
+            id,
+            email,
+            name,
+            password,
+            htel,
+            admin_yn,
+            reg_dt,
+            del_yn
+
+          )
+        values
+          (
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            'N',
+            NOW(),
+            'N'
+          )      
+      `
+
+      db.query(insertUser, [maxId, userInfo.email, userInfo.name, userInfo.password, userInfo.htel], (err3, result) => {
+
+        if(err3){
+          return next(err3);
+        }
+
+        return res.status(200).json({
+          success: true,
+          message: "회원가입을 완료했습니다."
+        })
+
+      })
+
+    })
+    
+  })
 
 })
 

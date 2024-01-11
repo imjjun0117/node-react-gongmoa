@@ -156,3 +156,46 @@ export const kakaoAddTel = createAsyncThunk(
 
   }
 )
+
+//회원 정보 관리 비밀번호 확인
+export const checkPwd = createAsyncThunk(
+  "user/checkPwd",
+  async(body, thunkAPI) => {
+
+    try{
+
+      const response = await axiosInstance.post(
+        `/users/checkPwd`,
+        body
+    )
+
+      return response.data;
+
+    }catch(error){
+      console.log(error)
+      return thunkAPI.rejectWithValue(error.response.data || error.message);
+    }//end catch
+
+  }
+)
+
+export const updateUser = createAsyncThunk(
+  "user/updateUser",
+  async(body, thunkAPI) => {
+
+    try{
+
+      const response = await axiosInstance.post(
+        `/users/update`,
+        body
+      )
+
+      return response.data;
+
+    }catch(error){
+      console.log(error);
+      return thunkAPI.rejectWithValue(error.response.data || error.message)
+    }//end catch
+
+  }
+)

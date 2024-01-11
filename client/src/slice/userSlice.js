@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { authUser, loginUser, registerUser, logoutUser, bookMark, kakaoLogin } from '../action/userAction'
+import { authUser, loginUser, registerUser, logoutUser, bookMark, kakaoLogin, checkPwd } from '../action/userAction'
 import { toast } from 'react-toastify'
 
 const initialState = {
@@ -13,7 +13,8 @@ const initialState = {
   isAuth: false,
   isLoading: false,
   error: '',
-  isKakao: false
+  isKakao: false,
+  isCheckedPwd: false
 }
 
 const userSlice = createSlice({
@@ -87,6 +88,7 @@ const userSlice = createSlice({
     })
     .addCase(bookMark.fulfilled, (state, action) => {
       state.isLoading = false;
+      console.log(action.payload);
       if(action.payload.addFlag === 'Y'){
         state.userData.bookmark.push(action.payload.id);
       }else if(action.payload.addFlag === 'N') {
@@ -114,6 +116,20 @@ const userSlice = createSlice({
 
     })
     .addCase(kakaoLogin.rejected, (state, action) => {
+      state.isLoading = false;
+      state.error = action.payload;
+      
+    })
+    .addCase(checkPwd.pending, state => {
+      state.isLoading = true;
+    })
+    .addCase(checkPwd.fulfilled, (state, action) => {
+      state.isLoading = false;
+      if(action.payload.success){
+        state.isCheckedPwd = true
+      }
+    })
+    .addCase(checkPwd.rejected, (state, action) => {
       state.isLoading = false;
       state.error = action.payload;
       
