@@ -186,7 +186,28 @@ export const updateUser = createAsyncThunk(
     try{
 
       const response = await axiosInstance.post(
-        `/users/update`,
+        `/users/updateUser`,
+        body
+      )
+
+      return response.data;
+
+    }catch(error){
+      console.log(error);
+      return thunkAPI.rejectWithValue(error.response.data || error.message)
+    }//end catch
+
+  }
+)
+
+export const updateKakao = createAsyncThunk(
+  "user/updateKakao",
+  async(body, thunkAPI) => {
+
+    try{
+
+      const response = await axiosInstance.post(
+        `/users/updateKakao`,
         body
       )
 

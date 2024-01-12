@@ -8,9 +8,8 @@ import StockPage from './Pages/StockPage';
 import StockDetail from './Pages/StockDetail';
 import LoginPage from './Pages/LoginPage';
 import RegisterPage from './Pages/RegisterPage';
-import ProtectedRoutes from './components/ProtectedRoutes'
-import CheckPwdRoutes from './components/CheckPwdRoutes';
-import NotAuthRoutes from './components/NotAuthRoutes'
+import ProtectedRoutes from './components/ProtectedRoutes';
+import NotAuthRoutes from './components/NotAuthRoutes';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { authUser } from './action/userAction';
@@ -68,9 +67,7 @@ function App(){
           {/* 로그인한 사람만 갈 수 있는 경로 */}
           <Route path="/kakao/addTel" element={<KakaoHtelAdd/>}/>
           <Route path="/users/checkPwd" element={<CheckPassword/>}/>
-          <Route element={<CheckPwdRoutes isCheckedPwd={isCheckedPwd}/>}>
-            <Route path="/users/account" element={<AccountPage/>}/>
-          </Route>
+          <Route path="/users/account" element={<AccountPage/>}/>
         </Route>
 
         {/* 로그인한 사람은 갈 수 없는 경로 */}

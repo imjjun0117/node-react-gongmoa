@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import {useForm} from 'react-hook-form';
+import {set, useForm} from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { updateUser } from '../../action/userAction';
+import { updateKakao, updateUser } from '../../action/userAction';
+import { setCheckedPwd } from '../../slice/userSlice'
 
 const AccountPage = () => {
 
@@ -10,44 +11,84 @@ const AccountPage = () => {
   const dispatch = useDispatch();
   
   const userInfo = useSelector(state => state.user?.userData);
-  const [smsToggle, setSmsToggle] = useState(false);
+  const [smsToggle, setSmsToggle] = useState(userInfo.sms_yn === 'Y');
+  const isCheckedPwd = useSelector(state => state.user?.isCheckedPwd);
+  const isKakao = useSelector(state => state.user?.isKakao);
+
+  useEffect(() => {
+
+
+    if(!isCheckedPwd && !isKakao){
+      navigate('/users/checkPwd');
+    }
+
+    dispatch(setCheckedPwd());
+
+  },[])
 
   const {
     register,
     handleSubmit,
     getValues,
-    setValue,
     formState: {errors},
     reset
   } = useForm({mode: 'onSubmit'});
   
-  const onSubmit = ({email, password, confirm_password, name, htel, sms_time = ""}) => {
+  const onSubmit = ({email, password, confirm_password, name, htel2, htel3, sms_time = ""}) => {
 
     if(password !== confirm_password){
       alert('비밀번호 확인이 틀렸습니다.');
       return false;
     }
 
+    let patternPhone =  /^(01[016789]{1})-[0-9]{3,4}-[0-9]{4}$/;
+    
+    if(!patternPhone.test(`010-${htel2}-${htel3}`)){
+
+      alert('핸드폰 번호가 유효하지 않습니다.');
+      return false;
+
+    }
+
     const body = {
       email: email,
       password: password,
       name: name,
-      htel: htel,
+      htel: `010-${htel2}-${htel3}`,
       sms_yn : smsToggle,
       sms_time : sms_time
     }
 
-    dispatch(updateUser(body)).then(response => {
+    if(isKakao){
+      console.log('----탔음');
+      dispatch(updateKakao(body)).then(response => {
+  
 
-      if(response.payload.success){
-        alert(response.payload.message);
-        navigate('/login');
-        reset();
-      }else{
-        alert(response.payload.message);
-      }
+        console.log(response);
+        if(response.payload.success){
+          alert(response.payload.message);
+          navigate('/login');
+          reset();
+        }else{
+          alert(response.payload.message);
+        }
+  
+      });
 
-    });
+    }else{
+      dispatch(updateUser(body)).then(response => {
+  
+        if(response.payload.success){
+          alert(response.payload.message);
+          navigate('/login');
+          reset();
+        }else{
+          alert(response.payload.message);
+        }
+  
+      });
+
+    }
     
 
   }
@@ -112,11 +153,11 @@ const AccountPage = () => {
         <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-xl xl:p-0 dark:bg-gray-800 dark:border-gray-700">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
             <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-              회원정보수정
+              회원정보 수정{isKakao ? '(소셜회원)' : ''}
             </h1>      
             <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit(onSubmit)}>
               <div>
-                <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">이메일</label>
+                <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">이메일<span className='text-red-500'> (필수)</span></label>
                 <input
                   type="email"
                   name="email"
@@ -124,6 +165,7 @@ const AccountPage = () => {
                   className=" border sm:text-sm rounded-lg  block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 :focus:border-blue-500"
                   placeholder="이메일을 입력해주세요"
                   defaultValue={userInfo.email}
+                  readOnly={isKakao}
                   {...register('email',userEmail)}
                 />
                 {
@@ -135,46 +177,52 @@ const AccountPage = () => {
                   </div>
                 }
               </div>
-              <div>
-                <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">비밀번호</label>
-                <input
-                  type="password"
-                  name="password"
-                  id="password"
-                  placeholder="••••••••"
-                  className="border sm:text-sm rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
-                  {...register('password',userPassword)}
-                />
-                {
-                  errors?.password && 
-                  <div>
-                    <span className='text-red-500'>
-                      {errors.password.message}
-                    </span>
-                  </div>
-                }
-              </div>
-              <div>
-                <label htmlFor="confirm_password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">비밀번호 확인</label>
-                <input
-                  type="password"
-                  name="confirm_password"
-                  id="confirm_password"
-                  placeholder="••••••••"
-                  className="border sm:text-sm rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
-                  {...register('confirm_password',userConfirmPassword)}
+              {
+              !isKakao && 
+              <>
+                <div>
+                  <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">비밀번호</label>
+                  <input
+                    type="password"
+                    name="password"
+                    id="password"
+                    placeholder="••••••••"
+                    className="border sm:text-sm rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
+                    {...register('password',userPassword)}
                   />
                   {
-                    errors?.confirm_password && 
+                    errors?.password && 
                     <div>
                       <span className='text-red-500'>
-                        {errors.confirm_password.message}
+                        {errors.password.message}
                       </span>
                     </div>
                   }
-              </div>
+                </div>
+                <div>
+                  <label htmlFor="confirm_password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">비밀번호 확인</label>
+                  <input
+                    type="password"
+                    name="confirm_password"
+                    id="confirm_password"
+                    placeholder="••••••••"
+                    className="border sm:text-sm rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
+                    {...register('confirm_password',userConfirmPassword)}
+                    />
+                    {
+                      errors?.confirm_password && 
+                      <div>
+                        <span className='text-red-500'>
+                          {errors.confirm_password.message}
+                        </span>
+                      </div>
+                    }
+                </div>
+              </>
+              }
+              
               <div>
-                <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">닉네임</label>
+                <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">닉네임<span className='text-red-500'> (필수)</span></label>
                 <input
                   type="text"
                   name="name"
@@ -182,6 +230,7 @@ const AccountPage = () => {
                   className="bordersm:text-sm rounded-lg block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
                   placeholder="사용하실 닉네임을 입력해주세요"
                   defaultValue={userInfo.name}
+                  readOnly={isKakao}
                   {...register('name', userName)}
                 />
                 {
@@ -194,63 +243,56 @@ const AccountPage = () => {
                 }
               </div>
               <div>
-                <div className="flex justify-center">
-                  <div>
-                    <label htmlFor="htel1" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                      전화번호
-                    </label>
+              <div className="flex justify-center">
+                <div>
+                  <label htmlFor="htel1" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    전화번호<span className='text-red-500'> (필수)</span>
+                  </label>
+                  <div className="flex items-center">
                     <input
                       type="text"
                       id="htel1"
-                      className="border text-sm rounded-lg marker:block w-[60%] p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
+                      className="border text-sm rounded-lg marker:block w-[25%] p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
                       value={'010'}
                       readOnly
                       maxLength={3}
                     />
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="htel2" className="block mb-2 text-sm font-medium text-gray-900 ">
-                      &nbsp;
-                    </label>
+                    <span className="mx-2 text-sm font-medium text-white">-</span>
                     <input
                       type="text"
                       id="htel2"
-                      className=" border text-sm rounded-lg marker:block w-[60%] p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
+                      className="border text-sm rounded-lg marker:block w-[25%] p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
                       placeholder="1234"
                       defaultValue={userInfo.htel.split('-')[1]}
                       maxLength={4}
                       {...register('htel2', userHtel)}
                     />
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="htel3" className="block mb-2 text-sm font-medium text-gray-900">
-                      &nbsp;
-                    </label>
+                    <span className="mx-2 text-sm font-medium text-white">-</span>
                     <input
                       type="text"
                       id="htel3"
-                      className="border text-sm rounded-lg marker:block w-[60%] p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
+                      className="border text-sm rounded-lg marker:block w-[25%] p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
                       placeholder="5678"
                       defaultValue={userInfo.htel.split('-')[2]}
                       maxLength={4}
                       {...register('htel3', userHtel)}
                     />
                   </div>
-
-                  <div className='w-[30%]'>
-                    <label htmlFor="auth" className="block mb-2 text-sm font-medium text-gray-900">
-                      &nbsp;
-                    </label>
-                    <button
-                      type="submit"
-                      className=" text-white w-full bg-blue-500 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-2 py-2.5"
-                    >
-                    본인인증
-                    </button>   
-                  </div>
                 </div>
+
+                <div className='w-[30%]'>
+                  <label htmlFor="auth" className="block mb-2 text-sm font-medium text-gray-900">
+                    &nbsp;
+                  </label>
+                  <button
+                    type="submit"
+                    className=" text-white w-full bg-blue-500 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-1 py-3"
+                  >
+                    본인인증
+                  </button>
+                </div>
+              </div>
+
                   {errors?.htel3 && (
                     <div>
                       <span className="text-red-500">{errors.htel3.message}</span>
@@ -280,9 +322,9 @@ const AccountPage = () => {
                     {...register('sms_time', userSmsTime)}
                   >
                     <option value="">시간설정</option>
-                    <option value="30m">30분 전에 받기</option>
-                    <option value="1s">1시간 전에 받기</option>
-                    <option value="2s">2시간 전에 받기</option>
+                    <option value="30m" selected={userInfo.sms_time === '30m'}>30분 전에 받기</option>
+                    <option value="1h" selected={userInfo.sms_time === '1h'}>1시간 전에 받기</option>
+                    <option value="2h" selected={userInfo.sms_time === '2h'}>2시간 전에 받기</option>
                   </select>
                   }
                   {errors?.sms_time && (

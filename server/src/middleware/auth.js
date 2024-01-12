@@ -25,7 +25,9 @@ const auth = async(req, res, next) => {
         id,
         email,
         name,
-        htel
+        htel,
+        sms_yn,
+        sms_time
       FROM
         users
       WHERE
@@ -41,7 +43,9 @@ const auth = async(req, res, next) => {
         id,
         email,
         name,
-        htel
+        htel,
+        sms_yn,
+        sms_time
       FROM
         sns_users
       WHERE

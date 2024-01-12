@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { useDispatch, useSelector } from 'react-redux'
 import { checkPwd } from '../../../action/userAction'
@@ -8,13 +8,21 @@ import { useNavigate } from 'react-router-dom'
 const CheckPassword = () => {
 
   const dispatch = useDispatch();
-  const payload = useSelector(state => state.user?.payload);
   const navigate = useNavigate();
+  const isCheckedPwd = useSelector(state => state.user?.isCheckedPwd);
+  const isKakao = useSelector(state => state.user?.isKakao);
+
+  useEffect(() => {
+    
+    if(isCheckedPwd || isKakao){
+      navigate('/users/account');
+    }
+
+  },[])
 
   const {
     register, 
     handleSubmit, 
-    getValues,
     formState:{errors},
     reset
   } = useForm({ mode: 'onBlur' })

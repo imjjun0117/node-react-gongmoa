@@ -26,6 +26,15 @@ const RegisterPage = () => {
       alert('비밀번호 확인이 틀렸습니다.');
       return false;
     }
+    
+    let patternPhone =  /^(01[016789]{1})-[0-9]{3,4}-[0-9]{4}$/;
+    
+    if(!patternPhone.test(`010-${htel2}-${htel3}`)){
+
+      alert('핸드폰 번호가 유효하지 않습니다.');
+      return false;
+
+    }
 
     const body = {
       email: email,
@@ -52,23 +61,19 @@ const RegisterPage = () => {
   const userEmail = {
     required: "이메일을 입력해주세요.",
     pattern :{
-      value: /@/,
+      value: /^[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i,
       message: "이메일 형식이 아닙니다."
     }
   }
   const userName = {
-    require: "닉네임을 입력해주세요.",
+    required: "닉네임을 입력해주세요.",
     maxLength: {
       value: 10,
       message: "닉네임은 10글자 이하로 작성해주세요."
     },
     pattern: {
-      value: /^\S*$/,
-      message: "닉네임에는 공백을 포함할 수 없습니다."
-    },
-    pattern: {
       value: /^[^\s!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/,
-      message: "닉네임에는 특수문자를 포함할 수 없습니다."
+      message: "특수문자 또는 공백을 포함할 수 없습니다."
     }
   }
 

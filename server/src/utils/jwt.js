@@ -1,5 +1,7 @@
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
+const bcrypt = require('bcryptjs');
+const saltRounds = 10;
 dotenv.config();
 
 //사용자 id를 받아 token을 생성하고 localstorage에 저장한다.
@@ -19,4 +21,13 @@ const decodeJwt = async (token) => {
 
 }
 
-module.exports = {encodeJwt, decodeJwt}
+const encPwd = async (password) => {
+  
+  const salt = await bcrypt.genSalt(saltRounds);
+  const hash = await bcrypt.hash(password, salt);
+  
+  return hash;
+  
+}
+
+module.exports = {encodeJwt, decodeJwt, encPwd}

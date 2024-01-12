@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { authUser, loginUser, registerUser, logoutUser, bookMark, kakaoLogin, checkPwd } from '../action/userAction'
+import { authUser, loginUser, registerUser, logoutUser, bookMark, kakaoLogin, checkPwd, updateUser, updateKakao } from '../action/userAction'
 import { toast } from 'react-toastify'
 
 const initialState = {
@@ -22,6 +22,9 @@ const userSlice = createSlice({
   name: 'user',
   initialState: initialState,
   reducers: {
+    setCheckedPwd : (state) => {
+      state.isCheckedPwd = false;
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -134,10 +137,32 @@ const userSlice = createSlice({
       state.error = action.payload;
       
     })
+    .addCase(updateUser.pending, state => {
+      state.isLoading = true;
+    })
+    .addCase(updateUser.fulfilled, (state, action) => {
+      state.isLoading = false;
+    })
+    .addCase(updateUser.rejected, (state, action) => {
+      state.isLoading = false;
+      state.error = action.payload;
+      
+    })
+    .addCase(updateKakao.pending, state => {
+      state.isLoading = true;
+    })
+    .addCase(updateKakao.fulfilled, (state, action) => {
+      state.isLoading = false;
+    })
+    .addCase(updateKakao.rejected, (state, action) => {
+      state.isLoading = false;
+      state.error = action.payload;
+      
+    })
   }
     
 
 })
 
-export const {resetPayload} = userSlice.actions;
+export const {setCheckedPwd} = userSlice.actions;
 export default userSlice.reducer;

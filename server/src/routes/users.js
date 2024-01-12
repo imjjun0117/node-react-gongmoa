@@ -3,7 +3,7 @@ const router = express.Router();
 const db = require('../databases/config/mysql');
 const {enc}  = require('../middleware/bcrypt');
 const bcrypt = require('bcryptjs');
-const {encodeJwt} = require('../utils/jwt');
+const {encodeJwt, encPwd} = require('../utils/jwt');
 const auth = require('../middleware/auth');
 const axios = require('axios');
 const dotenv = require('dotenv');
@@ -12,6 +12,7 @@ dotenv.config();
 router.get('/auth', auth, (req, res, next) => {
 
   const user = req.user;
+  console.log(user);
   
   return res.json({
 
@@ -22,7 +23,9 @@ router.get('/auth', auth, (req, res, next) => {
       email: user.email,
       name: user.name,
       htel: user.htel,
-      bookmark: user.bookmark
+      bookmark: user.bookmark,
+      sms_yn : user.sms_yn,
+      sms_time : user.sms_time
     
     }
 
@@ -42,7 +45,48 @@ router.post('/register', enc, (req, res, next) => {
       message: "필수 입력값이 누락되었습니다."
     })
   }
+  
 
+  //이메일 유효성 검사
+  let patternEmail =  /^[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
+
+  if(!patternEmail.test(userInfo.email)){
+    return res.json({
+      success: false,
+      message: "이메일 형식이 아닙니다."
+    })
+  }
+
+  //닉네임 유효성 검사
+  let patternName =  /^[^\s!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/;
+
+  if(!patternName.test(userInfo.name) || userInfo.name.length > 10){
+    return res.json({
+      success: false,
+      message: "유효하지 않은 닉네임 형식입니다."
+    })
+  }
+
+  //비밀번호 유효성 검사
+  let patternPassword =  /^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#$%^&*?_]).{8,16}$/;
+
+  if(!patternPassword.test(userInfo.password)){
+    return res.json({
+      success: false,
+      message: "비밀번호는 영문, 숫자, 특수문자 포함 8 ~ 16자로 입력해주세요."
+    })
+  }
+
+  //핸드폰 유효성 검사
+  let patternPhone =  /^(01[016789]{1})-[0-9]{3,4}-[0-9]{4}$/;
+
+  if(!patternPhone.test(userInfo.htel)){
+    return res.json({
+      success: false,
+      message: "핸드폰 번호가 유효하지 않습니다."
+    })
+  }
+  
   let selectUser =
   `
     SELECT * 
@@ -123,8 +167,6 @@ router.post('/register', enc, (req, res, next) => {
 
     })
 
-
-
   })
 
 })
@@ -181,7 +223,9 @@ router.post('/login', (req, res, next) => {
         id: user[0].id,
         email: user[0].email,
         name: user[0].name,
-        htel: user[0].htel
+        htel: user[0].htel,
+        sms_yn : user[0].sms_yn,
+        sms_time : user[0].sms_time
       }
     })
 
@@ -508,100 +552,227 @@ router.post(`/checkPwd`, auth, async (req, res, next) => {
 })
 
 
-//회원가입관련 로직
-router.post('/register', enc, (req, res, next) => {
+//회원수정관련 로직
+router.post('/updateUser', auth, async (req, res, next) => {
 
   let userInfo = {...req.body};
 
-  if(!userInfo.email || !userInfo.name || !userInfo.password || !userInfo.htel){
+  if(!userInfo.email || !userInfo.name || !userInfo.htel){
     return res.json({
       success: false,
       message: "필수 입력값이 누락되었습니다."
     })
   }
 
+  let data = [userInfo.email, userInfo.name, userInfo.htel];
+  let targetUpdate = '';
+  
+  //이메일 유효성 검사
+  let patternEmail =  /^[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
+
+  if(!patternEmail.test(userInfo.email)){
+    return res.json({
+      success: false,
+      message: "이메일 형식이 아닙니다."
+    })
+  }
+
+  //닉네임 유효성 검사
+  let patternName =  /^[^\s!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/;
+
+  if(!patternName.test(userInfo.name) || userInfo.name.length > 10){
+    return res.json({
+      success: false,
+      message: "유효하지 않은 닉네임 형식입니다."
+    })
+  }
+
+  //비밀번호를 변경한다면
+  if(userInfo.password){
+    //비밀번호 유효성 검사
+    let patternPassword =  /^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#$%^&*?_]).{8,16}$/;
+  
+    if(!patternPassword.test(userInfo.password)){
+      return res.json({
+        success: false,
+        message: "비밀번호는 영문, 숫자, 특수문자 포함 8 ~ 16자로 입력해주세요."
+      })
+    }
+
+    targetUpdate += 'password=?,';
+    data.push(await encPwd(userInfo.password));
+
+  }
+
+  //핸드폰 유효성 검사
+  let patternPhone =  /^(01[016789]{1})-[0-9]{3,4}-[0-9]{4}$/;
+
+  if(!patternPhone.test(userInfo.htel)){
+    return res.json({
+      success: false,
+      message: "핸드폰 번호가 유효하지 않습니다."
+    })
+  }
+  
+  if(userInfo.sms_yn){
+    
+    data.push('Y');
+    
+    if(['30m','1h','2h'].indexOf(userInfo.sms_time) === -1){
+      return res.json({
+        success: false,
+        message: "시간을 설정해주세요."
+      })
+    }
+    
+    data.push(userInfo.sms_time);
+    
+  }else{
+    data.push('N');
+    data.push('');
+  }
+  
+  data.push(req.user.id);
+
   let selectUser =
   `
     SELECT * 
     FROM users
-    WHERE email=?
+    WHERE id=?
   `
 
-  db.query(selectUser, [userInfo.email], (err, user) => {
+  db.query(selectUser, [req.user.id], (err, user) => {
 
     if(err){
       return next(err);
     }
 
-    if(user[0]){
+    if(!user[0]){
       return res.json({
         success: false,
-        message: "해당 이메일로 가입된 정보가 존재합니다."
+        message: "계정 조회 중 오류가 발생했습니다.\n잠시후 다시 시도해주세요."
       })
     }//end if
-
-    let selectMaxId = 
-    `
-      SELECT 
-        IFNULL(MAX(id),0)+1 as id
-      FROM users;
-    `
-
     
-    db.query(selectMaxId, (err2, id) => {
-      
-      if(err2){
-        return next(err2);
+
+    let updateUser = 
+    `
+      UPDATE users
+      SET 
+        email=?,
+        name=?,
+        htel=?,
+        update_dt=NOW(),
+        ${targetUpdate}
+        sms_yn=?,
+        sms_time=?
+      WHERE 
+        id=?
+    `
+
+    console.log(updateUser, data);
+
+    db.query(updateUser, data, (err3, result) => {
+
+      if(err3){
+        return next(err3);
       }
+
+      return res.status(200).json({
+        success: true,
+        message: "회원정보 수정을 완료했습니다."
+      })
+
+    })
+
+    })
+
+  })
+
+
+  router.post(`/updateKakao`, auth, (req, res, next) => {
+
+    let userInfo = {...req.body};
+
+    if(!userInfo.htel){
+      return res.json({
+        success: false,
+        message: "핸드폰 번호를 입력해주세요."
+      })
+    }
+
     
-      
-      let maxId = id[0].id;
+    let selectUser = 
+    `
+      SELECT * 
+      FROM sns_users
+      WHERE id = ?
+    `;
+
+    db.query(selectUser, [req.user.id], (err, user) => {
+
+      if(err){
+        return next(err);
+      }
+
+      let data = [userInfo.htel];
+
+      if(!user[0]){
+        return res.json({
+          success: false,
+          message: "해당 유저는 존재하지 않습니다." 
+        })
+      }
+
+      if(userInfo.sms_yn){
     
-      let insertUser = 
+        data.push('Y');
+        
+        if(['30m','1h','2h'].indexOf(userInfo.sms_time) === -1){
+          return res.json({
+            success: false,
+            message: "시간을 설정해주세요."
+          })
+        }
+        
+        data.push(userInfo.sms_time);
+        
+      }else{
+        data.push('N');
+        data.push('');
+      }
+
+      data.push(req.user.id);
+
+      let updateUser = 
       `
-        INSERT INTO
-          users
-          (
-            id,
-            email,
-            name,
-            password,
-            htel,
-            admin_yn,
-            reg_dt,
-            del_yn
+        UPDATE sns_users
+        SET 
+          htel=?,
+          sms_yn=?,
+          sms_time=?,
+          update_dt=NOW()
+        WHERE
+          id=?
+      `;
 
-          )
-        values
-          (
-            ?,
-            ?,
-            ?,
-            ?,
-            ?,
-            'N',
-            NOW(),
-            'N'
-          )      
-      `
 
-      db.query(insertUser, [maxId, userInfo.email, userInfo.name, userInfo.password, userInfo.htel], (err3, result) => {
+      db.query(updateUser, data, (err2, result) => {
 
-        if(err3){
-          return next(err3);
+        if(err2){
+          return next(err2);
         }
 
         return res.status(200).json({
           success: true,
-          message: "회원가입을 완료했습니다."
+          message: "회원정보 수정을 완료했습니다."
         })
 
       })
 
     })
-    
+
   })
 
-})
 
 module.exports = router;
