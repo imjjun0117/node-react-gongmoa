@@ -3,6 +3,8 @@ import StockItems from './StockItems/StockItems';
 import axiosInstance from '../../utils/axios';
 import SearchForm from './SearchForm';
 import FixedBar from './\bFixedBar/FixedBar';
+import { useLocation } from 'react-router-dom';
+import Loading from '../../Layout/Loading'
 
 const Main = () => {
   const limit = 12;
@@ -13,8 +15,35 @@ const Main = () => {
   const [initPage, setInitPage] = useState(true); 
   const [menuType, setMenuType] = useState('');
   const loader = useRef(null);
+  const [showScrollButton, setShowScrollButton] = useState(false);
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  
+  useEffect(() => {
+    //스크롤 위로 가기
+    const handleScroll = () => {
+      setShowScrollButton(window.scrollY > 200);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+  const scrollPage = (position) => {
+    window.scrollTo({ top: Number(position), behavior: 'smooth' });
+  };
 
   useEffect(() => {
+    setKeyword(params.get('keyword') || '');
+    setMenuType(params.get('menu_type') || '');
+
+  }, [params]);
+
+  useEffect(() => {
+    
     const options = {
       root: null, // 루트 요소. 기본값은 브라우저의 뷰포트
       rootMargin: '0px', // 루트와 타겟 요소 사이의 여백
@@ -33,7 +62,7 @@ const Main = () => {
     return () => {
       observer.disconnect();
     };
-  }, [loader, hasMore, skip, initPage]);
+  }, [loader, hasMore, skip, initPage, params]);
 
   const handleObserver = (entries) => {
     const target = entries[0];
@@ -41,7 +70,7 @@ const Main = () => {
     //initPage -> true인 경우 초기진입
     let rtnSkip = skip + limit;
     if(initPage) rtnSkip = 0;
-    
+
     if (target.isIntersecting && hasMore) {
 
       fetchStockList({ skip: rtnSkip, limit, keyword, loadMore: initPage, menuType});
@@ -58,15 +87,20 @@ const Main = () => {
       menuType
     };
 
+
+    console.log(skip);
+
     try {
       const response = await axiosInstance.get('/stocks', { params });
       const newStocks = response.data;
 
       if (loadMore) {
+
         // 초기 진입 && 검색
         setStocks(newStocks);
         setSkip(0);
         setInitPage(false);
+
       } else {
         // 기존 데이터에 새로운 데이터를 추가
         setStocks((prevStocks) => [...prevStocks, ...newStocks]);
@@ -79,22 +113,36 @@ const Main = () => {
       } else {
         setHasMore(true);
       }
+
     } catch (error) {
       console.error(error);
     }
+
   };
 
   const onSearchHandler = (input_keyword) => {
-    setKeyword(input_keyword);
-    fetchStockList({ skip : 0, limit, keyword: input_keyword, menuType });
+
+    // params.set('keyword', input_keyword); 
+    params.set('keyword', input_keyword);
+
+    window.location =`/?${params.toString()}`;
+      // window.location.href=`/?keyword=${input_keyword}`
+
+    // setKeyword(input_keyword);
+    // fetchStockList({ skip : 0, limit, keyword: input_keyword, menuType });
   };
 
   //일정 메뉴 
   const menuTypeHandler = (menuType) => {
 
-    setMenuType(menuType);
-    setKeyword('');
-    fetchStockList({ skip : 0, limit, keyword: '', menuType: menuType });
+    params.set('menu_type', menuType);
+    params.delete('keyword');
+
+    window.location = `/?${params.toString()}`;
+
+    // setMenuType(menuType);
+    // setKeyword('');
+    // fetchStockList({ skip : 0, limit, keyword: '', menuType: menuType });
     
   }
   
@@ -107,9 +155,18 @@ const Main = () => {
         <FixedBar menuTypeHandler={(menuType) => menuTypeHandler(menuType)} menuType={menuType}/>
       </div>
       <div className="grid gap-4 lg:grid-cols-2 lg:w-[1000px] sm:w-[600px] place-items-center">
-        <StockItems stocks={stocks} />
+        <StockItems stocks={stocks} keyword={keyword} menuType={menuType}/>
       </div>
-      {hasMore && <div ref={loader}>Loading...</div>}
+      {showScrollButton && (
+  <button
+    onClick={() => {scrollPage(0)}}
+    className="fixed w-[5%] bottom-8 right-8 p-2 bg-white text-gray-600 text-bold cursor-pointer shadow-md hover:shadow-lg transition duration-300 rounded-md"
+  >
+    ↑
+  </button>
+)}
+
+      {hasMore && <div ref={loader}><Loading/></div>}
     </div>
   );
 };

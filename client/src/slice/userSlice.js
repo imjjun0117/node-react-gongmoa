@@ -62,7 +62,6 @@ const userSlice = createSlice({
     })
     .addCase(authUser.fulfilled, (state, action) => {
       state.isLoading = false;
-      console.log(action.payload.userData)
       state.userData = action.payload.userData;
       state.isAuth = true;
     })
@@ -91,7 +90,6 @@ const userSlice = createSlice({
     })
     .addCase(bookMark.fulfilled, (state, action) => {
       state.isLoading = false;
-      console.log(action.payload);
       if(action.payload.addFlag === 'Y'){
         state.userData.bookmark.push(action.payload.id);
       }else if(action.payload.addFlag === 'N') {

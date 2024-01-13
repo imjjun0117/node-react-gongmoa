@@ -18,6 +18,7 @@ import KakaoHtelAdd from './Pages/LoginPage/Kakao/KakaoHtelAdd';
 import StockCalendar from './Pages/StockCalendar';
 import CheckPassword from './Pages/AccountPage/CheckPassword/CheckPassword';
 import AccountPage from './Pages/AccountPage/index';
+import ScrollRestoration from './scrollRestoration/scrollRestoration';
 
 function Layout() {
   return (
@@ -45,7 +46,6 @@ function Layout() {
 function App(){
 
   const isAuth = useSelector(state => state.user?.isAuth);
-  const isCheckedPwd = useSelector(state => state.user?.isCheckedPwd);
   const {pathname} = useLocation();
   const dispatch = useDispatch();
 
@@ -56,6 +56,8 @@ function App(){
     }
 
   },[isAuth, pathname, dispatch])
+
+  // ScrollRestoration();
 
   return (
     <Routes>

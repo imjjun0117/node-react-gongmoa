@@ -10,7 +10,6 @@ const Bookmark = ({id}) => {
 
   const isAuth = useSelector(state => state.user?.isAuth);
   const bookmark = useSelector(state => state.user?.userData.bookmark);
-  console.log(bookmark);
   // const [bookmark, setBookmark] = useState([]);
   const [flag, setFlag] = useState(true);
 

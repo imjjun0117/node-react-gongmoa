@@ -52,9 +52,9 @@ router.get('/', (req, res, next) => {
       `
         AND
         (
-          i.st_forecast_dt <= NOW() AND i.end_forecast_dt >= NOW()
+          DATE_FORMAT(i.st_forecast_dt, '%Y-%m-%d 00:00:00') <= NOW() AND DATE_FORMAT(i.end_forecast_dt, '%Y-%m-%d 23:59:59.999') >= NOW()
           OR
-          i.st_sub <= NOW() AND i.end_sub >= NOW()
+          DATE_FORMAT(i.st_sub, '%Y-%m-%d 00:00:00') <= NOW() AND DATE_FORMAT(i.end_sub, '%Y-%m-%d 23:59:59.999') >= NOW()
         )
       `;
       break;

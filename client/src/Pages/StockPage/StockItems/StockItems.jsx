@@ -4,7 +4,7 @@ import DdayMessage from './DdayMessage';
 import { Link } from 'react-router-dom';
 import Bookmark from '../../../Layout/Bookmark/Bookmark';
 
-const StockItems = ({stocks}) => {
+const StockItems = ({stocks, keyword, menuType}) => {
 
   return (
     <>
@@ -29,7 +29,7 @@ const StockItems = ({stocks}) => {
             {/* 카드 본문 */}
             <div className="py-2 px-4">
               {/* 종목명 */}
-              <div className="text-2xl font-semibold mb-2 hover:text-blue-500" style={{cursor:'pointer'}}><Link to={`/stocks/${stock.ipo_id}`}>{stock.corp_nm}</Link></div>
+              <div className="text-2xl font-semibold mb-2 hover:text-blue-500" style={{cursor:'pointer'}}><Link to={`/stocks/${stock.ipo_id}?keyword=${keyword}&menu_type=${menuType}`}>{stock.corp_nm}</Link></div>
               {/* 공모밴드 */}
               <div className="text-sm text-gray-600 mb-2">
                 <span>희망공모가: {addComma(stock.st_hope_price)} ~ {addComma(stock.end_hope_price)}원</span>

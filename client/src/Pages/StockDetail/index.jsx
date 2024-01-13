@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { addComma } from '../../utils/jsUtils';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import axiosInstance from '../../utils/axios';
 import Loading from '../../Layout/Loading';
 import Bookmark from '../../Layout/Bookmark/Bookmark';
@@ -11,6 +11,11 @@ const StockDetail = () => {
   const [stockDetail , setStockDetail] = useState(null);
   const [demandList, setDemandList] = useState([]);
   const navigate = useNavigate();
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const keyword = params.get('keyword') || '';
+  const menuType = params.get('menu_type') || '';
+
 
   //상세 정보 불러오기
   async function fetchStock(){
@@ -187,6 +192,9 @@ const StockDetail = () => {
         </div>
 
         }
+        <button onClick={() => navigate(`/?keyword=${keyword}&menu_type=${menuType}`)} className="bg-blue-500 text-white p-2 rounded-md mt-5">
+          돌아가기
+        </button>
       </div>
     </div>
   );
