@@ -12,7 +12,6 @@ dotenv.config();
 router.get('/auth', auth, (req, res, next) => {
 
   const user = req.user;
-  console.log(user);
   
   return res.json({
 
@@ -212,7 +211,12 @@ router.post('/login', (req, res, next) => {
       })
     }
 
-    const accessToken = await encodeJwt(user[0].id);
+    let expiredIn = '1h';
+    if(userInfo.remember){
+      expiredIn = '30d';
+    }
+
+    const accessToken = await encodeJwt(user[0].id, expiredIn);
 
     return res.json({
 
@@ -226,7 +230,8 @@ router.post('/login', (req, res, next) => {
         htel: user[0].htel,
         sms_yn : user[0].sms_yn,
         sms_time : user[0].sms_time
-      }
+      },
+      remember: userInfo.remember
     })
 
   })

@@ -3,7 +3,8 @@ const app = express();
 const path = require('path');
 const db = require('./databases/config/mysql.js');
 const cors = require('cors');
-
+const schedule = require('node-schedule');
+const ipoParsing = require('./databases/index.js');
 
 app.use(cors());
 app.use(express.json());
@@ -29,4 +30,11 @@ const port = 8080;
 
 app.listen(port, () => {
     console.log(`server start ${port}`);
+
+    schedule.scheduleJob('42 17 14 * * *', () => {
+      console.log('실행')
+      ipoParsing(1);
+
+    })
+
 })

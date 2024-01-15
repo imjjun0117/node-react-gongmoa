@@ -120,7 +120,9 @@ router.get('/', (req, res, next) => {
       console.log(`ipo list 조회 중 오류 발생: ${error}`);
       return false;
     }
-    res.send(stock_list);
+
+      res.send(stock_list);
+
 
   })
 
@@ -129,8 +131,6 @@ router.get('/', (req, res, next) => {
 router.get(`/calendar`, (req, res, next) => {
 
   let body = req.query;
-
-  console.log(body)
 
   let condition =   `
       AND

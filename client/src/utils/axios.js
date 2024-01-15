@@ -10,15 +10,19 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(function(config){
   const accessToken = localStorage.getItem('accessToken');
   const kakaoToken = localStorage.getItem('kakaoToken');
+  const remember = localStorage.getItem('remember');
 
   if(accessToken){
-    config.headers.Authorization = 'Gongmoa_'+accessToken;
+    config.headers.Authorization = 'Bearer'+accessToken;
   }
   
   if(kakaoToken){
-    config.headers.kakaoAuthorization = 'Gongmoa_'+kakaoToken;
+    config.headers.kakaoAuthorization = 'Bearer'+kakaoToken;
   }
-
+  
+  if(remember){
+    config.headers.remember = 'Bearer'+remember;
+  }
 
   return config;
 

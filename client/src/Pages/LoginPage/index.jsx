@@ -14,16 +14,16 @@ const LoginPage = () => {
   const {
     register, 
     handleSubmit, 
-    getValues,
     formState:{errors},
     reset
-  } = useForm({ mode: 'onBlur' })
+  } = useForm({ mode: 'onSubmit' })
 
-  const onSubmit = ({email, password}) => {
+  const onSubmit = ({email, password, remember}) => {
 
     const body = {
       email: email,
-      password: password
+      password: password,
+      remember: remember
     }
 
     dispatch(loginUser(body)).then(response => {
@@ -100,13 +100,15 @@ const LoginPage = () => {
                   <div className="flex items-center h-5">
                     <input
                       id="remember"
+                      name="remember"
                       aria-describedby="remember"
                       type="checkbox"
                       className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800"
+                      {...register('remember', {})}
                     />
                   </div>
                   <div className="ml-3 text-sm">
-                    <label htmlFor="remember" className="text-gray-500 dark:text-gray-300">회원정보 저장</label>
+                    <label htmlFor="remember" className="text-gray-500 dark:text-gray-300">로그인 상태 유지</label>
                   </div>
                 </div>
                 <a href="#" className="text-sm font-medium text-primary-600 hover:underline dark:text-blue-300">비밀번호를 잊으셨나요?</a>

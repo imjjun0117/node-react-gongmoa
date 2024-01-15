@@ -11,10 +11,7 @@ const StockDetail = () => {
   const [stockDetail , setStockDetail] = useState(null);
   const [demandList, setDemandList] = useState([]);
   const navigate = useNavigate();
-  const location = useLocation();
-  const params = new URLSearchParams(location.search);
-  const keyword = params.get('keyword') || '';
-  const menuType = params.get('menu_type') || '';
+  
 
 
   //상세 정보 불러오기
@@ -40,7 +37,20 @@ const StockDetail = () => {
   useEffect(() => {
     
     fetchStock();
-    
+    window.scrollTo({ top: 0});
+
+    if(JSON.parse(sessionStorage.getItem('stocks'))){ //stockitem이 있을 경우만 
+      
+      sessionStorage.setItem('reload', JSON.stringify('Y'));
+      sessionStorage.setItem('targetId', JSON.stringify(`${id}`));
+
+    }else{
+
+      sessionStorage.removeItem('reload');
+      sessionStorage.removeItem('targetId');
+
+    }
+
   },[id]);
 
 
@@ -64,6 +74,28 @@ const StockDetail = () => {
     <div className="flex justify-center items-center bg-gray-200 min-h-screen py-10 px-5">
       <div className="w-full max-w-md">
         <div className="flex items-center">
+        <div className='mr-5'>
+          <button
+            onClick={() => navigate(`/`)}
+            className="text-gray-600 hover:text-gray-800 focus:outline-none"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+          </button>
+
+        </div>
           <h2 className="text-3xl font-bold flex-grow mb-3">
             {stockDetail.corp_nm}
           </h2>
@@ -192,9 +224,6 @@ const StockDetail = () => {
         </div>
 
         }
-        <button onClick={() => navigate(`/?keyword=${keyword}&menu_type=${menuType}`)} className="bg-blue-500 text-white p-2 rounded-md mt-5">
-          돌아가기
-        </button>
       </div>
     </div>
   );

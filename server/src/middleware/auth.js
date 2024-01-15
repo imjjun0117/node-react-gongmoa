@@ -1,10 +1,10 @@
 const db = require('../databases/config/mysql');
-const { decodeJwt } = require('../utils/jwt');
+const { decodeJwt, encodeJwt } = require('../utils/jwt');
 
 const auth = async(req, res, next) => {
 
   let token = req.headers.authorization;
-  token = token?.replaceAll('Gongmoa_', '');
+  token = token?.replaceAll('Bearer', '');
   
   if(!token){
     return res.sendStatus(401);
@@ -72,7 +72,7 @@ const auth = async(req, res, next) => {
         WHERE user_id = ?
       `;
     
-      db.query(selectBookMark, [decoded._id], (err2, bookmark) => {
+      db.query(selectBookMark, [decoded._id], async (err2, bookmark) => {
     
         if(err2){
           return next(err2);
@@ -80,9 +80,15 @@ const auth = async(req, res, next) => {
     
         const list = bookmark.map(item => item.ipo_id);
 
+        let expiredIn = '1h';
+        
+        if(req.headers.remember){
+          expiredIn = '30d';
+        }
+
         user[0].bookmark = list;
         req.user = user[0];
-        req.accessToken = token;
+        req.accessToken = await encodeJwt(user[0].id, expiredIn);
     
         return next();
       })

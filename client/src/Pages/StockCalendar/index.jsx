@@ -23,17 +23,52 @@ const ToggleButton = ({ onClick, isToggled, label, color }) => {
 
 
 const StockCalendar = () => {
-  const [events, setEvents] = useState([]); // 캘린더 날짜 표시
+  const [events, setEvents] = useState([]); // 캘린더 공모주 표시
   const [strDate, setStrDate] = useState(''); //캘린더 표시 날짜 start
   const [endDate, setEndDate] = useState(''); //캘린던 표시 날짜 end
-  const [subToggle, setSubToggle] = useState(true); //공모일자 토글 온오프
-  const [refundToggle, setRefundToggle] = useState(true); //환불일 토글 온오프
-  const [listToggle, setListToggle] = useState(true); //상장일 토글 온오프
+  const [subToggle, setSubToggle] = useState(JSON.parse(sessionStorage.getItem('reloadCal'))  == 'Y' ? JSON.parse(sessionStorage.getItem('subToggle')) : true); //공모일자 토글 온오프
+  const [refundToggle, setRefundToggle] = useState(JSON.parse(sessionStorage.getItem('reloadCal'))  == 'Y' ? JSON.parse(sessionStorage.getItem('refundToggle')) : true); //환불일 토글 온오프
+  const [listToggle, setListToggle] = useState(JSON.parse(sessionStorage.getItem('reloadCal'))  == 'Y' ? JSON.parse(sessionStorage.getItem('listToggle')) : true); //상장일 토글 온오프
   const [modalIsOpen, setModalIsOpen] = useState(false); //모달 오픈
   const [selectedEvent, setSelectedEvent] = useState(null); //온클릭시 오픈 이벤트(모달용)
   const bookmark = useSelector(state => state.user?.userData.bookmark); // 즐겨찾기 목록
-  const [bookmarkFlag, setBookmarkFlag] = useState(false); // 즐겨찾기 토글
+  const [bookmarkFlag, setBookmarkFlag] = useState(JSON.parse(sessionStorage.getItem('reloadCal'))  == 'Y' ? JSON.parse(sessionStorage.getItem('bookmarkFlag')) : false); // 즐겨찾기 토글
   const isAuth = useSelector(state => state.user?.isAuth);
+
+  useEffect(() => {
+
+    sessionStorage.setItem('subToggle', JSON.stringify(subToggle));
+    sessionStorage.setItem('refundToggle', JSON.stringify(refundToggle));
+    sessionStorage.setItem('listToggle', JSON.stringify(listToggle));
+    sessionStorage.setItem('bookmarkFlag', JSON.stringify(bookmarkFlag));
+
+    sessionStorage.removeItem('reloadCal');
+
+  },[events])
+
+  useEffect(() => {
+
+
+    const handleBeforeUnload = () => {
+      sessionStorage.setItem('reloadCal', JSON.stringify('Y'));
+    };
+
+    // 새로 고침 이벤트 리스너 등록
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    const handlePageHide = () => {
+      sessionStorage.setItem('reloadCal', JSON.stringify('Y'));
+    };
+    
+    // iOS Safari에서 페이지가 숨겨질 때(pagehide) 이벤트 리스너 등록
+    window.addEventListener('pagehide', handlePageHide);
+
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('pagehide', handlePageHide);
+    };
+  },[])
 
   const handleEventClick = (arg) => {
     setSelectedEvent(arg.event._def);

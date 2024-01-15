@@ -1,15 +1,34 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { addComma,setTagColor } from '../../../utils/jsUtils';
 import DdayMessage from './DdayMessage';
 import { Link } from 'react-router-dom';
 import Bookmark from '../../../Layout/Bookmark/Bookmark';
 
-const StockItems = ({stocks, keyword, menuType}) => {
+const StockItems = ({stocks}) => {
+  const targetId = JSON.parse(sessionStorage.getItem('targetId')) || '';
 
+  useEffect( ()=> {
+
+    if(JSON.parse(sessionStorage.getItem('reload')) === 'Y' && targetId){
+
+      const targetDiv = document.getElementById(targetId);
+      targetDiv.scrollTop = 100;
+      console.log(targetDiv.scrollTop);
+
+      targetDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+  },[])
+
+  if(!stocks || stocks?.length < 1 && (JSON.parse(sessionStorage.getItem('keyword')) || JSON.parse(sessionStorage.getItem('menuType')))){
+    return (
+      <span className='text-black mt-24'>해당하는 공모주가 존재하지 않습니다.</span>
+    )
+  }
   return (
     <>
       {stocks.map((stock, index) => (
-        <div className="relative max-w-md w-full" key={index}>
+        <div className="relative max-w-md w-full" key={index} id={stock.ipo_id} >
 
           {/* 수요예측과 공모참여일자 */}
           <div className="top-0 left-0 px-2 py-1 z-10">
@@ -29,7 +48,7 @@ const StockItems = ({stocks, keyword, menuType}) => {
             {/* 카드 본문 */}
             <div className="py-2 px-4">
               {/* 종목명 */}
-              <div className="text-2xl font-semibold mb-2 hover:text-blue-500" style={{cursor:'pointer'}}><Link to={`/stocks/${stock.ipo_id}?keyword=${keyword}&menu_type=${menuType}`}>{stock.corp_nm}</Link></div>
+              <div className="text-2xl font-semibold mb-2 hover:text-blue-500" style={{cursor:'pointer'}}><Link to={`/stocks/${stock.ipo_id}`}>{stock.corp_nm}</Link></div>
               {/* 공모밴드 */}
               <div className="text-sm text-gray-600 mb-2">
                 <span>희망공모가: {addComma(stock.st_hope_price)} ~ {addComma(stock.end_hope_price)}원</span>

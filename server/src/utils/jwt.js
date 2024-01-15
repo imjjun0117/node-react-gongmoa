@@ -5,9 +5,9 @@ const saltRounds = 10;
 dotenv.config();
 
 //사용자 id를 받아 token을 생성하고 localstorage에 저장한다.
-const encodeJwt = async (user_id) => {
+const encodeJwt = async (user_id, expiresIn) => {
 
-  const accessToken = jwt.sign({_id: user_id}, process.env.SECRET_KEY, {expiresIn: '1h'});
+  const accessToken = jwt.sign({_id: user_id}, process.env.SECRET_KEY, {expiresIn: expiresIn});
 
   return accessToken;
 

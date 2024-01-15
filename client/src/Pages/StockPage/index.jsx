@@ -3,47 +3,77 @@ import StockItems from './StockItems/StockItems';
 import axiosInstance from '../../utils/axios';
 import SearchForm from './SearchForm';
 import FixedBar from './\bFixedBar/FixedBar';
-import { useLocation } from 'react-router-dom';
 import Loading from '../../Layout/Loading'
 
 const Main = () => {
   const limit = 12;
-  const [stocks, setStocks] = useState([]);
-  const [skip, setSkip] = useState(0);
-  const [keyword, setKeyword] = useState('');
-  const [hasMore, setHasMore] = useState(true);
-  const [initPage, setInitPage] = useState(true); 
-  const [menuType, setMenuType] = useState('');
+  const [stocks, setStocks] = useState(JSON.parse(sessionStorage.getItem('reload'))  == 'Y' ? JSON.parse(sessionStorage.getItem('stocks')) : []);
+  const [skip, setSkip] = useState(JSON.parse(sessionStorage.getItem('reload'))  == 'Y' ? JSON.parse(sessionStorage.getItem('skip')) : 0);
+  const [keyword, setKeyword] = useState(JSON.parse(sessionStorage.getItem('reload'))  == 'Y' ? JSON.parse(sessionStorage.getItem('keyword')) : '');
+  const [hasMore, setHasMore] = useState(JSON.parse(sessionStorage.getItem('reload'))  == 'Y' ? JSON.parse(sessionStorage.getItem('hasMore')) : true);
+  const [initPage, setInitPage] = useState(JSON.parse(sessionStorage.getItem('reload'))  == 'Y' ? JSON.parse(sessionStorage.getItem('initPage')) : true); 
+  const [menuType, setMenuType] = useState(JSON.parse(sessionStorage.getItem('reload'))  == 'Y' ? JSON.parse(sessionStorage.getItem('menuType')) : '');
   const loader = useRef(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
-  const location = useLocation();
-  const params = new URLSearchParams(location.search);
-  
+
   useEffect(() => {
     //스크롤 위로 가기
     const handleScroll = () => {
       setShowScrollButton(window.scrollY > 200);
     };
 
+    const handleBeforeUnload = () => {
+      //새로고침일 경우만
+      if (performance.navigation.type === 1) {
+        sessionStorage.setItem('reload', JSON.stringify('Y'));
+      }
+    };
+
     window.addEventListener('scroll', handleScroll);
+
+    // 새로 고침 이벤트 리스너 등록
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    const handlePageHide = () => {
+    //   //새로고침일 경우만 
+      if (performance.navigation.type === 1) {
+        sessionStorage.setItem('reload', JSON.stringify('Y'));
+      }
+    };
+    
+    // iOS Safari에서 페이지가 숨겨질 때(pagehide) 이벤트 리스너 등록
+    window.addEventListener('pagehide', handlePageHide);
+
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('pagehide', handlePageHide);
     };
   }, []);
 
-  const scrollPage = (position) => {
-    window.scrollTo({ top: Number(position), behavior: 'smooth' });
+  //페이지 스크롤링
+  const scrollPage = (position, behavior) => {
+    window.scrollTo({ top: Number(position), behavior: behavior });
   };
 
   useEffect(() => {
-    setKeyword(params.get('keyword') || '');
-    setMenuType(params.get('menu_type') || '');
 
-  }, [params]);
+      //새로고침, 뒤로가기 등 데이터 유지를 위한 세션 저장
+      sessionStorage.setItem('stocks' , JSON.stringify(stocks));
+      sessionStorage.setItem('skip', JSON.stringify(skip));
+      sessionStorage.setItem('menuType', JSON.stringify(menuType));
+      sessionStorage.setItem('keyword', JSON.stringify(keyword));
+      sessionStorage.setItem('hasMore', JSON.stringify(hasMore));
+      sessionStorage.setItem('initPage', JSON.stringify(initPage));
+      sessionStorage.removeItem('reload');
+      sessionStorage.removeItem('targetId');
 
+  }, [stocks])
+
+  //스크롤링을 위한 이벤트
   useEffect(() => {
-    
+
     const options = {
       root: null, // 루트 요소. 기본값은 브라우저의 뷰포트
       rootMargin: '0px', // 루트와 타겟 요소 사이의 여백
@@ -62,7 +92,7 @@ const Main = () => {
     return () => {
       observer.disconnect();
     };
-  }, [loader, hasMore, skip, initPage, params]);
+  }, [loader, hasMore, initPage, skip]);
 
   const handleObserver = (entries) => {
     const target = entries[0];
@@ -78,6 +108,7 @@ const Main = () => {
     }
   };
 
+  //공모주 데이터 통신
   const fetchStockList = async ({ skip, limit, keyword, loadMore = true, menuType }) => {
 
     let params = {
@@ -87,8 +118,6 @@ const Main = () => {
       menuType
     };
 
-
-    console.log(skip);
 
     try {
       const response = await axiosInstance.get('/stocks', { params });
@@ -120,29 +149,19 @@ const Main = () => {
 
   };
 
+  //검색 핸들러
   const onSearchHandler = (input_keyword) => {
 
-    // params.set('keyword', input_keyword); 
-    params.set('keyword', input_keyword);
-
-    window.location =`/?${params.toString()}`;
-      // window.location.href=`/?keyword=${input_keyword}`
-
-    // setKeyword(input_keyword);
-    // fetchStockList({ skip : 0, limit, keyword: input_keyword, menuType });
+    setKeyword(input_keyword);
+    fetchStockList({ skip : 0, limit, keyword: input_keyword, menuType });
   };
 
-  //일정 메뉴 
+  //메뉴 핸들러
   const menuTypeHandler = (menuType) => {
 
-    params.set('menu_type', menuType);
-    params.delete('keyword');
-
-    window.location = `/?${params.toString()}`;
-
-    // setMenuType(menuType);
-    // setKeyword('');
-    // fetchStockList({ skip : 0, limit, keyword: '', menuType: menuType });
+    setMenuType(menuType);
+    setKeyword('');
+    fetchStockList({ skip : 0, limit, keyword: '', menuType: menuType });
     
   }
   
@@ -154,12 +173,12 @@ const Main = () => {
       <div className='mb-5'>
         <FixedBar menuTypeHandler={(menuType) => menuTypeHandler(menuType)} menuType={menuType}/>
       </div>
-      <div className="grid gap-4 lg:grid-cols-2 lg:w-[1000px] sm:w-[600px] place-items-center">
+      <div className={`grid gap-4 ${stocks?.length > 0 ? 'lg:grid-cols-2' : ''} lg:w-[1000px] sm:w-[600px] place-items-center`}>
         <StockItems stocks={stocks} keyword={keyword} menuType={menuType}/>
       </div>
       {showScrollButton && (
   <button
-    onClick={() => {scrollPage(0)}}
+    onClick={() => {scrollPage(0, 'smooth')}}
     className="fixed w-[5%] bottom-8 right-8 p-2 bg-white text-gray-600 text-bold cursor-pointer shadow-md hover:shadow-lg transition duration-300 rounded-md"
   >
     ↑
