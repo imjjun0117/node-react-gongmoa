@@ -8,7 +8,8 @@ const initialState = {
     email: '',
     name: '',
     htel: '',
-    bookmark:[]
+    bookmark:[], 
+    notify:[]
   },
   isAuth: false,
   isLoading: false,

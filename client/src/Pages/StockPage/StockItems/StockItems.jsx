@@ -12,10 +12,13 @@ const StockItems = ({stocks}) => {
     if(JSON.parse(sessionStorage.getItem('reload')) === 'Y' && targetId){
 
       const targetDiv = document.getElementById(targetId);
-      targetDiv.scrollTop = 100;
-      console.log(targetDiv.scrollTop);
+      
+      if(targetDiv){
+        targetDiv.scrollTop = 100;
+  
+        targetDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-      targetDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     }
 
   },[])

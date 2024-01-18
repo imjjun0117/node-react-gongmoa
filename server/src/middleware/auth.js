@@ -72,7 +72,7 @@ const auth = async(req, res, next) => {
         WHERE user_id = ?
       `;
     
-      db.query(selectBookMark, [decoded._id], async (err2, bookmark) => {
+      db.query(selectBookMark, [decoded._id], (err2, bookmark) => {
     
         if(err2){
           return next(err2);
@@ -87,10 +87,55 @@ const auth = async(req, res, next) => {
         }
 
         user[0].bookmark = list;
-        req.user = user[0];
-        req.accessToken = await encodeJwt(user[0].id, expiredIn);
+
+        let selectNotify = 
+        `
+          SELECT 
+            n.id,
+            n.ipo_id,
+            n.notify_content,
+            n.url,
+            n.send_dt,
+            nu.read_yn,
+            nu.read_dt
+          FROM 
+            notify n
+          LEFT OUTER JOIN
+            notify_users nu
+          ON (n.id = nu.notify_id)
+          WHERE 
+            nu.user_id= ? 
+            AND n.del_yn = 'N'
+            AND now() <= DATE_ADD(send_dt, INTERVAL 9 DAY)
+          ORDER BY
+            n.send_dt DESC,
+            n.id ASC
+        `;
+
+        db.query(selectNotify, [decoded._id], async(err3, notify) => {
+
+          if(err3){
+            return next(err3);
+          }
+
+          let cnt = 0;
+          notify.map(item => {
+
+            if(item.read_yn === 'N'){
+              cnt ++;
+            }
+
+          })
+
+          user[0].notify = notify;
+          user[0].notify_cnt = cnt;
+          req.user = user[0];
+          req.accessToken = await encodeJwt(user[0].id, expiredIn);
+  
+          return next();
+        })
+
     
-        return next();
       })
 
   

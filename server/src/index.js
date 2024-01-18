@@ -5,7 +5,7 @@ const db = require('./databases/config/mysql.js');
 const cors = require('cors');
 const schedule = require('node-schedule');
 const ipoParsing = require('./databases/index.js');
-
+const {setStSub, setEndSub, setStForecast, setEndForecast} = require('./databases/ipoNotify.js')
 app.use(cors());
 app.use(express.json());
 
@@ -31,9 +31,19 @@ const port = 8080;
 app.listen(port, () => {
     console.log(`server start ${port}`);
 
-    schedule.scheduleJob('42 17 14 * * *', () => {
-      console.log('실행')
+    schedule.scheduleJob('00 35 18 * * *', () => {
+      // console.log('실행')
       ipoParsing(1);
+
+    })
+
+    schedule.scheduleJob('00 32 16 * * *', () => {
+      console.log('알림 보내는중...')
+      setStSub();
+      setEndSub();
+      setStForecast();
+      setEndForecast();
+      console.log('끝...')
 
     })
 

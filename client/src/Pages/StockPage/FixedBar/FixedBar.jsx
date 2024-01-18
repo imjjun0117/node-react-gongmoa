@@ -54,6 +54,16 @@ const FixedBar = ({menuType, menuTypeHandler}) => {
       >
         <span className="mx-1 text-sm sm:text-base"> 청약 예정 </span>
       </button>
+      <button
+        className={`flex items-center h-10 px-2 py-2 -mb-px text-center ${
+          menuType === 'bookmark'
+            ? 'text-indigo-600 border-b-2 border-indigo-500 hover:border-gray-400'
+            : 'text-gray-700 border-b-2 border-transparent hover:border-gray-400'
+        } sm:px-4 -px-1 whitespace-nowrap focus:outline-none`}
+        onClick={() => handleMenuClick('bookmark')}
+      >
+        <span className="mx-1 text-sm sm:text-base"> 즐겨찾기 </span>
+      </button>
     </div>
   </div>
   );

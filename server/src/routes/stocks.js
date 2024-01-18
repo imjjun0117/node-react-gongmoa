@@ -11,6 +11,10 @@ router.get('/', (req, res, next) => {
   body.skip && value.push(Number(body.skip));
   body.limit && value.push(Number(body.limit));
 
+  let token = req.headers.authorization;
+
+  console.log(token);
+
   //메뉴 타입에 따라 쿼리 분기처리
   let column = 
   `
@@ -28,9 +32,10 @@ router.get('/', (req, res, next) => {
   `
     CASE
       WHEN 
-        i.st_forecast_dt <= NOW() AND i.end_forecast_dt >= NOW()
-        OR
-        i.st_sub <= NOW() AND i.end_sub >= NOW()
+        (DATE_FORMAT(i.st_sub, '%Y-%m-%d 00:00:00') <= NOW() AND DATE_FORMAT(i.end_sub, '%Y-%m-%d 23:59:59.999') >= NOW())
+      THEN 4
+      WHEN 
+        (DATE_FORMAT(i.st_forecast_dt, '%Y-%m-%d 00:00:00') <= NOW() AND DATE_FORMAT(i.end_forecast_dt, '%Y-%m-%d 23:59:59.999') >= NOW())
       THEN 
         3
       WHEN 
@@ -60,12 +65,39 @@ router.get('/', (req, res, next) => {
       break;
     case 'forecast': 
       column = `'수요예측' as type`;
-      condition = 'AND DATEDIFF(i.st_forecast_dt, now()) >= 0';
+      condition = `
+      AND 
+      (
+        (
+          DATE_FORMAT(i.st_forecast_dt, '%Y-%m-%d 00:00:00') <= NOW() 
+          AND DATE_FORMAT(i.end_forecast_dt, '%Y-%m-%d 23:59:59.999') >= NOW()
+        ) 
+        OR DATEDIFF(i.st_forecast_dt, now()) >= 0
+      )
+      `;
       orderBy = 'ABS(DATEDIFF(i.st_forecast_dt, NOW())) ASC';
       break;
       case 'sub': 
       column = `'청약' as type`;
-      condition = 'AND DATEDIFF(i.st_sub, now()) >= 0';
+      condition = `AND 
+      (
+        (
+          DATE_FORMAT(i.st_sub, '%Y-%m-%d 00:00:00') <= NOW() 
+          AND DATE_FORMAT(i.end_sub, '%Y-%m-%d 23:59:59.999') >= NOW()
+          ) 
+          OR DATEDIFF(i.st_sub, now()) >= 0
+      )`;
+      orderBy = 'ABS(DATEDIFF(i.st_sub, NOW())) ASC';
+      break;
+      case 'bookmark': 
+      condition = `AND 
+      (
+        (
+          DATE_FORMAT(i.st_sub, '%Y-%m-%d 00:00:00') <= NOW() 
+          AND DATE_FORMAT(i.end_sub, '%Y-%m-%d 23:59:59.999') >= NOW()
+          ) 
+          OR DATEDIFF(i.st_sub, now()) >= 0
+      )`;
       orderBy = 'ABS(DATEDIFF(i.st_sub, NOW())) ASC';
       break;
 
@@ -113,6 +145,8 @@ router.get('/', (req, res, next) => {
     LIMIT ?, ?
     
   `;
+
+  console.log(selectQuery);
 
   db.query(selectQuery, value, (error, stock_list) => {
 

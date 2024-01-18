@@ -24,8 +24,9 @@ router.get('/auth', auth, (req, res, next) => {
       htel: user.htel,
       bookmark: user.bookmark,
       sms_yn : user.sms_yn,
-      sms_time : user.sms_time
-    
+      sms_time : user.sms_time,
+      notify: user.notify,
+      notify_cnt : user.notify_cnt
     }
 
   })
@@ -63,16 +64,6 @@ router.post('/register', enc, (req, res, next) => {
     return res.json({
       success: false,
       message: "유효하지 않은 닉네임 형식입니다."
-    })
-  }
-
-  //비밀번호 유효성 검사
-  let patternPassword =  /^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#$%^&*?_]).{8,16}$/;
-
-  if(!patternPassword.test(userInfo.password)){
-    return res.json({
-      success: false,
-      message: "비밀번호는 영문, 숫자, 특수문자 포함 8 ~ 16자로 입력해주세요."
     })
   }
 
@@ -776,6 +767,78 @@ router.post('/updateUser', auth, async (req, res, next) => {
       })
 
     })
+
+  })
+
+  router.post('/readNotify',auth, (req, res, next) => {
+
+    if(!req.body || !req.user.id){
+      return res.json({
+        success: false,
+        message: '필수 입력값이 누락되었습니다.'
+      })
+    }//end if
+
+    let selectNotifyUsers =
+    `
+      SELECT *
+      FROM notify_users
+      WHERE 
+        notify_id = ?
+        AND
+        user_id = ?
+    `
+
+    db.query(selectNotifyUsers, [req.body.id, req.user.id.toString()], (err, notify) => {
+
+      if(err){
+        return next(err);
+      }
+
+      if(!notify[0]){
+        return res.json({
+          success: false,
+          message : '잘못된 접근입니다.'
+        })
+      }
+
+      if(notify[0].read_yn === 'N'){
+
+        let updateNotify =
+        `
+          UPDATE notify_users
+          SET 
+            read_yn = 'Y',
+            read_dt = DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s')
+          WHERE 
+            notify_id = ?
+            AND 
+            user_id = ?
+        `
+    
+        db.query(updateNotify, [req.body.id, req.user.id.toString()], (err2, result) => {
+    
+          if(err2){
+            return next(err2);
+          }
+    
+          return res.json({
+            success: true,
+            message: '읽음처리 성공'
+          })
+    
+        })
+
+      }else{
+        return res.json({
+          success: true,
+          message: '이미 읽음'
+        })
+      }
+
+    })
+
+
 
   })
 

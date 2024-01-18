@@ -45,7 +45,6 @@ const Bookmark = ({id}) => {
 
       dispatch(bookMark(body)).then(() => {
         setFlag(true);
-        // fetchBookmark();
       });
 
     }else{
@@ -54,18 +53,8 @@ const Bookmark = ({id}) => {
   
   }
 
-  useEffect(() => {
-    
-    // if(isAuth) {
-    //   fetchBookmark();
-    // }else{
-    //   setBookmark([]);
-    // }
-
-  }, [dispatch, isAuth])
-
   return ( 
-    <span className={`${bookmark.indexOf(Number(id)) === -1 ? 'text-gray-300' : 'text-yellow-400'} hover:cursor-pointer hover:text-yellow-600 flex-shrink-0 ml-2`} onClick={() => bookMarkHandler(Number(id))}>
+    <span className={`${bookmark?.indexOf(Number(id)) === -1 ? 'text-gray-300' : 'text-yellow-400'} hover:cursor-pointer hover:text-yellow-600 flex-shrink-0 ml-2`} onClick={() => bookMarkHandler(Number(id))}>
       <FontAwesomeIcon icon={faStar} size="lg" />
     </span>
   )

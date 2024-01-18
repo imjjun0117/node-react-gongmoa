@@ -9,7 +9,8 @@ import { FaChartLine } from 'react-icons/fa';
 import { VscAccount } from "react-icons/vsc";
 import styled, { css } from "styled-components";
 import { IoIosSettings } from "react-icons/io";
-// import {DropdownMenu} from './NavItems/DropdownMenu';
+import { timeAgo } from '../../utils/jsUtils';
+import axiosInstance from '../../utils/axios';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -18,6 +19,8 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [acctMenu, setAcctMenu] = useState(false);
   const [alertMenu, setAlertMenu] = useState(false);
+  const notifyCnt = useSelector(state => state.user?.userData.notify_cnt);
+  const notify = useSelector(state => state.user?.userData.notify);
 
   const handleMenuToggle = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -50,14 +53,36 @@ const Navbar = () => {
     
   }
 
+  const handleNotify = (id, url, read_yn) => {
+
+    let body = {
+      id : id
+    }
+
+    if(read_yn === 'N'){
+      axiosInstance.post('/users/readNotify', body).then(res => {
   
+        if(res.data.success){
+          setAlertMenu(false);
+          navigate(url);
+        }else{
+          alert(res.data.message);
+        }
+  
+      })
+
+    }else{
+      setAlertMenu(false);
+      navigate(url);
+    }
+
+  }
+
   return (
     <nav className="bg-gray-900 fixed w-full z-20 top-0 start-0 border-b border-gray-600">
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
         <Link to={'/'}className="flex items-center space-x-3 rtl:space-x-reverse">
-          {/* <img src="https://flowbite.com/docs/images/logo.svg" className="h-8" alt="Flowbite Logo" /> */}
           <FaChartLine size={30} color="red" />
-
           <span className="self-center text-lg sm:text-lg md:text-2xl lg:text-3xl xl:text-4xl font-semibold whitespace-nowrap dark:text-white">공모아</span>
         </Link>
 
@@ -75,7 +100,6 @@ const Navbar = () => {
             </a>
           </> : 
           <>
-          {/* <button className='flex items-center text-white mr-10' onClick={onLogoutHandler}><MdOutlineLogout />&nbsp;&nbsp;로그아웃</button> */}
           <button className='flex items-center text-white mr-5 text-2xl' onClick={handleAcctMenu}><VscAccount /></button>
 
           {acctMenu && (
@@ -92,22 +116,25 @@ const Navbar = () => {
             
           )} 
             <button onClick={handleAlertMenu}>
-              <span className='absolute top-3 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 border-2 rounded-full'>
-                    2
-              </span>
+              {notifyCnt !== 0 && <span className='absolute top-3 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 border-2 rounded-full'>
+                  {notifyCnt}
+              </span>}
               <FaBell style={{ color: 'white', fontSize: '24px' }}/>
             </button>
           {alertMenu && (
             <AlertMenu>
               <span className="text-white px-2 py-2 text-lg mb-2 flex items-center"><FaBell style={{ color: 'white', fontSize: '12px' }}/>&nbsp;알림</span>
-              <a href="/users/account" className="px-4 py-2 text-sm flex items-center text-white hover:bg-gray-700 transition duration-300 rounded-md">
-              회원님이 즐겨찾기 하신 포스뱅크의 정보가 업데이트 됐습니다. 12분전
-              </a>
-              <hr className="my-2 border-t border-gray-300 opacity-50" />
+              {notify.map((item, idx) => (
+                <span key={idx}>
+                  <a href="#" className={`px-4 py-2 text-sm flex items-center ${item.read_yn === 'Y' ? 'text-gray-400' : 'text-white'} hover:bg-gray-700 transition duration-300 rounded-md`}
+                  onClick={() => handleNotify(item.id, item.url, item.read_yn)}
+                  >
+                  {item.notify_content} {timeAgo(item.send_dt)} 
+                  </a>
+                  <hr className="my-2 border-t border-gray-300 opacity-50" />
+                </span>
 
-              <a href="#" onClick={onLogoutHandler} className="px-4 py-2 text-sm flex items-center text-white-100 hover:bg-gray-700 transition duration-300 rounded-md">
-              회원님의 게시글에 댓글이 남겨졌습니다. 18분전
-              </a>
+              ))}
             </AlertMenu>  
           )} 
           </>}
