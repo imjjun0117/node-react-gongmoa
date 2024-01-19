@@ -8,12 +8,9 @@ router.get('/', (req, res, next) => {
   let body = req.query;
   let value = [];
   body.keyword && value.push(body.keyword);
+  body.menuType === 'bookmark' && value.push(body.setBookmark); //즐겨찾기 탭일 경우 북마크 목록 
   body.skip && value.push(Number(body.skip));
   body.limit && value.push(Number(body.limit));
-
-  let token = req.headers.authorization;
-
-  console.log(token);
 
   //메뉴 타입에 따라 쿼리 분기처리
   let column = 
@@ -90,15 +87,10 @@ router.get('/', (req, res, next) => {
       orderBy = 'ABS(DATEDIFF(i.st_sub, NOW())) ASC';
       break;
       case 'bookmark': 
-      condition = `AND 
-      (
-        (
-          DATE_FORMAT(i.st_sub, '%Y-%m-%d 00:00:00') <= NOW() 
-          AND DATE_FORMAT(i.end_sub, '%Y-%m-%d 23:59:59.999') >= NOW()
-          ) 
-          OR DATEDIFF(i.st_sub, now()) >= 0
-      )`;
-      orderBy = 'ABS(DATEDIFF(i.st_sub, NOW())) ASC';
+      condition = 
+      `
+        AND i.ipo_id IN (?)
+      `;
       break;
 
   }
@@ -145,8 +137,6 @@ router.get('/', (req, res, next) => {
     LIMIT ?, ?
     
   `;
-
-  console.log(selectQuery);
 
   db.query(selectQuery, value, (error, stock_list) => {
 

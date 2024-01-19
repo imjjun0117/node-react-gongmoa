@@ -4,6 +4,7 @@ import axiosInstance from '../../utils/axios';
 import SearchForm from './SearchForm';
 import FixedBar from './\bFixedBar/FixedBar';
 import Loading from '../../Layout/Loading'
+import { useSelector } from 'react-redux';
 
 const Main = () => {
   const limit = 12;
@@ -15,6 +16,7 @@ const Main = () => {
   const [menuType, setMenuType] = useState(JSON.parse(sessionStorage.getItem('reload'))  == 'Y' ? JSON.parse(sessionStorage.getItem('menuType')) : '');
   const loader = useRef(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
+  const bookmark = useSelector(state => state.user?.userData.bookmark);
 
   useEffect(() => {
     //스크롤 위로 가기
@@ -109,13 +111,14 @@ const Main = () => {
   };
 
   //공모주 데이터 통신
-  const fetchStockList = async ({ skip, limit, keyword, loadMore = true, menuType }) => {
+  const fetchStockList = async ({ skip, limit, keyword, loadMore = true, menuType, setBookmark = bookmark }) => {
 
     let params = {
       skip,
       limit,
       keyword,
-      menuType
+      menuType,
+      setBookmark
     };
 
 

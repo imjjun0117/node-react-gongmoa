@@ -23,16 +23,20 @@ const Navbar = () => {
   const notify = useSelector(state => state.user?.userData.notify);
 
   const handleMenuToggle = () => {
+    setAlertMenu(false);
+    setAcctMenu(false);
     setIsMenuOpen(!isMenuOpen);
   };
 
   const handleAcctMenu = () => {
     setAcctMenu(!acctMenu);
+    setIsMenuOpen(false);
     setAlertMenu(false);
   }
 
   const handleAlertMenu = () => {
     setAcctMenu(false);
+    setIsMenuOpen(false);
     setAlertMenu(!alertMenu);
   }
 
@@ -204,14 +208,21 @@ const AccountMenu = styled.div`
   opacity: 1;
   visibility: visible;
   transform: translate(-50%, 0);
+
+  @media (max-width: 767px) {
+    &::before {    
+      left: 55%;
+    }
+  }
+
 `;
 
 const AlertMenu = styled.div`
   position: absolute;
   top: 100%;
   transform: translateX(-50%);
-  width: 18rem;
-  left: 87.5%;
+  width: 24rem;
+  left:70%;
   padding: 0.5rem;
   margin-top: 10px;
   background-color: #4a5568;
@@ -244,6 +255,16 @@ const AlertMenu = styled.div`
   opacity: 1;
   visibility: visible;
   transform: translate(-50%, 0);
+
+  @media (max-width: 767px) {
+    /* 화면 폭이 767px 이하인 경우의 스타일 */
+    width: 20rem;
+    left: 55%;
+    &::before {    
+      left: 78%;
+    }
+  }
+  
 `;
 
 
