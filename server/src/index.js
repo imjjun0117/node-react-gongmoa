@@ -5,7 +5,8 @@ const db = require('./databases/config/mysql.js');
 const cors = require('cors');
 const schedule = require('node-schedule');
 const ipoParsing = require('./databases/index.js');
-const {setStSub, setEndSub, setStForecast, setEndForecast} = require('./databases/ipoNotify.js')
+const {setStSub, setEndSub, setStForecast, setEndForecast} = require('./databases/ipoNotify.js');
+const { emailSend } = require('./email/email.js');
 app.use(cors());
 app.use(express.json());
 
@@ -31,13 +32,13 @@ const port = 8080;
 app.listen(port, () => {
     console.log(`server start ${port}`);
 
-    schedule.scheduleJob('00 35 18 * * *', () => {
-      // console.log('실행')
+    schedule.scheduleJob('00 23 19 * * *', () => {
+      console.log('실행')
       ipoParsing(1);
 
     })
 
-    schedule.scheduleJob('00 32 16 * * *', () => {
+    schedule.scheduleJob('00 24 18 * * *', () => {
       console.log('알림 보내는중...')
       setStSub();
       setEndSub();

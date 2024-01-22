@@ -843,4 +843,14 @@ router.post('/updateUser', auth, async (req, res, next) => {
   })
 
 
+  router.post(`/emailChk`, (req, res, next) => {
+
+    let body = req.body;
+
+    console.log(body);
+
+
+  })
+
+
 module.exports = router;

@@ -7,7 +7,7 @@ import { MdOutlineLogin, MdOutlineLogout, MdPersonAdd } from "react-icons/md";
 import { logoutUser } from '../../action/userAction';
 import { FaChartLine } from 'react-icons/fa';
 import { VscAccount } from "react-icons/vsc";
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 import { IoIosSettings } from "react-icons/io";
 import { timeAgo } from '../../utils/jsUtils';
 import axiosInstance from '../../utils/axios';
@@ -244,7 +244,7 @@ const AlertMenu = styled.div`
   .dropdown-link {
     display: block;
     padding: 0.5rem;
-    text-decoration: none;
+    text-decoration: none;w
     color: white;
     transition: background-color 0.3s;
 
