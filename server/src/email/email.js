@@ -3,10 +3,11 @@ const dotenv = require('dotenv');
 const { authMail } = require('./templates/mail_template');
 dotenv.config();
 
+//이메일 환경설정
 const smtpTransport = nodemailer.createTransport({
 
-  pool: true,
-  maxConnection: 1,
+  // pool: true,
+  // maxConnection: 1,
   service: 'naver',
   host: 'smtp.naver.com',
   port: 587,
@@ -23,29 +24,31 @@ const smtpTransport = nodemailer.createTransport({
 
 })
 
+//이메일 전송 로직
 const emailSend = async(req, res) => {
 
-  console.log('실행이메일')
+  const to = req.body.email;
+  const subject = req.body.subject;
+  const html = req.body.html;
+  const data = req.body.data;
 
   const mailOptions = {
-    from : 'imjjun0117@naver.com',
-    to: 'imjjun0117@naver.com',
-    subject : '공모아에서 인증번호 발신입니다.',
-    html : authMail
+    from : process.env.SMTP_EMAIL,
+    to: to,
+    subject : subject,
+    html : html
   }
 
   smtpTransport.sendMail(mailOptions, (err, response) => {
 
-    console.log(response);
-
     if(err){
 
-      // res.json({success: false, msg: '메일 전송 중 오류가 발생했습니다.'});
+      res.json({success: false, msg: '메일 전송 중 오류가 발생했습니다.'});
       smtpTransport.close();
       
     }else{
-      
-      // res.json({success: true, msg: '메일 전송에 성공하였습니다.'});
+  
+      res.json({ success: true, msg: '메일 전송에 성공하였습니다.', data: data });
       smtpTransport.close();
 
     }
@@ -56,4 +59,17 @@ const emailSend = async(req, res) => {
 
 }
 
-module.exports = {emailSend}
+//10자리 대문자+숫자 형식 난수 생성(이메일 인증)
+const  generateRandomCode = () => {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let result = '';
+
+  for (let i = 0; i < 10; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    result += characters.charAt(randomIndex);
+  }
+
+  return result;
+}
+
+module.exports = {emailSend, generateRandomCode}

@@ -7,6 +7,9 @@ const {encodeJwt, encPwd} = require('../utils/jwt');
 const auth = require('../middleware/auth');
 const axios = require('axios');
 const dotenv = require('dotenv');
+const { generateRandomCode, emailSend } = require('../email/email');
+const { authMail } = require('../email/templates/mail_template');
+
 dotenv.config();
 
 router.get('/auth', auth, (req, res, next) => {
@@ -39,7 +42,7 @@ router.post('/register', enc, (req, res, next) => {
 
   let userInfo = {...req.body};
 
-  if(!userInfo.email || !userInfo.name || !userInfo.password || !userInfo.htel){
+  if(!userInfo.email || !userInfo.name || !userInfo.password || !userInfo.code){
     return res.json({
       success: false,
       message: "필수 입력값이 누락되었습니다."
@@ -66,16 +69,6 @@ router.post('/register', enc, (req, res, next) => {
       message: "유효하지 않은 닉네임 형식입니다."
     })
   }
-
-  //핸드폰 유효성 검사
-  let patternPhone =  /^(01[016789]{1})-[0-9]{3,4}-[0-9]{4}$/;
-
-  if(!patternPhone.test(userInfo.htel)){
-    return res.json({
-      success: false,
-      message: "핸드폰 번호가 유효하지 않습니다."
-    })
-  }
   
   let selectUser =
   `
@@ -97,68 +90,110 @@ router.post('/register', enc, (req, res, next) => {
       })
     }//end if
 
-    let selectMaxId = 
+    let selectCode = 
     `
-      SELECT 
-        IFNULL(MAX(id),0)+1 as id
-      FROM users;
+      SELECT *
+      FROM email_code
+      WHERE
+            email=?
+        AND code=?
     `
 
-    
-    db.query(selectMaxId, (err2, id) => {
-      
+    db.query(selectCode, [userInfo.email, userInfo.code], (err2, result) => {
+
       if(err2){
         return next(err2);
       }
-    
+
+      if(!result[0]){
+        return res.json({
+          success: false,
+          message: "인증번호가 틀렸습니다."
+        })
+      }
       
-      let maxId = id[0].id;
-    
-      let insertUser = 
-      `
-        INSERT INTO
-          users
-          (
-            id,
-            email,
-            name,
-            password,
-            htel,
-            admin_yn,
-            reg_dt,
-            del_yn
+      if(result[0].is_checked !== 'Y'){
+        return res.json({
+          success: false,
+          message: "이메일 인증을 진행해주세요."
+        })
+      }
 
-          )
-        values
-          (
-            ?,
-            ?,
-            ?,
-            ?,
-            ?,
-            'N',
-            NOW(),
-            'N'
-          )      
+      let deleteCode = 
+      `
+        DELETE 
+        FROM
+          email_code
+        WHERE 
+          email = ?
       `
 
-      db.query(insertUser, [maxId, userInfo.email, userInfo.name, userInfo.password, userInfo.htel], (err3, result) => {
+      db.query(deleteCode, [userInfo.email], (err3, result) => {
 
         if(err3){
           return next(err3);
         }
 
-        return res.status(200).json({
-          success: true,
-          message: "회원가입을 완료했습니다."
+        let selectMaxId = 
+        `
+          SELECT 
+            IFNULL(MAX(id),0)+1 as id
+          FROM users;
+        `
+    
+        
+        db.query(selectMaxId, (err4, id) => {
+          
+          if(err4){
+            return next(err4);
+          }
+        
+          
+          let maxId = id[0].id;
+        
+          let insertUser = 
+          `
+            INSERT INTO
+              users
+              (
+                id,
+                email,
+                name,
+                password,
+                admin_yn,
+                reg_dt,
+                del_yn
+    
+              )
+            values
+              (
+                ?,
+                ?,
+                ?,
+                ?,
+                'N',
+                NOW(),
+                'N'
+              )      
+          `
+    
+          db.query(insertUser, [maxId, userInfo.email, userInfo.name, userInfo.password], (err5, result) => {
+    
+            if(err5){
+              return next(err5);
+            }
+    
+            return res.status(200).json({
+              success: true,
+              message: "회원가입을 완료했습니다."
+            })
+    
+          })
+    
         })
-
       })
-
     })
-
   })
-
 })
 
 //로그인관련 로직
@@ -235,21 +270,8 @@ router.post('/logout', auth, (req, res, next) => {
 
   try{
 
-    //카카오 계정일 경우
-    // if(req.user.id.toString().indexOf('kakao_') !== -1){
-    //   let kakaoToken = req.headers.kakaoauthorization;
-    //   console.log(kakaoToken);
-    //   if(kakaoToken){
-    //     kakaoToken = kakaoToken.replaceAll('Gongmoa_','');
-    //     axios.post('https://kapi.kakao.com/v1/user/logout', {}, {Authorization: `Bearer ${kakaoToken}`,
-    //     }).then(res => {
-    //       console.log('dsa;lkd;lsa');
-    //     })
-
-    //   }
-    // }
-
     return res.sendStatus(200);
+
   }catch(error){
     return next(error);
   }
@@ -770,7 +792,7 @@ router.post('/updateUser', auth, async (req, res, next) => {
 
   })
 
-  router.post('/readNotify',auth, (req, res, next) => {
+  router.post('/readNotify', auth, (req, res, next) => {
 
     if(!req.body || !req.user.id){
       return res.json({
@@ -843,14 +865,148 @@ router.post('/updateUser', auth, async (req, res, next) => {
   })
 
 
-  router.post(`/emailChk`, (req, res, next) => {
+  //이메일 본인인증
+  router.post(`/sendCode`, (req, res, next) => {
 
     let body = req.body;
 
-    console.log(body);
+    if(!body.email){
+      return res.json({
+        success: false,
+        message: '이메일을 입력해주세요'
+      })
+    }
+
+    //이메일 유효성 검사
+    let patternEmail =  /^[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
+
+    if(!patternEmail.test(body.email)){
+      return res.json({
+        success: false,
+        message: "이메일 형식이 아닙니다."
+      })
+    }
+
+    let selectUser =
+      `
+        SELECT * 
+        FROM users
+        WHERE email=?
+      `
+
+
+    db.query(selectUser, [body.email], (err, user) => {
+
+      if(err){
+        return next(err);
+      }
+
+      if(user[0]){
+        return res.json({
+          success: false,
+          message: "해당 이메일로 가입된 정보가 존재합니다."
+        })
+      }//end if
+
+      //인증코드 생성
+      let code = generateRandomCode();
+    
+      let setCode = 
+      `
+        INSERT INTO 
+        email_code
+        (
+          email,
+          code,
+          reg_dt,
+          expired_dt
+        )
+        VALUES
+        (
+          ?,
+          ?,
+          DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s'),
+          DATE_FORMAT(NOW() + INTERVAL 5 MINUTE, '%Y-%m-%d %H:%i:%s')
+        )
+      
+      `
+  
+      db.query(setCode, [body.email, code], (err2) => {
+  
+        if(err2){
+          return next(err2);
+        }//end if
+        
+        //이메일 템플릿 생성
+        let html = authMail.replaceAll('%%%@@%%%', code);
+    
+        body.html = html;
+        body.subject = '공모아에서 인증번호 발신입니다.'
+        
+        emailSend(req, res);
+  
+      })
+    })
 
 
   })
+  
+  
+  //이메일 코드 확인
+  router.post(`/codeChk`, (req, res, next) => {
+    
+    let body = req.body;
+    
+
+    let selectCode = 
+    `
+      SELECT
+        email,
+        code,
+        reg_dt
+      FROM email_code
+      WHERE 
+            email = ? 
+        AND code = ?
+        AND is_checked='N'
+    `
+    db.query(selectCode, [body.email, body.code], (err, result) => {
+
+      if(err){
+        return next(err);
+      }
+
+      if(result.length !== 1){
+        return res.json({
+          success: false,
+          message: '인증번호가 일치하지 않습니다.\n다시 시도해주세요.'
+        })
+      }
+      if(new Date(result[0].expired_dt) < new Date()){
+        return res.json({
+          success: false,
+          message: '인증시간이 만료되었습니다.'
+        })
+        
+      }
+
+      db.query(`UPDATE email_code SET is_checked='Y' WHERE email = ? AND code = ?`, [body.email, body.code], (err2)=> {
+        
+        if(err2){
+          return next(err2);
+        }
+
+        return res.json({
+          success: true,
+          message: '인증번호 확인이 되었습니다.'
+        })
+
+      })
+
+    })
+
+  })
+
 
 
 module.exports = router;

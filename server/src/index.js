@@ -6,7 +6,10 @@ const cors = require('cors');
 const schedule = require('node-schedule');
 const ipoParsing = require('./databases/index.js');
 const {setStSub, setEndSub, setStForecast, setEndForecast} = require('./databases/ipoNotify.js');
-const { emailSend } = require('./email/email.js');
+
+const dotenv = require('dotenv');
+
+dotenv.config();
 app.use(cors());
 app.use(express.json());
 
@@ -19,6 +22,7 @@ app.use((error, req, res, next) => {
   res.status(error.status || 500);
   res.send(error.message || '서버에서 일시적인 오류가 발생했습니다.');
 })
+
 
 app.get('/', (req, res, next) => {
 

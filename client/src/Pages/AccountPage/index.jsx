@@ -60,7 +60,7 @@ const AccountPage = () => {
     }
 
     if(isKakao){
-      console.log('----탔음');
+      
       dispatch(updateKakao(body)).then(response => {
   
 

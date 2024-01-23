@@ -12,7 +12,7 @@ let authMail = `
     <tbody><tr><td rowspan="3" style="width:65px;"></td><td style="padding:85px 0 30px;text-align:left;line-height:28px;color:#333;font-size:20px;">
           이메일 인증번호를 발급해드렸습니다. <br>
         </td><td rowspan="3" style="width:65px;"></td></tr><tr><td style="padding:38px 0;background-color:#f7f7f8;text-align:center;line-height:36px;font-size:30px;font-weight:bold;">
-          XJ30125DFD
+          %%%@@%%%
         </td></tr><tr><td style="padding:30px 0 70px;">
           <table cellpadding="0" cellspacing="0" style="border-spacing:0;border-collapse:collapse;">
             <tbody><tr><td style="width:180px;height:60px;line-height:0;"></td><td style="width:250px;height:60px;">

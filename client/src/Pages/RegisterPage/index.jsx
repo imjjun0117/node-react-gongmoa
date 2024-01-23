@@ -9,10 +9,12 @@ const RegisterPage = () => {
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  
-  const payload = useSelector(state => state.user?.payload);
-  const [showAuth, setShowAuth] = useState(false);
 
+  const [showAuth, setShowAuth] = useState(false);
+  const [isEmailAuth, setIsEmailAuth] = useState(false);
+  const [timeRemaining, setTimeRemaining] = useState(5 * 60);
+  const [email, setEmail] = useState('');
+  
   const {
     register,
     handleSubmit,
@@ -21,8 +23,47 @@ const RegisterPage = () => {
     formState: {errors},
     reset
   } = useForm({mode: 'onSubmit'});
+
+  useEffect(() => {
+
+    setTimeRemaining(5 * 60);
+
+    // showAuth 값이 true일 때 타이머 시작
+    if (showAuth) {
+
+      const timerId = setInterval(() => {
+      
+        setTimeRemaining((prevTime) => {
+        
+          if(document.getElementById('email').value !== email){
+            setShowAuth(false);
+            setIsEmailAuth(false);
+            clearInterval(timerId);
+          }
+
+          if (prevTime === 0) {
+            // 타이머가 0이면 clearInterval로 타이머 중지
+            clearInterval(timerId);
+            setShowAuth(false); // 원하는 동작 수행 (예: 인증 유효시간 종료)
+          }
+          return prevTime - 1;
+
+        });
+
+      }, 1000);
+
+      // 컴포넌트가 언마운트되면 타이머 해제
+      return () => clearInterval(timerId);
+    }
+  }, [showAuth, isEmailAuth]);
+
   
-  const onSubmit = ({email, password, confirm_password, name}) => {
+  const onSubmit = ({email, password, confirm_password, name, code}) => {
+
+    if(!isEmailAuth){
+      alert('이메일 인증을 완료해주세요');
+      return false;
+    }
 
     if(password !== confirm_password){
       alert('비밀번호 확인이 틀렸습니다.');
@@ -34,7 +75,7 @@ const RegisterPage = () => {
       email: email,
       password: password,
       name: name,
-    
+      code : code
     }
 
     dispatch(registerUser(body)).then(response => {
@@ -78,7 +119,7 @@ const RegisterPage = () => {
       message: "영문, 숫자, 특수문자 포함 8 ~ 16자로 입력해주세요." 
     }
   }
-
+  
   const userConfirmPassword = {
     required : "비밀번호를 확인해주세요.",
     validate: {
@@ -89,31 +130,104 @@ const RegisterPage = () => {
     }
   }
 
-  const handleAuthCheck = () => {
+  const userCode = {
+    required: "인증번호를 입력해주세요."
+  }
 
-    const email = document.getElementById('email').value;
+  const sendCode = () => {
 
-    //이메일 유효성 검사
-    let patternEmail =  /^[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
+    let setFlag = true;
+    setShowAuth(false);
+    setIsEmailAuth(false);
 
-    if(!patternEmail.test(email)){
-      alert('이메일 형식이 아닙니다.')
-      return false
-    }
+    if(setFlag){
+      setFlag = false;
+      const email = document.getElementById('email').value;
+  
+      if(!email){
+        alert('이메일을 입력해주세요.');
+        return false;
+      }
 
-    let body = {
-      email : email
-    }
+      //이메일 유효성 검사
+      let patternEmail =  /^[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
+  
+      if(!patternEmail.test(email)){
+        alert('이메일 형식이 아닙니다.')
+        return false
+      }
+  
+      let body = {
+        email : email
+      }
+  
+      axiosInstance.post(`/users/sendCode`, body).then(res => {
+    
+        if(!res.data.success){
+          alert(res.data.message);
+          return false;
+        }
+  
+        alert('인증번호를 전송하였습니다.');
+        setShowAuth(true);
+        setFlag = true;
+        setEmail(email);
+      })
 
-    axiosInstance.post(`/users/emailChk`, body).then(res => {
+    }else{
 
-      console.log(res.data);
+      alert('처리중입니다. 잠시만 기다려주세요.');
 
-    })
-
-    setShowAuth(true);
+    }//end else
 
   }
+
+  const codeChk = () => {
+
+    if(isEmailAuth){
+      alert('이미 인증이 완료된 상태입니다.')
+      return false;
+    }
+
+    if(timeRemaining === 0){
+      alert('인증 시간이 만료되었습니다.\n다시 시도해주세요.')
+      return false;
+    }//end if
+
+    const email = document.getElementById('email').value;
+    const code = document.getElementById('code').value;
+
+    if(code){
+
+      let body = {
+        email : email,
+        code : code
+      }
+
+
+      axiosInstance.post('/users/codeChk', body).then(res => {
+
+        if(!res.data.success){
+          alert(res.data.message);
+          return false;
+        }
+
+        setIsEmailAuth(true);
+
+      })
+
+
+    }
+
+
+
+  }
+
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+  };
 
 
   return (
@@ -144,9 +258,9 @@ const RegisterPage = () => {
                   <button
                     type="button"
                     className=" text-white w-full bg-blue-500 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-2 py-2.5"
-                    onClick={handleAuthCheck}
+                    onClick={sendCode}
                     >
-                    인증 코드 전송
+                    인증 코드 발송
                   </button>   
                 </div>
               </div>
@@ -158,17 +272,61 @@ const RegisterPage = () => {
                     </span>
                   </div>
                 }
-              <div className={`${showAuth ? 'block' : 'hidden'} w-[50%]`}>
-                <label htmlFor="auth_key" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">인증번호</label>
-                <input
-                  type="text"
-                  name="auth_key"
-                  id="auth_key"
-                  className="border sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="인증번호를 입력해주세요."
-                  {...register('authCode',userEmail)}
-                />
+              {showAuth &&
+                <div className={`flex justify-between`}>
+                  <div className='w-[50%]'>
+                    <label htmlFor="auth_key" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">인증번호</label>
+                    <input
+                      type="text"
+                      name="code"
+                      id="code"
+                      className="border sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="인증번호를 입력해주세요."
+                      maxLength={10}
+                      {...register('code',userCode)}
+                      readOnly={isEmailAuth}                  
+                    />
+                  </div>
+                  <div className='w-[15%] mt-9'>
+                    {
+                      isEmailAuth ? (
+                        <span className='text-green-500 text-sm'>
+                        인증완료
+                        </span>
+
+                      ) : (
+                        <span className='text-red-500 text-sm'>
+                        {formatTime(timeRemaining)}
+                        </span>
+
+                      )
+                    }
+                  </div>
+                  {
+                    !isEmailAuth &&
+                    <div className='w-[27%]'>
+                      <label htmlFor="auth" className="block mb-2 text-sm font-medium text-gray-900">
+                        &nbsp;
+                      </label>
+                      <button
+                        type="button"
+                        className=" text-white w-full bg-blue-500 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-2 py-2.5"
+                        onClick={codeChk}
+                        >
+                        인증하기
+                      </button>   
+                    </div>
+                  }
+                </div>
+              }
+              {
+              errors?.code && 
+              <div>
+                <span className='text-red-500'>
+                  {errors.code.message}
+                </span>
               </div>
+              }
               <div>
                 <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">비밀번호</label>
                 <input
