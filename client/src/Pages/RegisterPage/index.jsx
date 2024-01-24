@@ -204,7 +204,6 @@ const RegisterPage = () => {
         code : code
       }
 
-
       axiosInstance.post('/users/codeChk', body).then(res => {
 
         if(!res.data.success){
@@ -216,10 +215,7 @@ const RegisterPage = () => {
 
       })
 
-
     }
-
-
 
   }
 
@@ -241,7 +237,7 @@ const RegisterPage = () => {
             <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit(onSubmit)}>
               <div className='flex justify-between'>
                 <div className='w-[70%]'>
-                  <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">이메일</label>
+                  <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">이메일<span className='text-red-500'> (필수)</span></label>
                   <input
                     type="email"
                     name="email"
@@ -328,7 +324,7 @@ const RegisterPage = () => {
               </div>
               }
               <div>
-                <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">비밀번호</label>
+                <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">비밀번호<span className='text-red-500'> (필수)</span></label>
                 <input
                   type="password"
                   name="password"
@@ -366,7 +362,7 @@ const RegisterPage = () => {
                   }
               </div>
               <div>
-                <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">닉네임</label>
+                <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">닉네임<span className='text-red-500'> (필수)</span></label>
                 <input
                   type="text"
                   name="name"

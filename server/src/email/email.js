@@ -39,7 +39,7 @@ const emailSend = async(req, res) => {
     html : html
   }
 
-  smtpTransport.sendMail(mailOptions, (err, response) => {
+  smtpTransport.sendMail(mailOptions, (err) => {
 
     if(err){
 
@@ -72,4 +72,24 @@ const  generateRandomCode = () => {
   return result;
 }
 
-module.exports = {emailSend, generateRandomCode}
+
+const cleanEmailCode = () => {
+
+  let deleteEmailCode = 
+  `
+    DELETE 
+    FROM email_code
+    WHERE 
+      expired_dt < DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s')
+  `
+
+  db.query(deleteEmailCode, (err) => {
+    if(err){
+      console.error('email_code 테이블 정리 중 에러발생 : ',err);
+    }
+
+  })
+
+}
+
+module.exports = {emailSend, generateRandomCode, cleanEmailCode}

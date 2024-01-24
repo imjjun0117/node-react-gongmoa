@@ -111,7 +111,7 @@ const LoginPage = () => {
                     <label htmlFor="remember" className="text-gray-500 dark:text-gray-300">로그인 상태 유지</label>
                   </div>
                 </div>
-                <a href="#" className="text-sm font-medium text-primary-600 hover:underline dark:text-blue-300">비밀번호를 잊으셨나요?</a>
+                <a href="/users/findPwd" className="text-sm font-medium text-primary-600 hover:underline dark:text-blue-300">비밀번호를 잊으셨나요?</a>
               </div>
               <button
                 type="submit"

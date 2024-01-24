@@ -3,12 +3,11 @@ const router = express.Router();
 const db = require('../databases/config/mysql');
 const {enc}  = require('../middleware/bcrypt');
 const bcrypt = require('bcryptjs');
-const {encodeJwt, encPwd} = require('../utils/jwt');
+const {encodeJwt, encPwd, decodeJwt} = require('../utils/jwt');
 const auth = require('../middleware/auth');
-const axios = require('axios');
 const dotenv = require('dotenv');
 const { generateRandomCode, emailSend } = require('../email/email');
-const { authMail } = require('../email/templates/mail_template');
+const { authMail, findPassword } = require('../email/templates/mail_template');
 
 dotenv.config();
 
@@ -26,8 +25,7 @@ router.get('/auth', auth, (req, res, next) => {
       name: user.name,
       htel: user.htel,
       bookmark: user.bookmark,
-      sms_yn : user.sms_yn,
-      sms_time : user.sms_time,
+      email_yn : user.email_yn,
       notify: user.notify,
       notify_cnt : user.notify_cnt
     }
@@ -253,9 +251,7 @@ router.post('/login', (req, res, next) => {
         id: user[0].id,
         email: user[0].email,
         name: user[0].name,
-        htel: user[0].htel,
-        sms_yn : user[0].sms_yn,
-        sms_time : user[0].sms_time
+        email_yn : user[0].email_yn
       },
       remember: userInfo.remember
     })
@@ -518,7 +514,7 @@ router.post('/kakao/addTel', auth, (req, res, next) => {
 
 })
 
-
+//개인정보 수정 비밀번호 확인 로직
 router.post(`/checkPwd`, auth, async (req, res, next) => {
 
   let body = req.body;
@@ -575,14 +571,14 @@ router.post('/updateUser', auth, async (req, res, next) => {
 
   let userInfo = {...req.body};
 
-  if(!userInfo.email || !userInfo.name || !userInfo.htel){
+  if(!userInfo.email || !userInfo.name){
     return res.json({
       success: false,
       message: "필수 입력값이 누락되었습니다."
     })
   }
 
-  let data = [userInfo.email, userInfo.name, userInfo.htel];
+  let data = [userInfo.email, userInfo.name];
   let targetUpdate = '';
   
   //이메일 유효성 검사
@@ -593,6 +589,59 @@ router.post('/updateUser', auth, async (req, res, next) => {
       success: false,
       message: "이메일 형식이 아닙니다."
     })
+  }
+
+  //이메일이 변경된 경우 본인인증 여부 확인
+  if(req.user.email !== userInfo.email){
+
+    let selectCode = 
+    `
+      SELECT *
+      FROM email_code
+      WHERE
+            email=?
+        AND code=?
+    `
+
+    db.query(selectCode, [userInfo.email, userInfo.code], (err2, result) => {
+
+      if(err2){
+        return next(err2);
+      }
+
+      if(!result[0]){
+        return res.json({
+          success: false,
+          message: "인증번호가 틀렸습니다."
+        })
+      }
+      
+      if(result[0].is_checked !== 'Y'){
+        return res.json({
+          success: false,
+          message: "이메일 인증을 진행해주세요."
+        })
+      }
+
+      let deleteCode = 
+      `
+        DELETE 
+        FROM
+          email_code
+        WHERE 
+          email = ?
+      `
+
+      db.query(deleteCode, [userInfo.email], (err3, result) => {
+
+        if(err3){
+          return next(err3);
+        }
+
+      })
+
+    })
+
   }
 
   //닉네임 유효성 검사
@@ -622,32 +671,15 @@ router.post('/updateUser', auth, async (req, res, next) => {
 
   }
 
-  //핸드폰 유효성 검사
-  let patternPhone =  /^(01[016789]{1})-[0-9]{3,4}-[0-9]{4}$/;
-
-  if(!patternPhone.test(userInfo.htel)){
-    return res.json({
-      success: false,
-      message: "핸드폰 번호가 유효하지 않습니다."
-    })
-  }
   
-  if(userInfo.sms_yn){
+  if(userInfo.email_yn){
     
     data.push('Y');
     
-    if(['30m','1h','2h'].indexOf(userInfo.sms_time) === -1){
-      return res.json({
-        success: false,
-        message: "시간을 설정해주세요."
-      })
-    }
-    
-    data.push(userInfo.sms_time);
-    
   }else{
+
     data.push('N');
-    data.push('');
+
   }
   
   data.push(req.user.id);
@@ -679,16 +711,12 @@ router.post('/updateUser', auth, async (req, res, next) => {
       SET 
         email=?,
         name=?,
-        htel=?,
         update_dt=NOW(),
         ${targetUpdate}
-        sms_yn=?,
-        sms_time=?
+        email_yn=?
       WHERE 
         id=?
     `
-
-    console.log(updateUser, data);
 
     db.query(updateUser, data, (err3, result) => {
 
@@ -1008,5 +1036,137 @@ router.post('/updateUser', auth, async (req, res, next) => {
   })
 
 
+  //회원 비밀번호 찾기 로직
+  router.post(`/findPwd`, (req, res, next) => {
+
+    let body = req.body;
+
+    if(!body.email){
+      return res.json({
+        success: false,
+        message:'이메일을 입력해주세요'
+      })
+    }
+
+     //이메일 유효성 검사
+    let patternEmail =  /^[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
+
+    if(!patternEmail.test(body.email)){
+      return res.json({
+        success: false,
+        message: "이메일 형식이 아닙니다."
+      })
+    }
+
+    let selectUser = 
+    `
+      SELECT *
+      FROM users
+      WHERE email=?
+    `
+
+    db.query(selectUser, [body.email], async(err, result) => {
+
+      if(err){
+        return next(err);
+      }
+
+      if(!result[0]){
+        return res.json({
+          success: false,
+          message: '해당 이메일은 가입된 이력이 없습니다.'
+        })
+      }
+
+      req.body.subject = '공모아에서 비밀번호 찾기 요청 결과 발신입니다.';
+
+      const accessToken = await encodeJwt(body.email, '1h');
+      req.body.html = findPassword.replaceAll('%%email%%', body.email).replaceAll('%%token%%', accessToken);
+
+      emailSend(req, res);
+
+    })
+
+  })
+
+
+  router.post('/updatePwd', async(req, res, next) => {
+
+    let body = req.body;
+
+    if(!body.email || !body.token){
+      return res.json({
+        success: false,
+        message: '잘못된 접근입니다. 다시 시도해주세요'
+      })
+    }
+
+    if(!body.password){
+      return res.json({
+        success: false,
+        message: '비밀번호가 누락되었습니다.'
+      })
+    }
+    
+    const decoded = await decodeJwt(body.token);
+    const encoded = await encPwd(body.password);
+
+    if(!decoded._id || decoded._id !== body.email){
+      return res.json({
+        success: false,
+        message: '잘못된 토큰입니다.\n다시 시도해주세요.'
+      })
+    }
+
+
+    let selectUser = 
+    `
+      SELECT *
+      FROM users
+      WHERE email = ?
+    `
+
+    db.query(selectUser, [body.email], (err, user) => {
+
+      if(err){
+        return next(err)
+      }
+
+      if(!user[0]){
+        return res.json({
+          success: false,
+          message: '해당 이메일로 가입된 정보가 없습니다.'
+        })
+      }
+
+      let updateUser = 
+      `
+        UPDATE
+          users
+        SET
+          password=?
+        WHERE
+          id=?
+      `
+      
+
+      db.query(updateUser, [encoded, user[0].id], (err2, result) => {
+
+        if(err2){
+          return next(err2);
+        }
+
+        return res.json({
+          success: true,
+          message: '비밀번호가 변경되었습니다. 로그인을 시도해주세요.'
+        })
+
+      })
+
+    })
+
+
+
+  })
 
 module.exports = router;

@@ -18,7 +18,8 @@ import KakaoHtelAdd from './Pages/LoginPage/Kakao/KakaoHtelAdd';
 import StockCalendar from './Pages/StockCalendar';
 import CheckPassword from './Pages/AccountPage/CheckPassword/CheckPassword';
 import AccountPage from './Pages/AccountPage/index';
-import ScrollRestoration from './scrollRestoration/scrollRestoration';
+import FindPassword from './Pages/FindPassword/index';
+import UpdatePassword from './Pages/FindPassword/UpdatePassword/UpdatePassword';
 
 function Layout() {
   return (
@@ -77,6 +78,8 @@ function App(){
           <Route path="login" element={<LoginPage/>}/>
           <Route path="register" element={<RegisterPage/>}/>
           <Route path="kakao/callback" element={<KakaoRedirectHandler/>}/>
+          <Route path="users/findPwd" element={<FindPassword/>}/>
+          <Route path="users/updatePwd" element={<UpdatePassword/>}/>
         </Route>
       </Route>
 

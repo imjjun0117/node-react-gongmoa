@@ -68,7 +68,6 @@ const userSlice = createSlice({
     .addCase(authUser.fulfilled, (state, action) => {
       state.isLoading = false;
       state.userData = action.payload.userData;
-      console.log(action.payload.userData.accessToken);
       localStorage.setItem('accessToken', action.payload.userData.accessToken);
       state.isAuth = true;
     })
@@ -165,6 +164,7 @@ const userSlice = createSlice({
       state.error = action.payload;
       
     })
+   
   }
     
 

@@ -8,11 +8,11 @@ const ipoParsing = require('./databases/index.js');
 const {setStSub, setEndSub, setStForecast, setEndForecast} = require('./databases/ipoNotify.js');
 
 const dotenv = require('dotenv');
+const { cleanEmailCode } = require('./email/email.js');
 
 dotenv.config();
 app.use(cors());
 app.use(express.json());
-
 
 //라우터 설정
 app.use('/stocks', require('./routes/stocks'));
@@ -39,7 +39,7 @@ app.listen(port, () => {
     schedule.scheduleJob('00 23 19 * * *', () => {
       console.log('실행')
       ipoParsing(1);
-
+      cleanEmailCode();
     })
 
     schedule.scheduleJob('00 24 18 * * *', () => {
@@ -48,7 +48,7 @@ app.listen(port, () => {
       setEndSub();
       setStForecast();
       setEndForecast();
-      console.log('끝...')
+      console.log('끝...');
 
     })
 

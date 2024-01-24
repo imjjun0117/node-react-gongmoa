@@ -11,6 +11,7 @@ const KakaoRedirectHandler = () => {
 
   const params= new URL(document.location.toString()).searchParams;
   const code = params.get('code');
+  console.log(code,'-----------');
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
