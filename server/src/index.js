@@ -8,7 +8,7 @@ const ipoParsing = require('./databases/index.js');
 const {setStSub, setEndSub, setStForecast, setEndForecast} = require('./databases/ipoNotify.js');
 
 const dotenv = require('dotenv');
-const { cleanEmailCode } = require('./email/email.js');
+const { cleanEmailCode, sendNotify } = require('./email/email.js');
 
 dotenv.config();
 app.use(cors());
@@ -42,14 +42,20 @@ app.listen(port, () => {
       cleanEmailCode();
     })
 
-    schedule.scheduleJob('00 24 18 * * *', () => {
+    schedule.scheduleJob('00 50 08 * * *', () => {
       console.log('알림 보내는중...')
       setStSub();
       setEndSub();
       setStForecast();
       setEndForecast();
       console.log('끝...');
-
     })
+    
+    schedule.scheduleJob('00 00 09 * * *', () => {
 
+      console.log('이메일 보내는중...');
+      sendNotify();
+      console.log('끝...');
+    })
+    
 })

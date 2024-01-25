@@ -414,7 +414,7 @@ router.post(`/kakao/login`, (req, res, next) => {
 
     if(user[0]){//사용자 정보가 있을 경우 로그인처리
       
-      let accessToken = await encodeJwt(`kakao_${userData.id}`);
+      let accessToken = await encodeJwt(`kakao_${userData.id}`, '1h');
 
       return res.json({
         kakaoLoginSuccess : true,
@@ -455,11 +455,10 @@ router.post(`/kakao/login`, (req, res, next) => {
         return next(err2);
       }
 
-      accessToken = await encodeJwt(`kakao_${userData.id}`);
+      accessToken = await encodeJwt(`kakao_${userData.id}`, '1h');
       
       return res.json({
         kakaoLoginSuccess : true,
-        newUser : true,
         userData:{
           id: userData.id,
           name: userData.properties.nickname,
@@ -477,42 +476,42 @@ router.post(`/kakao/login`, (req, res, next) => {
 })
 
 
-router.post('/kakao/addTel', auth, (req, res, next) => {
+// router.post('/kakao/addTel', auth, (req, res, next) => {
 
 
-  let body = req.body;
+//   let body = req.body;
 
-  if(!body.htel){
-    return res.json({
-      success: false,
-      message: '필수 입력값이 누락되었습니다.'
-    })
-  }
+//   if(!body.htel){
+//     return res.json({
+//       success: false,
+//       message: '필수 입력값이 누락되었습니다.'
+//     })
+//   }
 
 
-  let selectSnsUser = 
-  `
-    UPDATE sns_users
-    SET htel = ?
-    WHERE id = ?  
-  `
+//   let selectSnsUser = 
+//   `
+//     UPDATE sns_users
+//     SET htel = ?
+//     WHERE id = ?  
+//   `
 
-  db.query(selectSnsUser, [body.htel, req.user.id], (err, result) => {
+//   db.query(selectSnsUser, [body.htel, req.user.id], (err, result) => {
 
-    if(err){
-      return next(err);
-    }
+//     if(err){
+//       return next(err);
+//     }
 
-    return res.json({
-      success: true,
-      message: '전화번호가 등록되었습니다.'
-    })
+//     return res.json({
+//       success: true,
+//       message: '전화번호가 등록되었습니다.'
+//     })
 
-  })
+//   })
   
 
 
-})
+// })
 
 //개인정보 수정 비밀번호 확인 로직
 router.post(`/checkPwd`, auth, async (req, res, next) => {
@@ -739,14 +738,6 @@ router.post('/updateUser', auth, async (req, res, next) => {
   router.post(`/updateKakao`, auth, (req, res, next) => {
 
     let userInfo = {...req.body};
-
-    if(!userInfo.htel){
-      return res.json({
-        success: false,
-        message: "핸드폰 번호를 입력해주세요."
-      })
-    }
-
     
     let selectUser = 
     `
@@ -761,7 +752,7 @@ router.post('/updateUser', auth, async (req, res, next) => {
         return next(err);
       }
 
-      let data = [userInfo.htel];
+      let data = [];
 
       if(!user[0]){
         return res.json({
@@ -770,22 +761,12 @@ router.post('/updateUser', auth, async (req, res, next) => {
         })
       }
 
-      if(userInfo.sms_yn){
+      if(userInfo.email_yn){
     
         data.push('Y');
         
-        if(['30m','1h','2h'].indexOf(userInfo.sms_time) === -1){
-          return res.json({
-            success: false,
-            message: "시간을 설정해주세요."
-          })
-        }
-        
-        data.push(userInfo.sms_time);
-        
       }else{
         data.push('N');
-        data.push('');
       }
 
       data.push(req.user.id);
@@ -794,9 +775,7 @@ router.post('/updateUser', auth, async (req, res, next) => {
       `
         UPDATE sns_users
         SET 
-          htel=?,
-          sms_yn=?,
-          sms_time=?,
+          email_yn=?,
           update_dt=NOW()
         WHERE
           id=?
@@ -819,6 +798,77 @@ router.post('/updateUser', auth, async (req, res, next) => {
     })
 
   })
+
+  router.post('/delete', auth, (req, res, next) => {
+
+    let id = req.user.id;
+    
+
+    let deleteUser = 
+    `
+      UPDATE
+        users
+      SET
+        email = NULL,
+        name = NULL,
+        password = NULL,
+        del_yn = 'Y',
+        del_dt = NOW()
+      WHERE 
+        id = ?
+    `
+    if(id.toString().indexOf('kakao_') !== -1){
+
+      deleteUser = 
+      `
+        UPDATE
+          sns_users
+        SET
+          id = NULL,
+          email = NULL,
+          name = NULL,
+          del_yn = 'Y',
+          del_dt = NOW()
+        WHERE
+          id = ?
+      `
+
+    }
+
+    db.query(deleteUser, [id], (err, result) => {
+
+      if(err){
+        return next(err);
+      }
+
+      let deleteBookmark = 
+      `
+        DELETE 
+        FROM 
+          bookmark
+        WHERE
+          user_id=?
+      `;
+
+      db.query(deleteBookmark, [id], (err2, result2) => {
+
+        if(err2){
+          return next(err2)
+        }
+
+        return res.json({
+          success: true,
+          message: '회원탈퇴가 완료되었습니다.'
+        })
+
+      })
+
+
+    })
+
+
+  })
+
 
   router.post('/readNotify', auth, (req, res, next) => {
 

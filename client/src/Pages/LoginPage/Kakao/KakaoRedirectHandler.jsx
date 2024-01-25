@@ -11,7 +11,6 @@ const KakaoRedirectHandler = () => {
 
   const params= new URL(document.location.toString()).searchParams;
   const code = params.get('code');
-  console.log(code,'-----------');
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -52,9 +51,7 @@ const KakaoRedirectHandler = () => {
           
           localStorage.setItem('kakaoToken', access_token);
 
-          if(res.payload.newUser){
-            navigate('/kakao/addTel');
-          }else if(res.payload.kakaoLoginSuccess){
+          if(res.payload.kakaoLoginSuccess){
             navigate('/');
           }
 

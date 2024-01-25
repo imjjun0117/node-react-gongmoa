@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { updateKakao, updateUser } from '../../action/userAction';
+import { deleteUser, updateKakao, updateUser } from '../../action/userAction';
 import { setCheckedPwd } from '../../slice/userSlice'
 import axiosInstance from '../../utils/axios';
 
@@ -270,6 +270,23 @@ const AccountPage = () => {
     return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
   };
 
+  const deleteHandler = () => {
+
+    if(window.confirm('정말로 회원탈퇴를 진행하시겠습니까?')){
+      
+      dispatch(deleteUser()).then(res => {
+
+        if(res.data.success){
+          alert(res.data.message);
+        }
+
+      })
+
+    }
+
+
+  }
+
 
   return (
     <section className="bg-gray-200 mx-w-md w-full">
@@ -281,7 +298,7 @@ const AccountPage = () => {
             </h1>      
             <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit(onSubmit)}>
             <div className='flex justify-between'>
-                <div className='w-[70%]'>
+                <div className={isKakao ? 'w-[100%]' : 'w-[70%]'}>
                   <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">이메일<span className='text-red-500'> (필수)</span></label>
                   <input
                     type="email"
@@ -290,10 +307,12 @@ const AccountPage = () => {
                     className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     placeholder="이메일을 입력해주세요"
                     defaultValue={userInfo.email}
+                    readOnly={isKakao}
                     {...register('email',userEmail)}
                   />
                 </div>
-                <div className='w-[27%]'>
+                { !isKakao &&
+                  <div className='w-[27%]'>
                   <label htmlFor="auth" className="block mb-2 text-sm font-medium text-gray-900">
                     &nbsp;
                   </label>
@@ -305,6 +324,7 @@ const AccountPage = () => {
                     인증 코드 발송
                   </button>   
                 </div>
+              }
               </div>
                 {
                   errors?.email && 
@@ -461,7 +481,9 @@ const AccountPage = () => {
                 수정
                 </button>         
                 <button
+                  type="button"
                   className="w-full text-white bg-black hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                  onClick={deleteHandler}
                 >
                 회원탈퇴
                 </button>         

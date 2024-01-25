@@ -220,3 +220,23 @@ export const updateKakao = createAsyncThunk(
 
   }
 )
+
+export const deleteUser = createAsyncThunk(
+  "user/deleteUser",
+  async(_, thunkAPI) => {
+
+    try{
+
+      const response = await axiosInstance.post(
+        `/users/delete`
+      )
+
+      return response.data;
+
+    }catch(error){
+      console.log(error);
+      return thunkAPI.rejectWithValue(error.response.data || error.message)
+    }//end catch
+
+  }
+)

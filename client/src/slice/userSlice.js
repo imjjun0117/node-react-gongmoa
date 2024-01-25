@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { authUser, loginUser, registerUser, logoutUser, bookMark, kakaoLogin, checkPwd, updateUser, updateKakao } from '../action/userAction'
+import { authUser, loginUser, registerUser, logoutUser, bookMark, kakaoLogin, checkPwd, updateUser, updateKakao, deleteUser } from '../action/userAction'
 import { toast } from 'react-toastify'
 
 const initialState = {
@@ -68,12 +68,18 @@ const userSlice = createSlice({
     .addCase(authUser.fulfilled, (state, action) => {
       state.isLoading = false;
       state.userData = action.payload.userData;
+      if(state.userData.id.toString().indexOf('kakao_') === -1){
+        state.isKakao = false;
+      }else{
+        state.isKakao = true;
+      }
       localStorage.setItem('accessToken', action.payload.userData.accessToken);
       state.isAuth = true;
     })
     .addCase(authUser.rejected, (state, action) => {
       state.isLoading = false;
       state.isAuth = false;
+      state.isKakao = false;
       state.userData = initialState.userData;
       state.error = action.payload;
       localStorage.removeItem('accessToken');
@@ -164,7 +170,21 @@ const userSlice = createSlice({
       state.error = action.payload;
       
     })
-   
+    .addCase(deleteUser.pending, state => {
+      state.isLoading = true;
+    })
+    .addCase(deleteUser.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.isAuth = false;
+      state.isKakao = false;
+      state.userData = initialState.userData;
+      state.error = action.payload;
+      localStorage.removeItem('accessToken');
+    })
+    .addCase(deleteUser.rejected, (state, action) => {
+      state.isLoading = false;
+      state.error = action.payload;
+    })
   }
     
 

@@ -43,8 +43,7 @@ const auth = async(req, res, next) => {
         email,
         name,
         htel,
-        sms_yn,
-        sms_time
+        email_yn
       FROM
         sns_users
       WHERE

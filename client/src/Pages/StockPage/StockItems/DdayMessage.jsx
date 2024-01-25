@@ -33,6 +33,7 @@ const DdayMessage = ({stock}) => {
   let start_dt_str = `${start_dt.getFullYear()}-${start_dt.getMonth()+1}-${start_dt.getDate()}(${day[start_dt.getDay()]})`;
   let end_dt_str = `${end_dt.getFullYear()}-${end_dt.getMonth()+1}-${end_dt.getDate()}(${day[end_dt.getDay()]})`;
 
+
   if(now_dt < start_dt){
     return (
       <>
