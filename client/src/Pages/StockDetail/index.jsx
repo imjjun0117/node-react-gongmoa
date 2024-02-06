@@ -145,7 +145,7 @@ const StockDetail = () => {
         </div>
         <div className="bg-white shadow-md rounded-md overflow-hidden transform transition-transform relative z-10 mt-10">
           <div className="py-2 px-4 mt-3">
-            <div className="text-xl font-semibold mb-2">공모가</div>
+            <div className="text-xl font-semibold mb-2">공모가 / 증권사</div>
             <div className="border-t border-gray-300 my-3"></div>
             <table className="text-sm text-gray-600 mb-2">
               <tbody>
@@ -156,6 +156,10 @@ const StockDetail = () => {
                 <tr>
                   <td className="font-semibold text-gray-400">확정공모가</td>
                   <td>{!!stockDetail.confirmed_price && <span className='text-red-600'>{addComma(stockDetail.confirmed_price)}원</span> || '미정'}</td>
+                </tr>
+                <tr>
+                  <td className="font-semibold text-gray-400 w-[120px;]">증권사</td>
+                  <td>{stockDetail.weekly_company}</td>
                 </tr>
               </tbody>
             </table>

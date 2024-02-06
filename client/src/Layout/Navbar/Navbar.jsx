@@ -11,6 +11,7 @@ import styled from "styled-components";
 import { IoIosSettings } from "react-icons/io";
 import { timeAgo } from '../../utils/jsUtils';
 import axiosInstance from '../../utils/axios';
+import session from 'redux-persist/lib/storage/session';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -48,7 +49,7 @@ const Navbar = () => {
 
     try{
       dispatch(logoutUser()).then(() => {
-        navigate('/');
+        window.location = '/';
       });
     }catch(error){
       alert('일시적인 오류가 발생했습니다.\n잠시후 다시 시도해주세요.')
@@ -85,10 +86,10 @@ const Navbar = () => {
   return (
     <nav className="bg-gray-900 fixed w-full z-20 top-0 start-0 border-b border-gray-600">
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-        <Link to={'/'}className="flex items-center space-x-3 rtl:space-x-reverse">
+        <a href='/' className="flex items-center space-x-3 rtl:space-x-reverse">
           <FaChartLine size={30} color="red" />
           <span className="self-center text-lg sm:text-lg md:text-2xl lg:text-3xl xl:text-4xl font-semibold whitespace-nowrap dark:text-white">공모아</span>
-        </Link>
+        </a>
 
         <div className="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
           {
@@ -128,6 +129,13 @@ const Navbar = () => {
           {alertMenu && (
             <AlertMenu>
               <span className="text-white px-2 py-2 text-lg mb-2 flex items-center"><FaBell style={{ color: 'white', fontSize: '12px' }}/>&nbsp;알림</span>
+              <hr className="my-1 sborder-t border-gray-300 opacity-50" />
+              {
+                notify.length == 0 && 
+                <span className={`px-4 py-2 text-sm flex items-center text-white transition duration-300 rounded-md`}>
+                  받은 알림이 없습니다.
+                </span>
+              }
               {notify.map((item, idx) => (
                 <span key={idx}>
                   <a href="#" className={`px-4 py-2 text-sm flex items-center ${item.read_yn === 'Y' ? 'text-gray-400' : 'text-white'} hover:bg-gray-700 transition duration-300 rounded-md`}
@@ -139,6 +147,7 @@ const Navbar = () => {
                 </span>
 
               ))}
+            
             </AlertMenu>  
           )} 
           </>}
