@@ -291,20 +291,20 @@ const AccountPage = () => {
   return (
     <section className="bg-gray-200 mx-w-md w-full">
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-        <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-xl xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+        <div className="w-full rounded-lg shadow border md:mt-0 sm:max-w-xl xl:p-0 bg-gray-800 border-gray-700">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
-            <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
+            <h1 className="text-xl font-bold leading-tight tracking-tight md:text-2xl text-white">
               회원정보 수정{isKakao ? '(소셜회원)' : ''}
             </h1>      
             <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit(onSubmit)}>
             <div className='flex justify-between'>
-                <div className={isKakao ? 'w-[100%]' : 'w-[70%]'}>
-                  <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">이메일<span className='text-red-500'> (필수)</span></label>
+                <div className={`sm:w-[60%] ${isKakao ? 'w-[100%]' : 'w-[70%]'}`}>
+                  <label htmlFor="email" className="block mb-2 text-sm font-medium text-white">이메일<span className='text-red-500'> (필수)</span></label>
                   <input
                     type="email"
                     name="email"
                     id="email"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    className="border sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
                     placeholder="이메일을 입력해주세요"
                     defaultValue={userInfo.email}
                     readOnly={isKakao}
@@ -312,7 +312,7 @@ const AccountPage = () => {
                   />
                 </div>
                 { !isKakao &&
-                  <div className='w-[27%]'>
+                  <div className='w-[27%] sm:w-[37%]'>
                   <label htmlFor="auth" className="block mb-2 text-sm font-medium text-gray-900">
                     &nbsp;
                   </label>
@@ -337,7 +337,7 @@ const AccountPage = () => {
               {showAuth &&
                 <div className={`flex justify-between`}>
                   <div className='w-[50%]'>
-                    <label htmlFor="auth_key" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">인증번호</label>
+                    <label htmlFor="auth_key" className="block mb-2 text-sm font-medium text-white">인증번호</label>
                     <input
                       type="text"
                       name="code"
@@ -393,7 +393,7 @@ const AccountPage = () => {
               !isKakao && 
               <>
                 <div>
-                  <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">비밀번호</label>
+                  <label htmlFor="password" className="block mb-2 text-sm font-medium text-white">비밀번호</label>
                   <input
                     type="password"
                     name="password"
@@ -412,7 +412,7 @@ const AccountPage = () => {
                   }
                 </div>
                 <div>
-                  <label htmlFor="confirm_password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">비밀번호 확인</label>
+                  <label htmlFor="confirm_password" className="block mb-2 text-sm font-medium text-white">비밀번호 확인</label>
                   <input
                     type="password"
                     name="confirm_password"
@@ -434,7 +434,7 @@ const AccountPage = () => {
               }
               
               <div>
-                <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">닉네임<span className='text-red-500'> (필수)</span></label>
+                <label htmlFor="name" className="block mb-2 text-sm font-medium text-white">닉네임<span className='text-red-500'> (필수)</span></label>
                 <input
                   type="text"
                   name="name"
@@ -457,7 +457,7 @@ const AccountPage = () => {
               <div>
               </div>
               <div>
-                <label htmlFor="alarm" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">알림설정</label>
+                <label htmlFor="alarm" className="block mb-2 text-sm font-medium text-white">알림설정</label>
                 <div className="flex items-center">
                   <span className="mr-3 text-sm font-medium text-gray-300">E-Mail</span>
                   <label className="relative inline-flex items-center cursor-pointer">
@@ -469,20 +469,20 @@ const AccountPage = () => {
                       onChange={handleToggle}
                       id="email_yn"
                     />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                    <div className="w-11 h-6 peer-focus:outline-none peer-focus:ring-4peer-focus:ring-blue-800 rounded-full peer bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all border-gray-600 peer-checked:bg-blue-600"></div>
                   </label>
                 </div>
               </div>
               <div className='flex justify-between'>
                 <button
                   type="submit"
-                  className="w-full mr-10 text-white bg-blue-500 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                  className="w-full mr-10 text-white bg-blue-500 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center bg-primary-600 hover:bg-primary-700 focus:ring-primary-800"
                 >
                 수정
                 </button>         
                 <button
                   type="button"
-                  className="w-full text-white bg-black hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                  className="w-full text-white bg-black hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center bg-primary-600 hover:bg-primary-700 focus:ring-primary-800"
                   onClick={deleteHandler}
                 >
                 회원탈퇴

@@ -36,7 +36,7 @@ const port = 8080;
 app.listen(port, () => {
     console.log(`server start ${port}`);
 
-    schedule.scheduleJob('00 23 19 * * *', () => {
+    schedule.scheduleJob('00 11 19 * * *', () => {
       console.log('실행')
       ipoParsing(1);
       cleanEmailCode();

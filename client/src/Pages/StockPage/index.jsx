@@ -181,8 +181,8 @@ const Main = () => {
       </div>
       {showScrollButton && (
   <button
-    onClick={() => {scrollPage(0, 'smooth')}}
-    className="fixed w-[5%] bottom-8 right-8 p-2 bg-white text-gray-600 text-bold cursor-pointer shadow-md hover:shadow-lg transition duration-300 rounded-md"
+  onClick={() => {scrollPage(0, 'smooth')}}
+  className="fixed w-12 sm:w-1/20 bottom-8 right-8 p-2 bg-gray-100 text-gray-800 text-bold cursor-pointer shadow-md hover:shadow-lg transition duration-300 rounded-md z-50"
   >
     ↑
   </button>

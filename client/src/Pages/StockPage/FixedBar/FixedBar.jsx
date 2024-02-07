@@ -12,7 +12,7 @@ const FixedBar = ({menuType, menuTypeHandler}) => {
   };
   return (
     <div className="flex justify-center items-center">
-    <div className="flex border-b border-gray-200 dark:border-gray-700">
+    <div className="flex border-b border-gray-700">
       
       <button
         className={`flex items-center h-10 px-2 py-2 -mb-px text-center ${

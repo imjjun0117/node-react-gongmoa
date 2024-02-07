@@ -229,20 +229,20 @@ const RegisterPage = () => {
   return (
     <section className="bg-gray-200 mx-w-md w-full h-screen pt-4">
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-        <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+        <div className="w-full rounded-lg shadow border md:mt-0 sm:max-w-md xl:p-0 bg-gray-800 border-gray-700">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
-            <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
+            <h1 className="text-xl font-bold leading-tight tracking-tight md:text-2xl text-white">
               회원가입
             </h1>      
             <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit(onSubmit)}>
               <div className='flex justify-between'>
                 <div className='w-[70%]'>
-                  <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">이메일<span className='text-red-500'> (필수)</span></label>
+                  <label htmlFor="email" className="block mb-2 text-sm font-medium text-white">이메일<span className='text-red-500'> (필수)</span></label>
                   <input
                     type="email"
                     name="email"
                     id="email"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    className="bg-gray-700 border sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 bg-gry-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
                     placeholder="이메일을 입력해주세요"
                     {...register('email',userEmail)}
                   />
@@ -271,7 +271,7 @@ const RegisterPage = () => {
               {showAuth &&
                 <div className={`flex justify-between`}>
                   <div className='w-[50%]'>
-                    <label htmlFor="auth_key" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">인증번호</label>
+                    <label htmlFor="auth_key" className="block mb-2 text-sm font-medium text-white">인증번호</label>
                     <input
                       type="text"
                       name="code"
@@ -324,13 +324,13 @@ const RegisterPage = () => {
               </div>
               }
               <div>
-                <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">비밀번호<span className='text-red-500'> (필수)</span></label>
+                <label htmlFor="password" className="block mb-2 text-sm font-medium text-white">비밀번호<span className='text-red-500'> (필수)</span></label>
                 <input
                   type="password"
                   name="password"
                   id="password"
                   placeholder="••••••••"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  className="border sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
                   {...register('password',userPassword)}
                 />
                 {
@@ -343,13 +343,13 @@ const RegisterPage = () => {
                 }
               </div>
               <div>
-                <label htmlFor="confirm_password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">비밀번호 확인</label>
+                <label htmlFor="confirm_password" className="block mb-2 text-sm font-medium text-white">비밀번호 확인</label>
                 <input
                   type="password"
                   name="confirm_password"
                   id="confirm_password"
                   placeholder="••••••••"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  className="border sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
                   {...register('confirm_password',userConfirmPassword)}
                   />
                   {
@@ -362,12 +362,12 @@ const RegisterPage = () => {
                   }
               </div>
               <div>
-                <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">닉네임<span className='text-red-500'> (필수)</span></label>
+                <label htmlFor="name" className="block mb-2 text-sm font-medium text-white">닉네임<span className='text-red-500'> (필수)</span></label>
                 <input
                   type="text"
                   name="name"
                   id="name"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  className="border sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400 text-white focus:ring-blue-500 focus:border-blue-500"
                   placeholder="사용하실 닉네임을 입력해주세요"
                   maxLength={10}
                   {...register('name', userName)}
@@ -383,12 +383,12 @@ const RegisterPage = () => {
               </div>
               <button
                 type="submit"
-                className="w-full text-white bg-blue-500 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                className="w-full text-white bg-blue-500 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center bg-primary-600 hover:bg-primary-700 focus:ring-primary-800"
               >
               회원가입
               </button>
-              <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-                이미 가입하셨나요? <a href="#" className="font-medium text-blue-600 hover:underline dark:text-blue-500"> 로그인</a>
+              <p className="text-sm font-light text-gray-400">
+                이미 가입하셨나요? <a href="#" className="font-medium hover:underline text-blue-500"> 로그인</a>
               </p>
             </form>
           </div>

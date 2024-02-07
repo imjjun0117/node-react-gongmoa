@@ -79,15 +79,15 @@ const UpdatePassword = () => {
   return (
     <section className="bg-gray-200 mx-w-md w-full h-screen">
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-        <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+        <div className="w-full rounded-lg shadow border md:mt-0 sm:max-w-md xl:p-0 bg-gray-800 border-gray-700">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
-            <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
+            <h1 className="text-xl font-bold leading-tight tracking-tight md:text-2xl text-white">
               비밀번호 변경
             </h1>      
             <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit(onSubmit)}>
               
               <div>
-                  <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">비밀번호</label>
+                  <label htmlFor="password" className="block mb-2 text-sm font-medium text-white">비밀번호</label>
                   <input
                     type="password"
                     name="password"
@@ -106,7 +106,7 @@ const UpdatePassword = () => {
                   }
                 </div>
                 <div>
-                  <label htmlFor="confirm_password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">비밀번호 확인</label>
+                  <label htmlFor="confirm_password" className="block mb-2 text-sm font-medium text-white">비밀번호 확인</label>
                   <input
                     type="password"
                     name="confirm_password"
