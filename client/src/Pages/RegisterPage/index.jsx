@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import {useForm} from 'react-hook-form';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { registerUser } from '../../action/userAction';
 import axiosInstance from '../../utils/axios';
@@ -14,12 +14,12 @@ const RegisterPage = () => {
   const [isEmailAuth, setIsEmailAuth] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(5 * 60);
   const [email, setEmail] = useState('');
+  const [emailToggle, setEmailToggle] = useState(false);
   
   const {
     register,
     handleSubmit,
     getValues,
-    watch,
     formState: {errors},
     reset
   } = useForm({mode: 'onSubmit'});
@@ -75,7 +75,8 @@ const RegisterPage = () => {
       email: email,
       password: password,
       name: name,
-      code : code
+      code : code,
+      email_yn : emailToggle ? 'Y' : 'N'
     }
 
     dispatch(registerUser(body)).then(response => {
@@ -225,6 +226,12 @@ const RegisterPage = () => {
     return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
   };
 
+
+  const handleToggle = () => {
+
+    setEmailToggle(!emailToggle);
+
+  }
 
   return (
     <section className="bg-gray-200 mx-w-md w-full h-screen pt-4">
@@ -380,6 +387,25 @@ const RegisterPage = () => {
                     </span>
                   </div>
                 }
+              </div>
+              <div>
+                <label htmlFor="alarm" className="block text-sm font-medium text-white">알림설정</label>
+                <div className="flex items-center mb-2">
+                  <span className="mr-3 text-sm font-medium text-gray-300">E-Mail</span>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      value="Y"
+                      className="sr-only peer"
+                      onChange={handleToggle}
+                      id="email_yn"
+                    />
+                    <div className="w-11 h-6 peer-focus:outline-none peer-focus:ring-4peer-focus:ring-blue-800 rounded-full peer bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all border-gray-600 peer-checked:bg-blue-600"></div>
+                  </label>
+                </div>
+                <p className="text-xs font-light text-gray-400">
+                  즐겨찾기 한 공모주 정보를 받아보실 수 있습니다!
+                </p>
               </div>
               <button
                 type="submit"

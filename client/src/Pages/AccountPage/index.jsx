@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { deleteUser, updateKakao, updateUser } from '../../action/userAction';
 import { setCheckedPwd } from '../../slice/userSlice'
 import axiosInstance from '../../utils/axios';
+import axios from 'axios';
 
 const AccountPage = () => {
 
@@ -275,9 +276,26 @@ const AccountPage = () => {
     if(window.confirm('정말로 회원탈퇴를 진행하시겠습니까?')){
       
       dispatch(deleteUser()).then(res => {
+        
+        if(res.payload.success){
+          
+          if(isKakao){
+            axios.post(`https://kapi.kakao.com/v1/user/unlink`, {
+              target_id_type: 'user_id',
+              target_id: `${userInfo.id.split('_')[1]}`,
+              
+            },
+            {
+              headers :
+              {
+                "Content-type" : "application/x-www-form-urlencoded",
+                "Authorization" : `KakaoAK ${import.meta.env.VITE_ADMIN_KEY}`,
+              }
+            })
 
-        if(res.data.success){
-          alert(res.data.message);
+          }
+
+          alert(res.payload.message);
         }
 
       })

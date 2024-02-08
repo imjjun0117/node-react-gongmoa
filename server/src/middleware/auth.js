@@ -76,7 +76,8 @@ const auth = async(req, res, next) => {
           return next(err2);
         }
     
-        const list = bookmark.map(item => item.ipo_id);
+        let list = [];
+        list = bookmark?.map(item => item.ipo_id);
 
         let expiredIn = '1h';
         

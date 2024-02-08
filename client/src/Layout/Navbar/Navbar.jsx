@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import NavItems from './NavItems/NavItems';
 import { FaBell } from "react-icons/fa";
-import { MdOutlineLogin, MdOutlineLogout, MdPersonAdd } from "react-icons/md";
+import { MdOutlineLogin, MdOutlineLogout } from "react-icons/md";
 import { logoutUser } from '../../action/userAction';
 import { FaChartLine } from 'react-icons/fa';
 import { VscAccount } from "react-icons/vsc";
@@ -11,11 +11,11 @@ import styled from "styled-components";
 import { IoIosSettings } from "react-icons/io";
 import { timeAgo } from '../../utils/jsUtils';
 import axiosInstance from '../../utils/axios';
-import session from 'redux-persist/lib/storage/session';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const isAuth = useSelector(state => state.user?.isAuth);
+  const isKakao = useSelector(state => state.user?.isKakao);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [acctMenu, setAcctMenu] = useState(false);
@@ -43,13 +43,22 @@ const Navbar = () => {
 
   const onLogoutHandler = () => {
 
+    const REST_API_KEY = `${import.meta.env.VITE_REST_API_KEY}`;
+    const REDIRECT_URI = `${import.meta.env.VITE_LOGOUT_REDIRECT_URI}`
+    const link = `https://kauth.kakao.com/oauth/logout?client_id=${REST_API_KEY}&logout_redirect_uri=${REDIRECT_URI}`;
+
     if(!window.confirm('정말로 로그아웃을 하시겠습니까?')){
       return false;
     }
-
+    
     try{
       dispatch(logoutUser()).then(() => {
-        window.location = '/';
+        
+        if(isKakao){
+          window.location.href = link;
+        }else{
+          window.location = '/';
+        }
       });
     }catch(error){
       alert('일시적인 오류가 발생했습니다.\n잠시후 다시 시도해주세요.')

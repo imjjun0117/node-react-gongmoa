@@ -40,7 +40,7 @@ router.post('/register', enc, (req, res, next) => {
 
   let userInfo = {...req.body};
 
-  if(!userInfo.email || !userInfo.name || !userInfo.password || !userInfo.code){
+  if(!userInfo.email || !userInfo.name || !userInfo.password || !userInfo.code || !userInfo.email_yn){
     return res.json({
       success: false,
       message: "필수 입력값이 누락되었습니다."
@@ -160,7 +160,8 @@ router.post('/register', enc, (req, res, next) => {
                 password,
                 admin_yn,
                 reg_dt,
-                del_yn
+                del_yn,
+                email_yn
     
               )
             values
@@ -171,11 +172,12 @@ router.post('/register', enc, (req, res, next) => {
                 ?,
                 'N',
                 NOW(),
-                'N'
+                'N',
+                ?
               )      
           `
     
-          db.query(insertUser, [maxId, userInfo.email, userInfo.name, userInfo.password], (err5, result) => {
+          db.query(insertUser, [maxId, userInfo.email, userInfo.name, userInfo.password, userInfo.email_yn], (err5, result) => {
     
             if(err5){
               return next(err5);
@@ -835,7 +837,7 @@ router.post('/updateUser', auth, async (req, res, next) => {
 
     }
 
-    db.query(deleteUser, [id], (err, result) => {
+    db.query(deleteUser, [id.toString()], (err, result) => {
 
       if(err){
         return next(err);
@@ -850,9 +852,11 @@ router.post('/updateUser', auth, async (req, res, next) => {
           user_id=?
       `;
 
-      db.query(deleteBookmark, [id], (err2, result2) => {
+      
+      db.query(deleteBookmark, [id.toString()], (err2, result2) => {
 
         if(err2){
+          console.error('Delete Bookmark Query Error:', err2);
           return next(err2)
         }
 
