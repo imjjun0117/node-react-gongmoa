@@ -79,7 +79,7 @@ const Main = () => {
     const options = {
       root: null, // 루트 요소. 기본값은 브라우저의 뷰포트
       rootMargin: '0px', // 루트와 타겟 요소 사이의 여백
-      threshold: 0.5, // 타겟 요소의 가시성이 변경될 때 트리거되는 intersection ratio
+      threshold: 0, // 타겟 요소의 가시성이 변경될 때 트리거되는 intersection ratio
     };
   
     // IntersectionObserver 인스턴스 생성
