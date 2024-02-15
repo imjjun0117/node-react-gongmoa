@@ -4,7 +4,7 @@ const db = require('../databases/config/mysql');
 const {enc}  = require('../middleware/bcrypt');
 const bcrypt = require('bcryptjs');
 const {encodeJwt, encPwd, decodeJwt} = require('../utils/jwt');
-const auth = require('../middleware/auth');
+const {auth} = require('../middleware/auth');
 const dotenv = require('dotenv');
 const { generateRandomCode, emailSend } = require('../email/email');
 const { authMail, findPassword } = require('../email/templates/mail_template');
@@ -205,6 +205,16 @@ router.post('/login', (req, res, next) => {
     return res.json({
       loginSuccess: false,
       message: "필수 입력값이 누락되었습니다."
+    })
+  }
+
+  //이메일 유효성 검사
+  let patternEmail =  /^[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
+
+  if(!patternEmail.test(userInfo.email)){
+    return res.json({
+      success: false,
+      message: "이메일 형식이 아닙니다."
     })
   }
 

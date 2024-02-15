@@ -13,6 +13,7 @@ dist
 dist-ssr
 *.local
 client/.env
+admin/.env
 server/src/.env
 server/src/databases
 

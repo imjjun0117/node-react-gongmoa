@@ -156,5 +156,63 @@ const auth = async(req, res, next) => {
 
 }
 
+const authAdmin = async(req, res, next) => {
 
-module.exports = auth;
+  let token = req.headers.authorization;
+  token = token?.replaceAll('Bearer', '');
+  
+  if(!token){
+    return res.sendStatus(401);
+  }
+
+  //전달받은 토큰 파싱
+  try{
+    
+    const decoded = await decodeJwt(token);
+  
+    if(!decoded._id){
+      return res.sendStatus(401);
+    }
+  
+    let selectUser = 
+    `
+      SELECT 
+        id,
+        email,
+        name,
+        admin_yn
+      FROM
+        users
+      WHERE
+        del_yn = 'N'
+        AND id=?
+    `
+
+  
+    db.query(selectUser, [decoded._id], async(err, user) => {
+  
+      if(err){
+        return next(err);
+      }
+  
+      if(!user){
+        return res.sendStatus(400).send("올바르지 않은 로그인 토큰입니다.");
+      }
+
+      req.user = user[0];
+      req.accessToken = await encodeJwt(user[0].id, '1h');
+      
+      return next();
+
+    })  
+
+  }catch(error){
+
+    next(error);
+  }
+
+
+}
+
+
+module.exports = {auth, authAdmin};

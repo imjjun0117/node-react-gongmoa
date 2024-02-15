@@ -7,6 +7,9 @@ import {
   IconButton,
   Typography,
 } from "@material-tailwind/react";
+import {
+  Bars2Icon,
+} from "@heroicons/react/24/solid";
 import { useMaterialTailwindController, setOpenSidenav } from "@/context";
 
 export function Sidenav({ brandImg, brandName, routes }) {
@@ -31,7 +34,7 @@ export function Sidenav({ brandImg, brandName, routes }) {
           <Typography
             variant="h6"
             color={sidenavType === "dark" ? "white" : "blue-gray"}
-          >
+          >      
             {brandName}
           </Typography>
         </Link>
@@ -76,7 +79,7 @@ export function Sidenav({ brandImg, brandName, routes }) {
                       className="flex items-center gap-4 px-4 capitalize"
                       fullWidth
                     >
-                      {icon}
+                    <Bars2Icon className="w-5 h-5 text-inherit"/>
                       <Typography
                         color="inherit"
                         className="font-medium capitalize"

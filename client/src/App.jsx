@@ -1,4 +1,4 @@
-import { Outlet, Route, Routes, useLocation } from 'react-router-dom';
+import { Outlet, Route, Routes, useLocation, Navigate } from 'react-router-dom';
 import './App.css';
 import {ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -83,7 +83,7 @@ function App(){
         </Route>
       </Route>
 
-
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
 }

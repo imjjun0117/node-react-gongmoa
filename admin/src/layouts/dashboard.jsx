@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { Cog6ToothIcon } from "@heroicons/react/24/solid";
 import { IconButton } from "@material-tailwind/react";
 import {
@@ -7,20 +7,38 @@ import {
   Configurator,
   Footer,
 } from "@/widgets/layout";
-import routes from "@/routes";
+import { component } from "@/routes";
 import { useMaterialTailwindController, setOpenConfigurator } from "@/context";
+import React, { useEffect, useState } from 'react';
+import axiosInstance from '@/utils/axios';
 
 export function Dashboard() {
   const [controller, dispatch] = useMaterialTailwindController();
   const { sidenavType } = controller;
+  const [routes, setRoutes] = useState([]);
+
+  useEffect(() => {
+
+    //메뉴 
+    axiosInstance.get('/admin/menu').then(res => {
+
+      setRoutes(res.data.rtnMenu);
+
+    })
+
+
+  }, [])
+
 
   return (
     <div className="min-h-screen bg-blue-gray-50/50">
       <Sidenav
         routes={routes}
         brandImg={
-          sidenavType === "dark" ? "/img/logo-ct.png" : "/img/logo-ct-dark.png"
+          // sidenavType === "dark" ? "/img/logo-ct.png" : "/img/logo-ct-dark.png"
+          "/gongmoa.svg"
         }
+        brandName='공모아 관리자'
       />
       <div className="p-4 xl:ml-80">
         <DashboardNavbar />
@@ -37,11 +55,12 @@ export function Dashboard() {
         <Routes>
           {routes.map(
             ({ layout, pages }) =>
-              layout === "dashboard" &&
+              layout === "aoslwj7110" &&
               pages.map(({ path, element }) => (
-                <Route exact path={path} element={element} />
+                <Route exact path={path} element={component(element)} />
               ))
           )}
+          <Route path="*" element={<Navigate to="/aoslwj7110" replace />} />
         </Routes>
         <div className="text-blue-gray-600">
           <Footer />

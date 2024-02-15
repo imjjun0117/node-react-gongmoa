@@ -16,6 +16,7 @@ app.use(express.json());
 
 //라우터 설정
 app.use('/stocks', require('./routes/stocks'));
+app.use('/admin', require('./routes/admin'));
 app.use('/users', require('./routes/users'));
 
 app.use((error, req, res, next) => {
