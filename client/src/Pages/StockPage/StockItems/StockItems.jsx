@@ -26,7 +26,6 @@ const StockItems = ({stocks}) => {
   },[stocks])
 
   if( (stocks?.length < 1) ){
-    console.log('탓음')
 
     return (
       <span className='text-black mt-24'>해당하는 공모주가 존재하지 않습니다.</span>

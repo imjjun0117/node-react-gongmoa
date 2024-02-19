@@ -11,6 +11,9 @@ import { component } from "@/routes";
 import { useMaterialTailwindController, setOpenConfigurator } from "@/context";
 import React, { useEffect, useState } from 'react';
 import axiosInstance from '@/utils/axios';
+import AdminMenuModify from '@/pages/dashboard/adminMenuModify';
+import { AdminMenu, Home } from '@/pages/dashboard';
+import { Profile } from '@/pages/dashboard';
 
 export function Dashboard() {
   const [controller, dispatch] = useMaterialTailwindController();
@@ -19,15 +22,20 @@ export function Dashboard() {
 
   useEffect(() => {
 
-    //메뉴 
+    fetchRoutes();
+    
+  }, [])
+  
+  const fetchRoutes = () => {
+    
+    //메뉴 로드
     axiosInstance.get('/admin/menu').then(res => {
-
+  
       setRoutes(res.data.rtnMenu);
-
+  
     })
 
-
-  }, [])
+  }
 
 
   return (
@@ -53,13 +61,13 @@ export function Dashboard() {
           <Cog6ToothIcon className="h-5 w-5" />
         </IconButton>
         <Routes>
-          {routes.map(
-            ({ layout, pages }) =>
-              layout === "aoslwj7110" &&
-              pages.map(({ path, element }) => (
-                <Route exact path={path} element={component(element)} />
-              ))
-          )}
+          <Route exact path="/" element={<Home/>} />
+          <Route path="/admin_menu">
+            <Route index element={<AdminMenu fetchRoutes={fetchRoutes}/>}/>
+            <Route path="/admin_menu/modify" element={<AdminMenuModify/>} />
+          </Route>
+          <Route exact path="/tables" element={<Profile/>} />
+          <Route exact path="/profile" element={<Profile/>} />
           <Route path="*" element={<Navigate to="/aoslwj7110" replace />} />
         </Routes>
         <div className="text-blue-gray-600">

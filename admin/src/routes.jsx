@@ -2,14 +2,14 @@ import { Home, Profile, Tables, Notifications, AdminMenu } from "@/pages/dashboa
 import { SignIn, SignUp } from "@/pages/auth";
 import React from 'react';
 
-export const component = (element) => {
+export const component = (element, fetchRoutes) => {
 
   element = element.replaceAll('<','').replaceAll('/>','');
 
   const SpecificStory = eval(element);
 
 
-  return <SpecificStory/>
+  return <SpecificStory fetchRoutes={() => fetchRoutes()}/>
 
 }
 

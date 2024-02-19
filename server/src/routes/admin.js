@@ -11,6 +11,19 @@ const { authMail, findPassword } = require('../email/templates/mail_template');
 
 dotenv.config();
 
+// Promise를 반환하는 query 함수를 사용하여 쿼리 실행(동기실행)
+function queryAsync(sql, values) {
+  return new Promise((resolve, reject) => {
+    db.query(sql, values, (err, results) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(results);
+      }
+    });
+  });
+}
+
 router.get('/auth', authAdmin, (req, res, next) => {
 
   const user = req.user;
@@ -125,6 +138,8 @@ router.post('/logout', authAdmin, (req, res, next) => {
   
 })
 
+
+
 router.get('/menu', async (req, res, next) => {
 
   let rtnMenu =  [];
@@ -158,13 +173,13 @@ router.get('/menu', async (req, res, next) => {
           admin_menu
         WHERE 
           use_yn = 'Y'
-          AND SUBSTRING(menu_code, 1, 3) = ?
-          AND LENGTH(menu_code) = 6
+          AND menu_code LIKE CONCAT(?, '%')
+          AND CHAR_LENGTH(menu_code) = COALESCE(CHAR_LENGTH(?), 0) + 3
         ORDER BY
           sort_num
       `;
 
-      const twoDepth = await queryAsync(selectTwoDepth, [menu.menu_code]);
+      const twoDepth = await queryAsync(selectTwoDepth, [menu.menu_code, menu.menu_code]);
 
       let oneDepthJson = {
         title: menu.name,
@@ -185,675 +200,402 @@ router.get('/menu', async (req, res, next) => {
   }
 });
 
-// Promise를 반환하는 query 함수를 사용하여 쿼리 실행
-function queryAsync(sql, values) {
-  return new Promise((resolve, reject) => {
-    db.query(sql, values, (err, results) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(results);
+
+router.get('/adminMenuList', async (req, res, next) => {
+
+  let body = req.query;
+
+  let pg = body.pg ? body.pg : 1; // 페이지
+  let pp = body.pp ? body.pp : 10; // 페이지에 보여줄 리스트 갯수
+
+  let bind = [];
+  let p_name = '최상위';
+
+  //부모 메뉴명 조회
+  if(body.parentCode){
+    
+    bind.push(body.parentCode);
+    bind.push(body.parentCode);
+
+    let p_menu = await queryAsync(`
+      SELECT 
+        name
+      FROM admin_menu
+      WHERE menu_code=?
+    `, [body.parentCode])
+
+    if(!p_menu[0]){
+      return res.json({
+        success: false,
+        msg: '해당 상위 메뉴가 존재하지 않습니다.'
+      })
+    }
+
+    p_name = p_menu[0].name; 
+
+  }//end if
+  
+  bind = [...bind, pp, (pg - 1) * pp];
+
+  let selectMenu = 
+  `
+    SELECT 
+      * 
+    FROM (
+      SELECT 
+        menu_code,
+        name,
+        DATE_FORMAT(reg_dt, '%Y-%m-%d') AS reg_dt,
+        DATE_FORMAT(update_dt, '%Y-%m-%d') AS update_dt,
+        use_yn
+      FROM
+        admin_menu
+      WHERE 
+        1 = 1
+        ${body.parentCode ? 
+        `
+          AND menu_code LIKE CONCAT(?, '%')
+          AND CHAR_LENGTH(menu_code) = COALESCE(CHAR_LENGTH(?), 0) + 3
+        ` : 
+        `
+          AND CHAR_LENGTH(menu_code) = 3
+        `
       }
-    });
-  });
-}
-
-
-
-// //회원수정관련 로직
-// router.post('/updateUser', auth, async (req, res, next) => {
-
-//   let userInfo = {...req.body};
-
-//   if(!userInfo.email || !userInfo.name){
-//     return res.json({
-//       success: false,
-//       message: "필수 입력값이 누락되었습니다."
-//     })
-//   }
-
-//   let data = [userInfo.email, userInfo.name];
-//   let targetUpdate = '';
+      ORDER BY
+        sort_num
+    ) LASTROW
+    LIMIT ? OFFSET ?
   
-//   //이메일 유효성 검사
-//   let patternEmail =  /^[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
+  `
+  
+  let result = await queryAsync(selectMenu, bind)
 
-//   if(!patternEmail.test(userInfo.email)){
-//     return res.json({
-//       success: false,
-//       message: "이메일 형식이 아닙니다."
-//     })
-//   }
+  return res.json({
+    success: true,
+    menu_list : result,
+    p_name
+  })
 
-//   //이메일이 변경된 경우 본인인증 여부 확인
-//   if(req.user.email !== userInfo.email){
+})
 
-//     let selectCode = 
-//     `
-//       SELECT *
-//       FROM email_code
-//       WHERE
-//             email=?
-//         AND code=?
-//     `
+router.post('/setAdminMenuStatus', async (req, res, next) => {
 
-//     db.query(selectCode, [userInfo.email, userInfo.code], (err2, result) => {
+  let body = req.body;
 
-//       if(err2){
-//         return next(err2);
-//       }
+  let updateStatus = 
+  `
+    UPDATE admin_menu
+    SET 
+      use_yn = ?,
+      update_dt = NOW()
+    WHERE
+      menu_code = ?
+  `
 
-//       if(!result[0]){
-//         return res.json({
-//           success: false,
-//           message: "인증번호가 틀렸습니다."
-//         })
-//       }
+  try{
+    
+    await queryAsync(updateStatus, [body.value, body.menu_code]);
+
+    return res.json({
+      result : true,
+      msg: '사용여부 변경을 성공하였습니다.'
+    })
+
+  }catch(err){
+    return res.json({
+      result : false,
+      msg : '상태 변경 중 문제가 발생하였습니다.\n잠시후 다시 시도해주세요.'
+    })
+  }
+
+  
+
+})
+
+//메뉴 등록시에 가장 큰 메뉴 코드 반환
+router.get('/getAdminMenuCode', async (req, res, next) => {
+
+  let params = req.query;
+
+  //1뎁스, 2뎁스 이외일 경우
+  if(params.code?.length > 3){
+
+    return res.json({
+      success: false,
+      msg: '해당 메뉴 코드를 생성할 수 없습니다.'
+    })
+
+  }//end if
+
+  //메뉴 코드가 없을경우
+  if(!params.code){
+    params.code = '';
+  }
+
+  let selectMenuCode = 
+  `
+    SELECT 
+      CONCAT('00', IFNULL(MAX(menu_code), 0) + 1) AS menu_code
+    FROM 
+      admin_menu
+    WHERE 
+      LENGTH(menu_code) = COALESCE(CHAR_LENGTH(?), 0) + 3
+      AND
+      menu_code LIKE CONCAT(COALESCE(?), '%')
+  
+  `
+
+  try{
+    const menu = await queryAsync(selectMenuCode, [params.code, params.code])
+
+    return res.json({
+      success: true,
+      code: menu[0].menu_code
+    })
+
+  }catch(err){
+    return next(err);
+  }
+
+  
+
+
+})
+
+//메뉴 등록시 디테일
+router.get('/getAdminMenuDetail', async (req, res, next) => {
+
+  let params = req.query;
+
+  if(!params.code){
+    return res.json({
+      success: false,
+      msg: '잚못된 접근입니다.'
+    })
+  }
+
+  let selectMenu = 
+  `
+    SELECT 
+      menu_code,
+      name,
+      path,
+      element,
+      use_yn
+    FROM 
+      admin_menu
+    WHERE
+      menu_code=?
+  `
+
+  try{
+    const menu = await queryAsync(selectMenu, [params.code])
+    return res.json({
+      success: true,
+      menu: menu[0]
+    })
+
+  }catch(err){
+    return next(err);
+  }
+
+})
+
+//관리자 메뉴 수정 로직
+router.post('/modifyAdminMenu', async (req, res, next) => {
+
+  try{
+
+    let body = req.body;
+  
+    if(
+      !body.act || !body.menu_code || 
+      !body.menu_name || !body.menu_path || !body.use_yn
+      ){
+  
+      return res.json({
+        success: false,
+        msg: "필수 입력값이 누락되었습니다."
+      })
       
-//       if(result[0].is_checked !== 'Y'){
-//         return res.json({
-//           success: false,
-//           message: "이메일 인증을 진행해주세요."
-//         })
-//       }
-
-//       let deleteCode = 
-//       `
-//         DELETE 
-//         FROM
-//           email_code
-//         WHERE 
-//           email = ?
-//       `
-
-//       db.query(deleteCode, [userInfo.email], (err3, result) => {
-
-//         if(err3){
-//           return next(err3);
-//         }
-
-//       })
-
-//     })
-
-//   }
-
-//   //닉네임 유효성 검사
-//   let patternName =  /^[^\s!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/;
-
-//   if(!patternName.test(userInfo.name) || userInfo.name.length > 10){
-//     return res.json({
-//       success: false,
-//       message: "유효하지 않은 닉네임 형식입니다."
-//     })
-//   }
-
-//   //비밀번호를 변경한다면
-//   if(userInfo.password){
-//     //비밀번호 유효성 검사
-//     let patternPassword =  /^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#$%^&*?_]).{8,16}$/;
+    }
   
-//     if(!patternPassword.test(userInfo.password)){
-//       return res.json({
-//         success: false,
-//         message: "비밀번호는 영문, 숫자, 특수문자 포함 8 ~ 16자로 입력해주세요."
-//       })
-//     }
-
-//     targetUpdate += 'password=?,';
-//     data.push(await encPwd(userInfo.password));
-
-//   }
-
+    let selectMenu = 
+    `
+      SELECT
+        * 
+      FROM 
+        admin_menu
+      WHERE 
+        menu_code = ?
+    `
   
-//   if(userInfo.email_yn){
-    
-//     data.push('Y');
-    
-//   }else{
-
-//     data.push('N');
-
-//   }
+    const menu = await queryAsync(selectMenu, [body.menu_code])
   
-//   data.push(req.user.id);
-
-//   let selectUser =
-//   `
-//     SELECT * 
-//     FROM users
-//     WHERE id=?
-//   `
-
-//   db.query(selectUser, [req.user.id], (err, user) => {
-
-//     if(err){
-//       return next(err);
-//     }
-
-//     if(!user[0]){
-//       return res.json({
-//         success: false,
-//         message: "계정 조회 중 오류가 발생했습니다.\n잠시후 다시 시도해주세요."
-//       })
-//     }//end if
-    
-
-//     let updateUser = 
-//     `
-//       UPDATE users
-//       SET 
-//         email=?,
-//         name=?,
-//         update_dt=NOW(),
-//         ${targetUpdate}
-//         email_yn=?
-//       WHERE 
-//         id=?
-//     `
-
-//     db.query(updateUser, data, (err3, result) => {
-
-//       if(err3){
-//         return next(err3);
-//       }
-
-//       return res.status(200).json({
-//         success: true,
-//         message: "회원정보 수정을 완료했습니다."
-//       })
-
-//     })
-
-//     })
-
-//   })
-
-
-//   router.post(`/updateKakao`, auth, (req, res, next) => {
-
-//     let userInfo = {...req.body};
-    
-//     let selectUser = 
-//     `
-//       SELECT * 
-//       FROM sns_users
-//       WHERE id = ?
-//     `;
-
-//     db.query(selectUser, [req.user.id], (err, user) => {
-
-//       if(err){
-//         return next(err);
-//       }
-
-//       let data = [];
-
-//       if(!user[0]){
-//         return res.json({
-//           success: false,
-//           message: "해당 유저는 존재하지 않습니다." 
-//         })
-//       }
-
-//       if(userInfo.email_yn){
-    
-//         data.push('Y');
-        
-//       }else{
-//         data.push('N');
-//       }
-
-//       data.push(req.user.id);
-
-//       let updateUser = 
-//       `
-//         UPDATE sns_users
-//         SET 
-//           email_yn=?,
-//           update_dt=NOW()
-//         WHERE
-//           id=?
-//       `;
-
-
-//       db.query(updateUser, data, (err2, result) => {
-
-//         if(err2){
-//           return next(err2);
-//         }
-
-//         return res.status(200).json({
-//           success: true,
-//           message: "회원정보 수정을 완료했습니다."
-//         })
-
-//       })
-
-//     })
-
-//   })
-
-//   router.post('/delete', auth, (req, res, next) => {
-
-//     let id = req.user.id;
-    
-
-//     let deleteUser = 
-//     `
-//       UPDATE
-//         users
-//       SET
-//         email = NULL,
-//         name = NULL,
-//         password = NULL,
-//         del_yn = 'Y',
-//         del_dt = NOW()
-//       WHERE 
-//         id = ?
-//     `
-//     if(id.toString().indexOf('kakao_') !== -1){
-
-//       deleteUser = 
-//       `
-//         UPDATE
-//           sns_users
-//         SET
-//           id = NULL,
-//           email = NULL,
-//           name = NULL,
-//           del_yn = 'Y',
-//           del_dt = NOW()
-//         WHERE
-//           id = ?
-//       `
-
-//     }
-
-//     db.query(deleteUser, [id.toString()], (err, result) => {
-
-//       if(err){
-//         return next(err);
-//       }
-
-//       let deleteBookmark = 
-//       `
-//         DELETE 
-//         FROM 
-//           bookmark
-//         WHERE
-//           user_id=?
-//       `;
-
+    if(body.act === "I"){
+  
+      //DB 존재여부 확인
+      if(menu[0]){
+  
+        return res.json({
+          success: false,
+          msg: "해당 메뉴코드는 이미 존재합니다."
+        })
+  
+      }
+  
+      let insertMenu = 
+      `
+        INSERT INTO admin_menu
+        (
+          menu_code,
+          name,
+          path,
+          reg_dt,
+          use_yn,
+          sort_num
+        )
+        VALUES
+        (
+          ?,
+          ?,
+          ?,
+          NOW(),
+          ?,
+          (
+            SELECT IFNULL(MAX(a.sort_num), 0) +1 as sort_num
+            FROM 
+              admin_menu a
+            WHERE
+              LENGTH(a.menu_code) = LENGTH(?)
+              AND a.menu_code LIKE CONCAT(SUBSTRING(?, 1, LENGTH(?) - 3), '%')
+          )
+  
+        )
       
-//       db.query(deleteBookmark, [id.toString()], (err2, result2) => {
-
-//         if(err2){
-//           console.error('Delete Bookmark Query Error:', err2);
-//           return next(err2)
-//         }
-
-//         return res.json({
-//           success: true,
-//           message: '회원탈퇴가 완료되었습니다.'
-//         })
-
-//       })
-
-
-//     })
-
-
-//   })
-
-
-//   router.post('/readNotify', auth, (req, res, next) => {
-
-//     if(!req.body || !req.user.id){
-//       return res.json({
-//         success: false,
-//         message: '필수 입력값이 누락되었습니다.'
-//       })
-//     }//end if
-
-//     let selectNotifyUsers =
-//     `
-//       SELECT *
-//       FROM notify_users
-//       WHERE 
-//         notify_id = ?
-//         AND
-//         user_id = ?
-//     `
-
-//     db.query(selectNotifyUsers, [req.body.id, req.user.id.toString()], (err, notify) => {
-
-//       if(err){
-//         return next(err);
-//       }
-
-//       if(!notify[0]){
-//         return res.json({
-//           success: false,
-//           message : '잘못된 접근입니다.'
-//         })
-//       }
-
-//       if(notify[0].read_yn === 'N'){
-
-//         let updateNotify =
-//         `
-//           UPDATE notify_users
-//           SET 
-//             read_yn = 'Y',
-//             read_dt = DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s')
-//           WHERE 
-//             notify_id = ?
-//             AND 
-//             user_id = ?
-//         `
-    
-//         db.query(updateNotify, [req.body.id, req.user.id.toString()], (err2, result) => {
-    
-//           if(err2){
-//             return next(err2);
-//           }
-    
-//           return res.json({
-//             success: true,
-//             message: '읽음처리 성공'
-//           })
-    
-//         })
-
-//       }else{
-//         return res.json({
-//           success: true,
-//           message: '이미 읽음'
-//         })
-//       }
-
-//     })
-
-
-
-//   })
-
-
-//   //이메일 본인인증
-//   router.post(`/sendCode`, (req, res, next) => {
-
-//     let body = req.body;
-
-//     if(!body.email){
-//       return res.json({
-//         success: false,
-//         message: '이메일을 입력해주세요'
-//       })
-//     }
-
-//     //이메일 유효성 검사
-//     let patternEmail =  /^[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
-
-//     if(!patternEmail.test(body.email)){
-//       return res.json({
-//         success: false,
-//         message: "이메일 형식이 아닙니다."
-//       })
-//     }
-
-//     let selectUser =
-//       `
-//         SELECT * 
-//         FROM users
-//         WHERE email=?
-//       `
-
-
-//     db.query(selectUser, [body.email], (err, user) => {
-
-//       if(err){
-//         return next(err);
-//       }
-
-//       if(user[0]){
-//         return res.json({
-//           success: false,
-//           message: "해당 이메일로 가입된 정보가 존재합니다."
-//         })
-//       }//end if
-
-//       //인증코드 생성
-//       let code = generateRandomCode();
-    
-//       let setCode = 
-//       `
-//         INSERT INTO 
-//         email_code
-//         (
-//           email,
-//           code,
-//           reg_dt,
-//           expired_dt
-//         )
-//         VALUES
-//         (
-//           ?,
-//           ?,
-//           DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s'),
-//           DATE_FORMAT(NOW() + INTERVAL 5 MINUTE, '%Y-%m-%d %H:%i:%s')
-//         )
-      
-//       `
+      `
   
-//       db.query(setCode, [body.email, code], (err2) => {
+      const result = await queryAsync(insertMenu, 
+        [body.menu_code, body.menu_name, body.menu_path, body.use_yn, body.menu_code, body.menu_code, body.menu_code]
+        );
   
-//         if(err2){
-//           return next(err2);
-//         }//end if
-        
-//         //이메일 템플릿 생성
-//         let html = authMail.replaceAll('%%%@@%%%', code);
-    
-//         body.html = html;
-//         body.subject = '공모아에서 인증번호 발신입니다.'
-        
-//         emailSend(req, res);
+      return res.json({
+        success: true,
+        msg: "메뉴 등록을 완료했습니다."
+      })
   
-//       })
-//     })
+    }else{
+
+      if(!menu[0]){
+        return res.json({
+          success: false,
+          msg: '해당 메뉴가 존재하지 않습니다.'
+        })
+      }
+
+      let updateMenu = 
+      `
+        UPDATE admin_menu
+        SET
+          name=?,
+          path=?,
+          use_yn=?,
+          update_dt=NOW()
+        WHERE 
+          menu_code=?
+      `
+
+      const result = await queryAsync(updateMenu,[body.menu_name, body.menu_path, body.use_yn, body.menu_code]);
+
+      return res.json({
+        success: true,
+        msg: '메뉴 수정을 완료하였습니다.'
+      })
+
+    }//end else
+
+  }catch(err){
+    return next(err)
+  }
 
 
-//   })
-  
-  
-//   //이메일 코드 확인
-//   router.post(`/codeChk`, (req, res, next) => {
+})
+
+
+//관리자 메뉴코드 순서변경 로직
+router.post('/setAdminMenuOrder', (req, res, next) => {
+
+  let body = req.body;
+  let parentCode = body.parentCode ? body.parentCode : '';
+
+  //넘어온 데이터 유효성 검사
+  body?.menu_list.map(async(menu) => {
     
-//     let body = req.body;
+    if(menu.menu_code.length !== parentCode.length + 3){
+      return res.json({
+        success: false,
+        msg: '잘못된 접근입니다.'
+      })
+    }
     
+    // 부모 메뉴 유효성 검사
+    if(parentCode){
 
-//     let selectCode = 
-//     `
-//       SELECT
-//         email,
-//         code,
-//         reg_dt
-//       FROM email_code
-//       WHERE 
-//             email = ? 
-//         AND code = ?
-//         AND is_checked='N'
-//     `
-//     db.query(selectCode, [body.email, body.code], (err, result) => {
+      if(menu.menu_code.substring(0, parentCode.length) !== parentCode){
 
-//       if(err){
-//         return next(err);
-//       }
+        return res.json({
+          success: false,
+          msg: '잘못된 접근입니다.'
+        })
 
-//       if(result.length !== 1){
-//         return res.json({
-//           success: false,
-//           message: '인증번호가 일치하지 않습니다.\n다시 시도해주세요.'
-//         })
-//       }
-//       if(new Date(result[0].expired_dt) < new Date()){
-//         return res.json({
-//           success: false,
-//           message: '인증시간이 만료되었습니다.'
-//         })
-        
-//       }
+      }//end if
 
-//       db.query(`UPDATE email_code SET is_checked='Y' WHERE email = ? AND code = ?`, [body.email, body.code], (err2)=> {
-        
-//         if(err2){
-//           return next(err2);
-//         }
+    }//end if
 
-//         return res.json({
-//           success: true,
-//           message: '인증번호 확인이 되었습니다.'
-//         })
+    let selectMenu = 
+    `
+      SELECT 
+        *
+      FROM 
+        admin_menu
+      WHERE 
+        menu_code=?
+    `
 
-//       })
+    const rtnMenu = await queryAsync(selectMenu, [menu.menu_code]);
 
-//     })
+    if(!rtnMenu[0]){
+      return res.json({
+        success: false,
+        msg: '잘못된 접근입니다.'
+      })
+    }
 
-//   })
+  })
 
+  //순서 업데이트
+  body?.menu_list.map(async( menu, index ) => {
 
-//   //회원 비밀번호 찾기 로직
-//   router.post(`/findPwd`, (req, res, next) => {
+    let updateMenu = 
+    `
+      UPDATE
+        admin_menu
+      SET
+        sort_num = ?
+      WHERE 
+        menu_code = ?
+    `
 
-//     let body = req.body;
+    await queryAsync(updateMenu, [index, menu.menu_code]);
 
-//     if(!body.email){
-//       return res.json({
-//         success: false,
-//         message:'이메일을 입력해주세요'
-//       })
-//     }
+  })
 
-//      //이메일 유효성 검사
-//     let patternEmail =  /^[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
-
-//     if(!patternEmail.test(body.email)){
-//       return res.json({
-//         success: false,
-//         message: "이메일 형식이 아닙니다."
-//       })
-//     }
-
-//     let selectUser = 
-//     `
-//       SELECT *
-//       FROM users
-//       WHERE email=?
-//     `
-
-//     db.query(selectUser, [body.email], async(err, result) => {
-
-//       if(err){
-//         return next(err);
-//       }
-
-//       if(!result[0]){
-//         return res.json({
-//           success: false,
-//           message: '해당 이메일은 가입된 이력이 없습니다.'
-//         })
-//       }
-
-//       req.body.subject = '공모아에서 비밀번호 찾기 요청 결과 발신입니다.';
-
-//       const accessToken = await encodeJwt(body.email, '1h');
-//       req.body.html = findPassword.replaceAll('%%email%%', body.email).replaceAll('%%token%%', accessToken);
-
-//       emailSend(req, res);
-
-//     })
-
-//   })
+  return res.json({
+    success: true,
+    msg: '순서변경을 성공하였습니다.'
+  })
 
 
-//   router.post('/updatePwd', async(req, res, next) => {
-
-//     let body = req.body;
-
-//     if(!body.email || !body.token){
-//       return res.json({
-//         success: false,
-//         message: '잘못된 접근입니다. 다시 시도해주세요'
-//       })
-//     }
-
-//     if(!body.password){
-//       return res.json({
-//         success: false,
-//         message: '비밀번호가 누락되었습니다.'
-//       })
-//     }
-    
-//     const decoded = await decodeJwt(body.token);
-//     const encoded = await encPwd(body.password);
-
-//     if(!decoded._id || decoded._id !== body.email){
-//       return res.json({
-//         success: false,
-//         message: '잘못된 토큰입니다.\n다시 시도해주세요.'
-//       })
-//     }
-
-
-//     let selectUser = 
-//     `
-//       SELECT *
-//       FROM users
-//       WHERE email = ?
-//     `
-
-//     db.query(selectUser, [body.email], (err, user) => {
-
-//       if(err){
-//         return next(err)
-//       }
-
-//       if(!user[0]){
-//         return res.json({
-//           success: false,
-//           message: '해당 이메일로 가입된 정보가 없습니다.'
-//         })
-//       }
-
-//       let updateUser = 
-//       `
-//         UPDATE
-//           users
-//         SET
-//           password=?
-//         WHERE
-//           id=?
-//       `
-      
-
-//       db.query(updateUser, [encoded, user[0].id], (err2, result) => {
-
-//         if(err2){
-//           return next(err2);
-//         }
-
-//         return res.json({
-//           success: true,
-//           message: '비밀번호가 변경되었습니다. 로그인을 시도해주세요.'
-//         })
-
-//       })
-
-//     })
-
-
-
-//   })
+})
 
 module.exports = router;
