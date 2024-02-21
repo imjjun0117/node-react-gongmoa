@@ -8,7 +8,7 @@ import {
   Typography,
 } from "@material-tailwind/react";
 import {
-  Bars2Icon,
+  Bars2Icon
 } from "@heroicons/react/24/solid";
 import { useMaterialTailwindController, setOpenSidenav } from "@/context";
 
@@ -34,10 +34,16 @@ export function Sidenav({ brandImg, brandName, routes }) {
           <Typography
             variant="h6"
             color={sidenavType === "dark" ? "white" : "blue-gray"}
-          >      
-            {brandName}
+          >  
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style={{ fill: '#e9220c', marginRight: 10 }}>
+                <path d="M496 384H64V80c0-8.8-7.2-16-16-16H16C7.2 64 0 71.2 0 80v336c0 17.7 14.3 32 32 32h464c8.8 0 16-7.2 16-16v-32c0-8.8-7.2-16-16-16zM464 96H345.9c-21.4 0-32.1 25.9-17 41l32.4 32.4L288 242.8l-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0l-68.7 68.7c-6.3 6.3-6.3 16.4 0 22.6l22.6 22.6c6.3 6.3 16.4 6.3 22.6 0L192 237.3l73.4 73.4c12.5 12.5 32.8 12.5 45.3 0l96-96 32.4 32.4c15.1 15.1 41 4.4 41-17V112c0-8.8-7.2-16-16-16z"/>
+              </svg>
+              <span>{brandName}</span>
+            </div>
           </Typography>
         </Link>
+
         <IconButton
           variant="text"
           color="white"
@@ -55,7 +61,6 @@ export function Sidenav({ brandImg, brandName, routes }) {
             {title && (
               <li className="mx-3.5 mt-4 mb-2">
                 <Typography
-                  variant="small"
                   color={sidenavType === "dark" ? "white" : "blue-gray"}
                   className="font-black uppercase opacity-75"
                 >
@@ -76,11 +81,12 @@ export function Sidenav({ brandImg, brandName, routes }) {
                           ? "white"
                           : "blue-gray"
                       }
-                      className="flex items-center gap-4 px-4 capitalize"
+                      className="flex items-center gap-4 px-4 capitalize text-sm"
                       fullWidth
                     >
-                    <Bars2Icon className="w-5 h-5 text-inherit"/>
+                    <Bars2Icon className="w-3 h-3 text-inherit"/>
                       <Typography
+                        variant="small"
                         color="inherit"
                         className="font-medium capitalize"
                       >

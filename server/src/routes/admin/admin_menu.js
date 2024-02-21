@@ -1,13 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../databases/config/mysql');
-const {enc}  = require('../middleware/bcrypt');
-const bcrypt = require('bcryptjs');
-const {encodeJwt, encPwd, decodeJwt} = require('../utils/jwt');
-const {authAdmin} = require('../middleware/auth');
+const db = require('../../databases/config/mysql');
 const dotenv = require('dotenv');
-const { generateRandomCode, emailSend } = require('../email/email');
-const { authMail, findPassword } = require('../email/templates/mail_template');
+
 
 dotenv.config();
 
@@ -23,121 +18,6 @@ function queryAsync(sql, values) {
     });
   });
 }
-
-router.get('/auth', authAdmin, (req, res, next) => {
-
-  const user = req.user;
-
-  return res.json({
-
-    userData:{
-    
-      accessToken : req.accessToken,
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      admin_yn: user.admin_yn
-    }
-
-  })
-
-
-})
-
-// 관리자 로그인 관련 로직
-router.post('/login', (req, res, next) => {
-
-  let userInfo = req.body;
-
-  if(!userInfo.email || !userInfo.password){
-    return res.json({
-      loginSuccess: false,
-      message: "필수 입력값이 누락되었습니다."
-    })
-  }
-
-  //이메일 유효성 검사
-  let patternEmail =  /^[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\.]?[0-9a-zA-Z])*\.[a-zA-Z]{2,3}$/i;
-
-  if(!patternEmail.test(userInfo.email)){
-    return res.json({
-      loginSuccess: false,
-      message: "이메일 형식이 아닙니다."
-    })
-  }
-
-  let selectId = 
-  `
-    SELECT *
-    FROM users
-    WHERE email = ?
-  `;
-
-  db.query(selectId, [userInfo.email], async(err, user) => {
-
-    if(err){
-      return next(err);
-    }
-
-    if(!user[0]){
-      return res.json({
-        loginSuccess: false,
-        message: "아이디가 존재하지 않습니다."
-      })
-    }
-    
-    const isMatch = await bcrypt.compare(userInfo.password, user[0].password);
-
-    if(!isMatch){
-      return res.json({
-        loginSuccess: false,
-        message: "비밀번호가 일치하지 않습니다."
-      })
-    }
-
-    if(user[0].admin_yn === 'N'){
-      return res.json({
-        loginSuccess: false,
-        message: "관리자 페이지 접근 권한이 없습니다."
-      })
-    }
-
-
-    const accessToken = await encodeJwt(user[0].id, '1h');
-
-    return res.json({
-
-      loginSuccess: true,
-      message: "로그인 성공하였습니다.",
-      userData:{
-        accessToken,
-        id: user[0].id,
-        email: user[0].email,
-        name: user[0].name,
-        admin_yn: user[0].admin_yn
-      }
-    })
-
-  })
-
-
-})
-
-//관리자 로그아웃 관련 로직
-router.post('/logout', authAdmin, (req, res, next) => {
-
-  try{
-
-    console.log(req.user);
-
-    return res.sendStatus(200);
-
-  }catch(error){
-    return next(error);
-  }
-  
-})
-
 
 
 router.get('/menu', async (req, res, next) => {
@@ -205,8 +85,8 @@ router.get('/adminMenuList', async (req, res, next) => {
 
   let body = req.query;
 
-  let pg = body.pg ? body.pg : 1; // 페이지
-  let pp = body.pp ? body.pp : 10; // 페이지에 보여줄 리스트 갯수
+  let pg = Number(body.pg ? body.pg : 1); // 페이지
+  let pp = Number(body.pp ? body.pp : 10); // 페이지에 보여줄 리스트 갯수
 
   let bind = [];
   let p_name = '최상위';
@@ -270,10 +150,34 @@ router.get('/adminMenuList', async (req, res, next) => {
   
   let result = await queryAsync(selectMenu, bind)
 
+  let seletcMenuCnt = 
+  `
+  
+      SELECT 
+        COUNT(*) AS cnt
+      FROM
+        admin_menu
+      WHERE 
+        1 = 1
+        ${body.parentCode ? 
+        `
+          AND menu_code LIKE CONCAT(?, '%')
+          AND CHAR_LENGTH(menu_code) = COALESCE(CHAR_LENGTH(?), 0) + 3
+        ` : 
+        `
+          AND CHAR_LENGTH(menu_code) = 3
+        `
+      }
+
+  `
+
+  let count = await queryAsync(seletcMenuCnt, [body.parentCode, body.parentCode])
+
   return res.json({
     success: true,
     menu_list : result,
-    p_name
+    p_name,
+    totalRowNum: count[0].cnt
   })
 
 })
@@ -335,7 +239,16 @@ router.get('/getAdminMenuCode', async (req, res, next) => {
   let selectMenuCode = 
   `
     SELECT 
-      CONCAT('00', IFNULL(MAX(menu_code), 0) + 1) AS menu_code
+      CONCAT(
+        ?,
+        CONCAT('00', 
+        IFNULL(
+          MAX(
+          SUBSTRING(menu_code, length(?)+1, length(menu_code)) 
+          ), 0) + 1
+        ) 
+      )
+        AS menu_code
     FROM 
       admin_menu
     WHERE 
@@ -344,9 +257,9 @@ router.get('/getAdminMenuCode', async (req, res, next) => {
       menu_code LIKE CONCAT(COALESCE(?), '%')
   
   `
-
+  
   try{
-    const menu = await queryAsync(selectMenuCode, [params.code, params.code])
+    const menu = await queryAsync(selectMenuCode, [params.code, params.code, params.code, params.code])
 
     return res.json({
       success: true,
@@ -594,7 +507,6 @@ router.post('/setAdminMenuOrder', (req, res, next) => {
     success: true,
     msg: '순서변경을 성공하였습니다.'
   })
-
 
 })
 

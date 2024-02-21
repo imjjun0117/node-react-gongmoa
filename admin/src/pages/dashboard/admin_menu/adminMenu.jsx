@@ -14,6 +14,7 @@ import axiosInstance from '@/utils/axios';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import LoadingBar from '@/layouts/loadingBar';
 
 //테이블 로우 드래그앤드롭 설정
 const ItemType = 'ROW';
@@ -51,11 +52,15 @@ const DraggableRow = ({ id, index, moveRow, children, use_yn }) => {
 
 export function AdminMenu({fetchRoutes}) {
 
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const pCode = searchParams.get('p_code');
+  const pp = searchParams.get('pp') ? searchParams.get('pp') : 10;
+  const pg = searchParams.get('pg') ? searchParams.get('pg') : 1;
   const [menuList, setMenuList] = useState([]);
   const [parentName, setParentName] = useState('최상위');
   const navigate = useNavigate();
+  const [totalRowNum, setTotalRowNum] = useState(0);
+  const [dataStatus, setDataStatus] = useState(true);
 
   useEffect(() => {
 
@@ -66,26 +71,38 @@ export function AdminMenu({fetchRoutes}) {
   const fetchMenuList = async() => {
 
     let params = {
-      parentCode : pCode
-      
+      parentCode : pCode,
+      pp,
+      pg
     }
+    if(dataStatus){
+
+      setDataStatus(false);
+
+
+      //메뉴 리스트 호출
+      await axiosInstance.get('/admin/admin_menu/adminMenuList', {params}).then(res => {
+  
+        if(res.data.success){
+  
+          setMenuList(res.data.menu_list);
+          setParentName(res.data.p_name);
+          setTotalRowNum(res.data.totalRowNum);
+  
+          fetchRoutes();
+
+          setDataStatus(true);
+
+        }else{
+  
+          alert(res.data.msg);
+          navigate('/aoslwj7110/admin_menu');
+        }
+  
+      })
+    }
+
     
-    //메뉴 리스트 호출
-    await axiosInstance.get('/admin/adminMenuList', {params}).then(res => {
-
-      if(res.data.success){
-
-        setMenuList(res.data.menu_list);
-        setParentName(res.data.p_name);
-        fetchRoutes();
-
-      }else{
-
-        alert(res.data.msg);
-        navigate('/aoslwj7110/admin_menu');
-      }
-
-    })
 
   }
 
@@ -107,7 +124,7 @@ export function AdminMenu({fetchRoutes}) {
     }
 
     //상태변경 서버
-    axiosInstance.post('/admin/setAdminMenuStatus', body).then(async(res) => {
+    axiosInstance.post('/admin/admin_menu/setAdminMenuStatus', body).then(async(res) => {
 
       alert(res.data.msg);
 
@@ -140,8 +157,6 @@ export function AdminMenu({fetchRoutes}) {
   
   //순서변경 적용
   const setOrder = () => {
-    
-    console.log(menuList);
 
     let body = {
 
@@ -149,7 +164,7 @@ export function AdminMenu({fetchRoutes}) {
       parentCode: pCode
     }
 
-    axiosInstance.post('/admin/setAdminMenuOrder', body).then(res => {
+    axiosInstance.post('/admin/admin_menu/setAdminMenuOrder', body).then(res => {
 
       alert(res.data.msg);
 
@@ -161,6 +176,35 @@ export function AdminMenu({fetchRoutes}) {
 
     });
 
+  }
+  
+  const pagingFunction = (pg) => {
+
+    const currentParams = { ...Object.fromEntries(searchParams) };
+
+    // 새로운 값을 추가
+    currentParams.pg = pg;
+
+    // 업데이트된 search parameters를 URL에 반영
+    setSearchParams(currentParams);
+
+  }
+
+  if(!dataStatus){
+    return (
+      <div className="mt-48 mb-8 flex flex-col gap-12 ">
+        <Card>
+            <CardHeader variant="gradient" color="gray" className="mb-8 p-6">
+              <Typography variant="h6" color="white">
+                관리자 메뉴 관리
+              </Typography>
+            </CardHeader>
+            <CardBody className="overflow-x-scroll px-0 pt-0 pb-2">
+              <LoadingBar/>
+          </CardBody>
+        </Card>
+      </div>
+    )
   }
 
 
@@ -283,7 +327,7 @@ export function AdminMenu({fetchRoutes}) {
                         />
                       </td>
                       <td className={className}>
-                        <Link to={`/aoslwj7110/admin_menu/modify?act=U&code=${menu_code}`}>
+                        <Link to={`/aoslwj7110/admin_menu/modify?act=U&code=${menu_code}&p_code=${pCode ? pCode : ''}`}>
                           <Typography
                             as="a"
                             href="#"
@@ -308,14 +352,14 @@ export function AdminMenu({fetchRoutes}) {
             <Button size="md" className='mr-4' onClick={() => {setOrder()}}>
                 순서 변경적용
             </Button>
-            <Link to={`/aoslwj7110/admin_menu/modify?act=I&code=${pCode}`}>
+            <Link to={`/aoslwj7110/admin_menu/modify?act=I&code=${pCode ? pCode : ''}&p_code=${pCode ? pCode : ''}`}>
               <Button size="md" color='blue'>
                   등록
               </Button>
             </Link>
           </div>
           <div className='flex items-center justify-center mt-5'>
-            <DefaultPagination />
+            <DefaultPagination prn_Per_cnt={pp} currentPage={pg} totalRowNum={totalRowNum} pagingFunction={pagingFunction}/>
           </div>
         </CardBody>
       </Card>

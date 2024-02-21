@@ -1,13 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../databases/config/mysql');
-const {enc}  = require('../middleware/bcrypt');
+const db = require('../../databases/config/mysql');
+const {enc}  = require('../../middleware/bcrypt');
 const bcrypt = require('bcryptjs');
-const {encodeJwt, encPwd, decodeJwt} = require('../utils/jwt');
-const {auth} = require('../middleware/auth');
+const {encodeJwt, encPwd, decodeJwt} = require('../../utils/jwt');
+const {auth} = require('../../middleware/auth');
 const dotenv = require('dotenv');
-const { generateRandomCode, emailSend } = require('../email/email');
-const { authMail, findPassword } = require('../email/templates/mail_template');
+const { generateRandomCode, emailSend } = require('../../email/email');
+const { authMail, findPassword } = require('../../email/templates/mail_template');
 
 dotenv.config();
 

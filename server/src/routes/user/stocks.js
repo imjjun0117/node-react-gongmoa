@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../databases/config/mysql.js');
+const db = require('../../databases/config/mysql.js');
 
 //공모주 리스트 
 router.get('/', (req, res, next) => {

@@ -11,9 +11,12 @@ import { component } from "@/routes";
 import { useMaterialTailwindController, setOpenConfigurator } from "@/context";
 import React, { useEffect, useState } from 'react';
 import axiosInstance from '@/utils/axios';
-import AdminMenuModify from '@/pages/dashboard/adminMenuModify';
+import AdminMenuModify from '@/pages/dashboard/admin_menu/adminMenuModify';
 import { AdminMenu, Home } from '@/pages/dashboard';
 import { Profile } from '@/pages/dashboard';
+import IpoList from '@/pages/dashboard/ipo_list/ipoList';
+import IpoModify from '@/pages/dashboard/ipo_list/ipoModify';
+import IpoLoad from '@/pages/dashboard/ipo_load/ipoLoad';
 
 export function Dashboard() {
   const [controller, dispatch] = useMaterialTailwindController();
@@ -29,7 +32,7 @@ export function Dashboard() {
   const fetchRoutes = () => {
     
     //메뉴 로드
-    axiosInstance.get('/admin/menu').then(res => {
+    axiosInstance.get('/admin/admin_menu/menu').then(res => {
   
       setRoutes(res.data.rtnMenu);
   
@@ -64,7 +67,14 @@ export function Dashboard() {
           <Route exact path="/" element={<Home/>} />
           <Route path="/admin_menu">
             <Route index element={<AdminMenu fetchRoutes={fetchRoutes}/>}/>
-            <Route path="/admin_menu/modify" element={<AdminMenuModify/>} />
+            <Route path="/admin_menu/modify" element={<AdminMenuModify fetchRoutes={fetchRoutes}/>} />
+          </Route>
+          <Route path="/ipo_list">
+            <Route index element={<IpoList/>}/>
+            <Route path="/ipo_list/modify" element={<IpoModify/>} />
+          </Route>
+          <Route path="/ipo_load">
+            <Route index element={<IpoLoad/>}/>
           </Route>
           <Route exact path="/tables" element={<Profile/>} />
           <Route exact path="/profile" element={<Profile/>} />
