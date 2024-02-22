@@ -32,6 +32,17 @@ app.get('/', async (req, res, next) => {
 
 })
 
+app.get('/hihi', async(req, res, next) => {
+
+  ipo_update_time = await schedulerTime();
+
+  return res.json({
+    success: true,
+    msg: '성공'
+  })
+
+})
+
 const port = 8080;
 
 app.listen(port, async() => {
@@ -43,6 +54,7 @@ app.listen(port, async() => {
     console.error(err);
     ipo_update_time = '00 00 00 * * *';
   }
+
 
   console.log(`server start ${port} ${ipo_update_time}`);
 
