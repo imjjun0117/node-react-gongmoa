@@ -28,8 +28,7 @@ router.get('/menu', async (req, res, next) => {
     SELECT 
       menu_code,
       name,
-      path,
-      element
+      path
     FROM
       admin_menu
     WHERE
@@ -47,8 +46,7 @@ router.get('/menu', async (req, res, next) => {
         SELECT 
           menu_code,
           name,
-          path,
-          element
+          path
         FROM
           admin_menu
         WHERE 
@@ -64,10 +62,10 @@ router.get('/menu', async (req, res, next) => {
       let oneDepthJson = {
         title: menu.name,
         layout: 'aoslwj7110',
+        path: menu.path,
         pages: twoDepth.map(menu2 => ({
           name: menu2.name,
-          path: menu2.path,
-          element: menu2.element
+          path: menu2.path
         }))
       };
 

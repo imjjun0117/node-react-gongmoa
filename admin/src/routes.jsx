@@ -1,5 +1,5 @@
 import { Home, Profile, Tables, Notifications, AdminMenu } from "@/pages/dashboard";
-import { SignIn, SignUp } from "@/pages/auth";
+import { SignIn } from "@/pages/auth";
 import React from 'react';
 
 export const component = (element, fetchRoutes) => {
@@ -26,12 +26,7 @@ export const routes = [
         name: "로그인",
         path: "/login",
         element: <SignIn />,
-      },
-      {
-        name: "sign up",
-        path: "/sign-up",
-        element: <SignUp />,
-      },
+      }
     ],
   },
 ];

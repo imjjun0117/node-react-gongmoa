@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import NavItems from './NavItems/NavItems';
+import DropdownMenu from './NavItems/DropdownMenu'
 import { FaBell } from "react-icons/fa";
 import { MdOutlineLogin, MdOutlineLogout } from "react-icons/md";
 import { logoutUser } from '../../action/userAction';
@@ -11,6 +12,13 @@ import styled from "styled-components";
 import { IoIosSettings } from "react-icons/io";
 import { timeAgo } from '../../utils/jsUtils';
 import axiosInstance from '../../utils/axios';
+import {
+  Sidenav,
+  initTE,
+} from "tw-elements";
+
+initTE({ Sidenav });
+
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -93,13 +101,41 @@ const Navbar = () => {
   }
 
   return (
+    
+    <>
+      
+    
     <nav className="bg-gray-900 fixed w-full z-20 top-0 start-0 border-b border-gray-600">
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-        <a href='/' className="flex items-center space-x-3 rtl:space-x-reverse">
-          <FaChartLine size={30} color="red" />
-          <span className="self-center text-lg sm:text-lg md:text-2xl lg:text-3xl xl:text-4xl font-semibold whitespace-nowrap text-white">공모아</span>
-        </a>
+ 
+      <div className='flex justify-start'>
+          {/* <button
+            data-collapse-toggle="navbar-sticky"
+            type="button"
+            className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg  hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600 mr-3"
+            data-te-sidenav-toggle-ref
+            data-te-target="#sidenav-3"
+            aria-controls="#sidenav-3"
+            aria-haspopup="false"
+            onClick={handleMenuToggle}
+          >
+            <span className="sr-only">Open main menu</span>
+            <svg
+              className="w-5 h-5"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 17 14"
+            >
+              <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M1 1h15M1 7h15M1 13h15" />
+            </svg>
+          </button> */}
+          <a href='/' className="flex items-center space-x-3 rtl:space-x-reverse">
+            <FaChartLine size={30} color="red" />
+            <span className="self-center text-lg sm:text-lg md:text-2xl lg:text-2xl xl:text-3xl font-semibold whitespace-nowrap text-white">공모아</span>
+          </a>
 
+      </div>
         <div className="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
           {
             !isAuth ? 
@@ -182,11 +218,15 @@ const Navbar = () => {
           </button>
         </div>
         <div className={`items-center justify-between w-full md:flex md:w-auto md:order-1 ${isMenuOpen ? 'block' : 'hidden'}`} id="navbar-sticky">
-          <NavItems/>
+          
           {/* <DropdownMenu/> */}
+          <NavItems/>
+          
         </div>
       </div>
     </nav>
+    
+    </>
   );
 }
 const AccountMenu = styled.div`
@@ -238,9 +278,7 @@ const AccountMenu = styled.div`
 const AlertMenu = styled.div`
   position: absolute;
   top: 100%;
-  transform: translateX(-50%);
   width: 24rem;
-  left:70%;
   padding: 0.5rem;
   margin-top: 10px;
   background-color: #4a5568;
@@ -272,12 +310,12 @@ const AlertMenu = styled.div`
   }
   opacity: 1;
   visibility: visible;
-  transform: translate(-50%, 0);
+  transform: translate(-76%, 0);
 
   @media (max-width: 767px) {
     /* 화면 폭이 767px 이하인 경우의 스타일 */
-    width: 20rem;
-    left: 55%;
+    width: 18rem;
+    transform: translate(-60%, 0);    
     &::before {    
       left: 78%;
     }

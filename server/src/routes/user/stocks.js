@@ -130,6 +130,7 @@ router.get('/', (req, res, next) => {
       corp_info c
     WHERE
       i.ipo_id = c.ipo_id
+      AND i.use_yn = 'Y'
       ${body.keyword ? "AND (LOWER(i.corp_nm) LIKE CONCAT('%', LOWER(?) , '%'))" : ""}
       ${condition}
     ORDER BY 
@@ -199,6 +200,7 @@ router.get(`/calendar`, (req, res, next) => {
       corp_info c
     WHERE
       i.ipo_id = c.ipo_id
+      AND i.use_yn = 'Y'
     ${condition}
   `;
 
@@ -263,6 +265,7 @@ router.get('/:stockId', (req, res, next) => {
       corp_info c
     WHERE
       i.ipo_id = c.ipo_id
+      AND i.use_yn = 'Y'
       AND i.ipo_id = ?    
   `;
 

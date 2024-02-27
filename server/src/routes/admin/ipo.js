@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../../databases/config/mysql');
 const dotenv = require('dotenv');
+const ipoParsing = require('../../databases');
 
 dotenv.config();
 
@@ -634,108 +635,36 @@ try{
 })
 
 
-//공모주 불러오기 정보
-router.get('/getIpoLoad', async(req, res, next) => {
-
-  let selectIpoLoad = 
-  `
-    SELECT
-      id,
-      time,
-      update_data_num,
-      use_yn
-    FROM
-      ipo_load_info
-    ORDER BY
-      id DESC
-  `
-
-  try{
-
-    const ipoLoad = await queryAsync(selectIpoLoad);
-  
-  
-    return res.json({
-      success: true,
-      ipoLoad : ipoLoad[0]
-    })
-
-  }catch(err){
-
-    return res.json({
-      success: false,
-      msg: '서버에서 오류가 발생했습니다.\n잠시후 다시 시도해주세요.'
-    })
-  }//end catch
-
-})
-
-//공모주 불러오기 정보 수정 로직
-router.post('/modifyIpoLoad', async (req, res, next) => {
+//공모주 불러오기
+router.post('/loadIpo', async (req, res, next) => {
 
     let body = req.body;
 
-    if(!body.time || !body.update_data_num || !body.use_yn){
+    if(!body.update_st_num || !body.update_end_num){
       return res.json({
         success: false,
         msg: '필수 입력값이 누락되었습니다.'
       })
     }
 
-
-    let selectIpoLoad = 
-    `
-      SELECT
-        id,
-        time,
-        update_data_num,
-        use_yn
-      FROM
-        ipo_load_info
-      ORDER BY
-        id DESC
-    `
-
-    try{
-
-      const ipoLoad = await queryAsync(selectIpoLoad);
-    
-      if(!ipoLoad[0].id){
-        return res.json({
-          success: false,
-          msg: '공모주 불러오기 정보가 존재하지 않습니다.\n관리자에게 문의하세요.'
-        })
-      }
-
-      let updateIpoLoad = 
-      `
-        UPDATE
-          ipo_load_info
-        SET
-          time= ?,
-          update_data_num= ?,
-          use_yn= ?,
-          update_dt = NOW()
-        WHERE
-          id= ?
-      `
-
-      await queryAsync(updateIpoLoad, [body.time, body.update_data_num, body.use_yn, ipoLoad[0].id]);
-
-      return res.json({
-        success: true,
-        msg: '수정에 성공하였습니다.'
-      })
-
-    }catch(err){
-
+    if(Number(body.update_st_num) > Number(body.update_end_num)){
       return res.json({
         success: false,
-        msg: '서버에서 오류가 발생했습니다.\n잠시후 다시 시도해주세요.'
+        msg: '시작 갯수가 종료 갯수보다 높을수는 없습니다.'
       })
-    }//end catch
+    }
 
+    let start = Math.floor(body.update_st_num / 30) + 1;
+    let end = Math.ceil(body.update_end_num / 30);
 
+    for(let i = start; i <= end; i++){
+      ipoParsing(i);
+    }
+
+    return res.json({
+      success: true,
+      msg: '업데이트를 성공하였습니다.'
+    })
 
 })
 

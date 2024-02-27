@@ -9,12 +9,10 @@ const {setStSub, setEndSub, setStForecast, setEndForecast} = require('./database
 
 const dotenv = require('dotenv');
 const { cleanEmailCode, sendNotify } = require('./email/email.js');
-const {schedulerTime}  = require('./databases/ipoLoadConfig.js')
 
 dotenv.config();
 app.use(cors());
 app.use(express.json());
-let ipo_update_time = '00 00 00 * * *';
 
 //라우터 설정
 app.use('/stocks', require('./routes/user/stocks.js'));
@@ -32,33 +30,13 @@ app.get('/', async (req, res, next) => {
 
 })
 
-app.get('/hihi', async(req, res, next) => {
-
-  ipo_update_time = await schedulerTime();
-
-  return res.json({
-    success: true,
-    msg: '성공'
-  })
-
-})
-
 const port = 8080;
 
-app.listen(port, async() => {
+app.listen(port, () => {
   
-  try{
-    ipo_update_time= await schedulerTime();
+  console.log(`server start ${port}`);
 
-  }catch(err){
-    console.error(err);
-    ipo_update_time = '00 00 00 * * *';
-  }
-
-
-  console.log(`server start ${port} ${ipo_update_time}`);
-
-    schedule.scheduleJob(ipo_update_time, () => {
+    schedule.scheduleJob('00 19 00 * * *', () => {
       console.log('실행')
       ipoParsing(1);
       cleanEmailCode();

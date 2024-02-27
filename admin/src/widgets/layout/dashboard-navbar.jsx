@@ -17,12 +17,29 @@ import {
 import { logoutAdmin } from '@/action/adminAction';
 import { useDispatch } from 'react-redux';
 
-export function DashboardNavbar() {
+export function DashboardNavbar({routes}) {
   const [controller, dispatch] = useMaterialTailwindController();
   const dispatch_action = useDispatch();
   const { fixedNavbar, openSidenav } = controller;
   const { pathname } = useLocation();
   const [layout, page] = pathname.split("/").filter((el) => el !== "");
+
+  let parent = '메인';
+  let child = '';
+
+  routes.map(route => {
+    
+    route.pages.map(route_page => {
+
+      if(route_page.path.split('/')[1] === page){
+        parent = route.title;
+        child= route_page.name;
+      } 
+
+    })
+
+  })
+
 
   const logoutHandler = () => {
 
@@ -50,13 +67,13 @@ export function DashboardNavbar() {
               fixedNavbar ? "mt-1" : ""
             }`}
           >
-            <Link to={`/${layout}`}>
+            <Link to={`#`}>
               <Typography
                 variant="small"
                 color="blue-gray"
                 className="font-normal opacity-50 transition-all hover:text-blue-500 hover:opacity-100"
               >
-                {layout}
+                {parent}
               </Typography>
             </Link>
             <Typography
@@ -64,11 +81,11 @@ export function DashboardNavbar() {
               color="blue-gray"
               className="font-normal"
             >
-              {page}
+              {child}
             </Typography>
           </Breadcrumbs>
           <Typography variant="h6" color="blue-gray">
-            {page}
+            {child}
           </Typography>
         </div>
         <div className="flex items-center">

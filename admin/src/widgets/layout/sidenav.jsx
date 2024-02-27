@@ -2,7 +2,6 @@ import PropTypes from "prop-types";
 import { Link, NavLink } from "react-router-dom";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import {
-  Avatar,
   Button,
   IconButton,
   Typography,
@@ -12,7 +11,7 @@ import {
 } from "@heroicons/react/24/solid";
 import { useMaterialTailwindController, setOpenSidenav } from "@/context";
 
-export function Sidenav({ brandImg, brandName, routes }) {
+export function Sidenav({ brandName, routes }) {
   const [controller, dispatch] = useMaterialTailwindController();
   const { sidenavColor, sidenavType, openSidenav } = controller;
   const sidenavTypes = {
@@ -56,18 +55,46 @@ export function Sidenav({ brandImg, brandName, routes }) {
         </IconButton>
       </div>
       <div className="m-4">
-        {routes.map(({ layout, title, pages }, key) => (
+        {routes.map(({ layout, title, pages, path }, key) => (
           <ul key={key} className="mb-4 flex flex-col gap-1">
-            {title && (
-              <li className="mx-3.5 mt-4 mb-2">
-                <Typography
-                  color={sidenavType === "dark" ? "white" : "blue-gray"}
-                  className="font-black uppercase opacity-75"
-                >
-                  {title}
-                </Typography>
+            {title && path !== "#" && (
+              <li>
+                <NavLink to={`/${layout}${path}`}>
+                {({ isActive }) => (
+                    <Button
+                      variant={isActive ? "gradient" : "text"}
+                      color={
+                        isActive
+                          ? sidenavColor
+                          : sidenavType === "dark"
+                          ? "white"
+                          : "blue-gray"
+                      }
+                      className="flex items-center gap-4 px-4 capitalize text-sm"
+                      fullWidth
+                    >
+                  <Typography
+                    color={isActive ? "white" : "blue-gray"}
+                    className="font-black uppercase opacity-75"
+                  
+                  >
+                    {title}
+                  </Typography>
+                    </Button>
+                  )}
+                </NavLink>
               </li>
-            )}
+              )}
+              {title && path === "#" && (
+                <li className="mx-3 mt-4 mb-2">
+                  <Typography
+                    color={sidenavType === "dark" ? "white" : "blue-gray"}
+                    className="font-black uppercase opacity-75"
+                  >
+                    {title}
+                  </Typography>
+                </li>
+              )}
             {pages.map(({ name, path }) => (
               <li key={name}>
                 <NavLink to={`/${layout}${path}`}>

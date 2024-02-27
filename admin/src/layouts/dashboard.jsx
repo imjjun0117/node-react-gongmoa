@@ -26,7 +26,7 @@ export function Dashboard() {
   useEffect(() => {
 
     fetchRoutes();
-    
+
   }, [])
   
   const fetchRoutes = () => {
@@ -36,6 +36,8 @@ export function Dashboard() {
   
       setRoutes(res.data.rtnMenu);
   
+      console.log(res.data.rtnMenu);
+
     })
 
   }
@@ -52,7 +54,7 @@ export function Dashboard() {
         brandName='공모아 관리자'
       />
       <div className="p-4 xl:ml-80">
-        <DashboardNavbar />
+        <DashboardNavbar routes={routes}/>
         <Configurator />
         <IconButton
           size="lg"

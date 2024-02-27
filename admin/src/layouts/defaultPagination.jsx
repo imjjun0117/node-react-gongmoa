@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Button, IconButton } from "@material-tailwind/react";
 import { ArrowRightIcon, ArrowLeftIcon } from "@heroicons/react/24/outline";
 
@@ -6,7 +6,7 @@ const PAGE_GROUP_SIZE = 5;
 
 export function DefaultPagination({prn_Per_cnt, currentPage, totalRowNum, pagingFunction}) {
 
-  const [active, setActive] = React.useState(currentPage);
+  const [active, setActive] = React.useState(Number(currentPage));
   const finalPage = Math.ceil(totalRowNum / prn_Per_cnt); // 마지막 페이지
   const rest = totalRowNum % prn_Per_cnt; // 남은 데이터 갯수
   const virtualStartPage = Math.floor((currentPage - 1) / PAGE_GROUP_SIZE) * PAGE_GROUP_SIZE + 1;
@@ -38,9 +38,6 @@ export function DefaultPagination({prn_Per_cnt, currentPage, totalRowNum, paging
   const prev = () => {
     if (currentPage === 1) return;
 
-
-    console.log( Math.floor((currentPage - 1) / PAGE_GROUP_SIZE) == 0);
-
     if( Math.floor((currentPage - 1) / PAGE_GROUP_SIZE) == 0){
       setActive(1);
       pagingFunction(1);
@@ -64,7 +61,7 @@ export function DefaultPagination({prn_Per_cnt, currentPage, totalRowNum, paging
       </Button>
       <div className="flex items-center gap-2">
         {[...Array(virtualEndPage - virtualStartPage + 1)].map((_, index) => (
-          <IconButton key={virtualStartPage + index} variant= {active === index ? "filled" : "text"} {...getItemProps(virtualStartPage + index)}>
+          <IconButton key={virtualStartPage + index} {...getItemProps(virtualStartPage + index)}>
             {virtualStartPage + index}
           </IconButton>
         ))}

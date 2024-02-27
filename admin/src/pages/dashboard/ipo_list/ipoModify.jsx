@@ -19,7 +19,6 @@ export function IpoModify({fetchRoutes}) {
   const [searchParams] = useSearchParams();
   const ipoId = searchParams.get('ipo_id');
   const act = searchParams.get('act');
-  const [targetCode, setTargetCode] = useState('');
   const navigate = useNavigate();
   const [ipoDetail, setIpoDetail] = useState({});
   const pp = searchParams.get('pp') ? searchParams.get('pp') : 10;
@@ -99,7 +98,7 @@ export function IpoModify({fetchRoutes}) {
 
     
 
-  },[])
+  },[act])
 
   const {
     register, 
@@ -163,7 +162,7 @@ export function IpoModify({fetchRoutes}) {
     }
   }
 
-  if(!dataStatus){
+  if(!dataStatus && act !== "I"){
     return (
       <div className="mt-48 mb-8 flex flex-col gap-12 ">
         <Card>

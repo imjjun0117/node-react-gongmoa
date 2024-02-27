@@ -6,10 +6,10 @@ import eslint from 'vite-plugin-eslint'
 export default defineConfig({
   server: {
     proxy: {
-      '/server': {
+      '/api': {
         target: 'http://15.165.95.65:8080',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/server/, ''), // 수정된 부분
+        rewrite: (path) => path.replace(/^\/api/, ''), // 수정된 부분
       },
     },
   },
