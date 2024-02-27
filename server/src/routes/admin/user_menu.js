@@ -19,7 +19,6 @@ function queryAsync(sql, values) {
   });
 }
 
-
 router.get('/menu', async (req, res, next) => {
 
   let rtnMenu =  [];
@@ -30,7 +29,7 @@ router.get('/menu', async (req, res, next) => {
       name,
       path
     FROM
-      admin_menu
+      user_menu
     WHERE
       use_yn='Y'
       AND LENGTH(menu_code) = 3
@@ -48,7 +47,7 @@ router.get('/menu', async (req, res, next) => {
           name,
           path
         FROM
-          admin_menu
+          user_menu
         WHERE 
           use_yn = 'Y'
           AND menu_code LIKE CONCAT(?, '%')
@@ -61,7 +60,6 @@ router.get('/menu', async (req, res, next) => {
 
       let oneDepthJson = {
         title: menu.name,
-        layout: 'aoslwj7110',
         path: menu.path,
         pages: twoDepth.map(menu2 => ({
           name: menu2.name,
@@ -78,8 +76,7 @@ router.get('/menu', async (req, res, next) => {
   }
 });
 
-
-router.get('/adminMenuList', async (req, res, next) => {
+router.get('/userMenuList', async (req, res, next) => {
 
   let body = req.query;
 
@@ -98,7 +95,7 @@ router.get('/adminMenuList', async (req, res, next) => {
     let p_menu = await queryAsync(`
       SELECT 
         name
-      FROM admin_menu
+      FROM user_menu
       WHERE menu_code=?
     `, [body.parentCode])
 
@@ -127,7 +124,7 @@ router.get('/adminMenuList', async (req, res, next) => {
         DATE_FORMAT(update_dt, '%Y-%m-%d') AS update_dt,
         use_yn
       FROM
-        admin_menu
+        user_menu
       WHERE 
         1 = 1
         ${body.parentCode ? 
@@ -154,7 +151,7 @@ router.get('/adminMenuList', async (req, res, next) => {
       SELECT 
         COUNT(*) AS cnt
       FROM
-        admin_menu
+        user_menu
       WHERE 
         1 = 1
         ${body.parentCode ? 
@@ -180,13 +177,13 @@ router.get('/adminMenuList', async (req, res, next) => {
 
 })
 
-router.post('/setAdminMenuStatus', async (req, res, next) => {
+router.post('/setUserMenuStatus', async (req, res, next) => {
 
   let body = req.body;
 
   let updateStatus = 
   `
-    UPDATE admin_menu
+    UPDATE user_menu
     SET 
       use_yn = ?,
       update_dt = NOW()
@@ -215,7 +212,7 @@ router.post('/setAdminMenuStatus', async (req, res, next) => {
 })
 
 //메뉴 등록시에 가장 큰 메뉴 코드 반환
-router.get('/getAdminMenuCode', async (req, res, next) => {
+router.get('/getUserMenuCode', async (req, res, next) => {
 
   let params = req.query;
 
@@ -248,7 +245,7 @@ router.get('/getAdminMenuCode', async (req, res, next) => {
       )
         AS menu_code
     FROM 
-      admin_menu
+      user_menu
     WHERE 
       LENGTH(menu_code) = COALESCE(CHAR_LENGTH(?), 0) + 3
       AND
@@ -274,7 +271,7 @@ router.get('/getAdminMenuCode', async (req, res, next) => {
 })
 
 //메뉴 등록시 디테일
-router.get('/getAdminMenuDetail', async (req, res, next) => {
+router.get('/getUserMenuDetail', async (req, res, next) => {
 
   let params = req.query;
 
@@ -293,7 +290,7 @@ router.get('/getAdminMenuDetail', async (req, res, next) => {
       path,
       use_yn
     FROM 
-      admin_menu
+      user_menu
     WHERE
       menu_code=?
   `
@@ -312,7 +309,7 @@ router.get('/getAdminMenuDetail', async (req, res, next) => {
 })
 
 //관리자 메뉴 수정 로직
-router.post('/modifyAdminMenu', async (req, res, next) => {
+router.post('/modifyUserMenu', async (req, res, next) => {
 
   try{
 
@@ -335,7 +332,7 @@ router.post('/modifyAdminMenu', async (req, res, next) => {
       SELECT
         * 
       FROM 
-        admin_menu
+        user_menu
       WHERE 
         menu_code = ?
     `
@@ -356,7 +353,7 @@ router.post('/modifyAdminMenu', async (req, res, next) => {
   
       let insertMenu = 
       `
-        INSERT INTO admin_menu
+        INSERT INTO user_menu
         (
           menu_code,
           name,
@@ -375,7 +372,7 @@ router.post('/modifyAdminMenu', async (req, res, next) => {
           (
             SELECT IFNULL(MAX(a.sort_num), 0) +1 as sort_num
             FROM 
-              admin_menu a
+              user_menu a
             WHERE
               LENGTH(a.menu_code) = LENGTH(?)
               AND a.menu_code LIKE CONCAT(SUBSTRING(?, 1, LENGTH(?) - 3), '%')
@@ -405,7 +402,7 @@ router.post('/modifyAdminMenu', async (req, res, next) => {
 
       let updateMenu = 
       `
-        UPDATE admin_menu
+        UPDATE user_menu
         SET
           name=?,
           path=?,
@@ -433,7 +430,7 @@ router.post('/modifyAdminMenu', async (req, res, next) => {
 
 
 //관리자 메뉴코드 순서변경 로직
-router.post('/setAdminMenuOrder', (req, res, next) => {
+router.post('/setUserMenuOrder', (req, res, next) => {
 
   let body = req.body;
   let parentCode = body.parentCode ? body.parentCode : '';
@@ -467,7 +464,7 @@ router.post('/setAdminMenuOrder', (req, res, next) => {
       SELECT 
         *
       FROM 
-        admin_menu
+        user_menu
       WHERE 
         menu_code=?
     `
@@ -489,7 +486,7 @@ router.post('/setAdminMenuOrder', (req, res, next) => {
     let updateMenu = 
     `
       UPDATE
-        admin_menu
+        user_menu
       SET
         sort_num = ?
       WHERE 

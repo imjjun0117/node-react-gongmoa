@@ -2,7 +2,8 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_SERVER_URL_DEV
+  baseURL: import.meta.env.VITE_SERVER_URL ? 
+  import.meta.env.VITE_SERVER_URL : import.meta.env.VITE_SERVER_URL_DEV
 })
 
 //accessToken 헤더 세팅

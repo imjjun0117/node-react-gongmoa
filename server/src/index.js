@@ -18,6 +18,7 @@ app.use(express.json());
 app.use('/stocks', require('./routes/user/stocks.js'));
 app.use('/admin', require('./routes/admin/admin'));
 app.use('/users', require('./routes/user/users.js'));
+app.use('/menu', require('./routes/user/menu.js'));
 
 app.use((error, req, res, next) => {
   res.status(error.status || 500);

@@ -7,7 +7,6 @@ import {
   Configurator,
   Footer,
 } from "@/widgets/layout";
-import { component } from "@/routes";
 import { useMaterialTailwindController, setOpenConfigurator } from "@/context";
 import React, { useEffect, useState } from 'react';
 import axiosInstance from '@/utils/axios';
@@ -17,6 +16,8 @@ import { Profile } from '@/pages/dashboard';
 import IpoList from '@/pages/dashboard/ipo_list/ipoList';
 import IpoModify from '@/pages/dashboard/ipo_list/ipoModify';
 import IpoLoad from '@/pages/dashboard/ipo_load/ipoLoad';
+import UserMenu from '@/pages/dashboard/user_menu/userMenu';
+import UserMenuModify from '@/pages/dashboard/user_menu/userMenuModify';
 
 export function Dashboard() {
   const [controller, dispatch] = useMaterialTailwindController();
@@ -35,8 +36,6 @@ export function Dashboard() {
     axiosInstance.get('/admin/admin_menu/menu').then(res => {
   
       setRoutes(res.data.rtnMenu);
-  
-      console.log(res.data.rtnMenu);
 
     })
 
@@ -70,6 +69,10 @@ export function Dashboard() {
           <Route path="/admin_menu">
             <Route index element={<AdminMenu fetchRoutes={fetchRoutes}/>}/>
             <Route path="/admin_menu/modify" element={<AdminMenuModify fetchRoutes={fetchRoutes}/>} />
+          </Route>
+          <Route path="/user_menu">
+            <Route index element={<UserMenu fetchRoutes={fetchRoutes}/>}/>
+            <Route path="/user_menu/modify" element={<UserMenuModify fetchRoutes={fetchRoutes}/>} />
           </Route>
           <Route path="/ipo_list">
             <Route index element={<IpoList/>}/>

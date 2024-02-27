@@ -21,6 +21,7 @@ import AccountPage from './Pages/AccountPage/index';
 import FindPassword from './Pages/FindPassword/index';
 import UpdatePassword from './Pages/FindPassword/UpdatePassword/UpdatePassword';
 
+
 function Layout() {
   return (
     <div className='flex flex-col h-screen justify-between'>

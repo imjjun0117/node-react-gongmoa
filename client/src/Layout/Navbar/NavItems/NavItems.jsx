@@ -1,14 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Collapse,
-  Dropdown,
-  initTE,
-} from "tw-elements";
+  Menu,
+  MenuHandler,
+  MenuList,
+  MenuItem
+} from "@material-tailwind/react";
+import axiosInstance from '../../../utils/axios';
+import { NavLink } from 'react-router-dom';
 
-initTE({ Collapse, Dropdown });
 const NavItems = () => {
   const [isMobile, setIsMobile] = useState(false);
+  const [menuList, setMenuList] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
+  useEffect(() => {
+
+    if(!isLoading){
+      setIsLoading(true);
+
+      axiosInstance.get('/menu').then(res => {
+        setMenuList(res.data.rtnMenu);
+        setIsLoading(false);
+      })
+
+    }
+    
+  }, [])
+  
+  console.log(menuList);
+  
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768); // 예시의 임계값인 768은 모바일 여부를 판단하기 위한 임의의 값입니다.
@@ -27,29 +47,50 @@ const NavItems = () => {
 
   },[])
 
+  if(isLoading){
+    return (
+      <></>
+    )
+  }
+
   return (
-
-  <ul className="flex flex-col p-4 md:p-0 mt-4 font-medium border rounded-lg md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 bg-gray-800 md:bg-gray-900 border-gray-700">
-    <li>
-      <a
-        href="/"
-        className="block py-2 px-3 rounded md:p-0 md:hover:text-blue-500 text-white hover:bg-gray-700 hover:text-white md:hover:bg-transparent border-gray-700"
-        aria-current="page"
-      >
-        공모주 일정
-      </a>
-
-    </li>
-    <li>
-      <a
-        href="/stocks/calendar"
-        className="block py-2 px-3 rounded md:p-0 md:hover:text-blue-500 text-white hover:bg-gray-700 hover:text-white md:hover:bg-transparent border-gray-700"
-      >
-        공모주 캘린더
-      </a>
-    </li>
+    <ul className="flex flex-col p-4 md:p-0 mt-4 font-medium border rounded-lg md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0 md:border-0 bg-gray-800 md:bg-gray-900 border-gray-700">
+      {
+        menuList.map(({title, path, pages}, idx) => (
+          <li key={idx}>
+            <Menu>
+              {
+                path === '#' ? (
+                  <MenuHandler>
+                    <button className='lock py-2 px-3 text-md rounded md:p-0 md:hover:text-blue-500 text-white hover:bg-gray-700 hover:text-white md:hover:bg-transparent border-gray-700 text-lg'>{title}</button>
+                  </MenuHandler>
+                ) : (
+                <NavLink to={`${path}`}>
+                  <MenuHandler>
+                    <button className='lock py-2 px-3 text-md rounded md:p-0 md:hover:text-blue-500 text-white hover:bg-gray-700 hover:text-white md:hover:bg-transparent border-gray-700 text-lg'>{title}</button>
+                  </MenuHandler>
+                </NavLink>
+                )
+              }
+              {
+                pages.length !== 0 && (
+                  <MenuList className='z-30 w-48 mt-2 p-3 hover:decoration-none'>
+                    {pages.map(({name, path}, idx) => (
+                      <>
+                        <NavLink to={`${path}`}>
+                          <MenuItem className='my-2'>{name}</MenuItem>
+                        </NavLink>
+                        <hr className="my-3" />
+                      </>
+                    ))}
+                  </MenuList>
+                )
+              }
+            </Menu>
+          </li>
+        ))
+      }
   </ul>
-
   );
 };
 
