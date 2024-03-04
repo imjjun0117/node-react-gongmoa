@@ -73,8 +73,8 @@ const EventModal = ({ isOpen, closeModal, event }) => {
     },
     content: {
       ...customStyles.content, // 기존 스타일 유지
-      left: isMobile ? '10vw' : '40vw',
-      right: isMobile ? '10vw' : '40vw',
+      left: isMobile ? '5vw' : '30vw',
+      right: isMobile ? '5vw' : '30vw',
     },
   };
 

@@ -136,14 +136,14 @@ export const kakaoLogin = createAsyncThunk(
 
 
 //카카오 로그인
-export const kakaoAddTel = createAsyncThunk(
-  "user/addTel",
+export const kakaoAddInfo = createAsyncThunk(
+  "user/addInfo",
   async(body, thunkAPI) => {
 
     try{
 
       const response = await axiosInstance.post(
-        `/users/kakao/addTel`,
+        `/users/kakao/addInfo`,
         body
     )
 

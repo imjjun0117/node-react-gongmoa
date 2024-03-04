@@ -123,22 +123,6 @@ export function IpoList() {
 
   }
 
-  if(!dataStatus){
-    return (
-      <div className="mt-48 mb-8 flex flex-col gap-12 ">
-        <Card>
-            <CardHeader variant="gradient" color="gray" className="mb-8 p-6">
-              <Typography variant="h6" color="white">
-                공모주 관리
-              </Typography>
-            </CardHeader>
-            <CardBody className="overflow-x-scroll px-0 pt-0 pb-2">
-              <LoadingBar/>
-          </CardBody>
-        </Card>
-      </div>
-    )
-  }
 
   return (
     <div className="mt-48 mb-8 flex flex-col gap-12">
@@ -289,8 +273,7 @@ export function IpoList() {
                 ))}
               </tr>
             </thead>
-            <tbody>
-          
+            <tbody>   
               {ipoList.map(
                 ({ corp_nm, st_sub, end_sub, weekly_company, ipo_id, stock_type, stock_code, listed_type,
                   reg_dt, update_dt, use_yn, update_yn }, key) => {
@@ -443,6 +426,22 @@ export function IpoList() {
               )}
             </tbody>
           </table>
+          {
+            !dataStatus && (
+  
+                  <div className='flex justify-center w-full my-10'>
+                    <span>
+                      <LoadingBar/>
+                    </span>
+                  </div>
+                
+            )
+          }
+          {dataStatus && ipoList.length === 0 && (
+            <span className='flex justify-center mt-5 font-semibold text-gray-400 text-sm'>
+              해당하는 공모주가 존재하지 않습니다.
+            </span>
+          )} 
           <div className='flex justify-end mt-5 mr-8'>
             <Link to={`/aoslwj7110/ipo_load`}>
               <Button size="md" className='mr-4'>

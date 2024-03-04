@@ -52,7 +52,7 @@ app.listen(port, () => {
       console.log('끝...');
     })
     
-    schedule.scheduleJob('00 00 09 * * *', () => {
+    schedule.scheduleJob('00 16 20 * * *', () => {
 
       console.log('이메일 보내는중...');
       sendNotify();

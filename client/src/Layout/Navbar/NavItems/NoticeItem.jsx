@@ -74,9 +74,9 @@ export function NoticeItem() {
           <FaBell style={{ color: 'white', fontSize: '24px' }}/>
         </button>
       </MenuHandler>
-      <MenuList className="flex flex-col gap-2 z-30 max-w-[500px] w-[300px]">
+      <MenuList className="flex flex-col gap-2 z-30 max-w-[600px] w-[500px]">
         {
-          notifyCnt == 0 && 
+          notifyCnt === 0 && notify.length === 0 && 
           <MenuItem className="flex items-center gap-4 py-2 pl-2 pr-8">
             <AiFillCloseCircle className='w-5 h-5'/>
             <div className="flex flex-col gap-1">
@@ -89,23 +89,6 @@ export function NoticeItem() {
         
       {notify?.map((item, idx) => (
         item.read_yn === 'Y' ? (
-          <span key={idx}>
-            <MenuItem className="flex items-center gap-4 py-2 pl-2 pr-8" onClick={() => handleNotify(item.id, item.url, item.read_yn)}>
-              <MdMarkEmailUnread className='w-6 h-6'/>
-              <div className="flex flex-col gap-1">
-                <Typography variant="small" color="gray" className="font-semibold">
-                  {item.notify_content}
-                </Typography>
-                <Typography className="flex items-center gap-1 text-sm font-medium text-blue-gray-500">
-                  <ClockIcon />
-                  {timeAgo(item.send_dt)}
-                </Typography>
-              </div>
-            </MenuItem>
-            <hr className="my-2 border-blue-gray-50" />
-          </span>
-        ) : (
-
           <span key={idx}>
             <MenuItem className="flex items-center gap-4 py-2 pl-2 pr-8" onClick={() => handleNotify(item.id, item.url, item.read_yn)}>
             <MdMarkEmailRead className='w-6 h-6'/>
@@ -124,6 +107,23 @@ export function NoticeItem() {
             </MenuItem>
             <hr className="my-2 border-blue-gray-50" />
             </span>
+        ) : (
+          <span key={idx}>
+            <MenuItem className="flex items-center gap-4 py-2 pl-2 pr-8" onClick={() => handleNotify(item.id, item.url, item.read_yn)}>
+              <MdMarkEmailUnread className='w-6 h-6'/>
+              <div className="flex flex-col gap-1">
+                <Typography variant="small" color="gray" className="font-semibold">
+                  {item.notify_content}
+                </Typography>
+                <Typography className="flex items-center gap-1 text-sm font-medium text-blue-gray-500">
+                  <ClockIcon />
+                  {timeAgo(item.send_dt)}
+                </Typography>
+              </div>
+            </MenuItem>
+            <hr className="my-2 border-blue-gray-50" />
+          </span>
+
         )
       ))}
       </MenuList>

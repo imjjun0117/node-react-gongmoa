@@ -1,33 +1,29 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { kakaoAddTel } from '../../../action/userAction';
+import { kakaoAddInfo } from '../../../action/userAction';
 
-
-const KakaoHtelAdd = () => {
+const KakaoAddInfo = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [emailToggle, setEmailToggle] = useState(false);
 
   const payload = useSelector(state => state.user?.payload);
 
   const {
-    register,
     handleSubmit,
-    getValues,
-    setValue,
     formState: {errors},
-    reset
   } = useForm({mode: 'onBlur'});
   
-  const onSubmit = ({ htel }) => {
+  const onSubmit = () => {
 
 
     let body = {
-      htel : htel
+      email_yn : emailToggle ? 'Y' : 'N'
     }
     
-    dispatch(kakaoAddTel(body)).then(res => {
+    dispatch(kakaoAddInfo(body)).then(res => {
       if(res.payload.success){
         alert(res.payload.message);
         navigate('/');
@@ -38,30 +34,30 @@ const KakaoHtelAdd = () => {
     });
   }
 
-  const userHtel = {
-    required: "전화번호를 입력해주세요.",
-    pattern: {
-      value: /^010-[0-9]{4}-[0-9]{4}$/,
-      message: "유효하지 않는 전화번호입니다." 
-    },
-    maxLength: {
-      value: 13, // 최대 길이 지정
-      message: '전화번호는 13자 이하여야 합니다.',
-    },
-    onChange: (e) => { //전화번호 형태 자동입력
-      let inputPhoneNumber = e.target.value;
+  // const userHtel = {
+  //   required: "전화번호를 입력해주세요.",
+  //   pattern: {
+  //     value: /^010-[0-9]{4}-[0-9]{4}$/,
+  //     message: "유효하지 않는 전화번호입니다." 
+  //   },
+  //   maxLength: {
+  //     value: 13, // 최대 길이 지정
+  //     message: '전화번호는 13자 이하여야 합니다.',
+  //   },
+  //   onChange: (e) => { //전화번호 형태 자동입력
+  //     let inputPhoneNumber = e.target.value;
 
-      // 정규식을 사용하여 숫자만 추출
-      const numbersOnly = inputPhoneNumber.replace(/\D/g, '');
+  //     // 정규식을 사용하여 숫자만 추출
+  //     const numbersOnly = inputPhoneNumber.replace(/\D/g, '');
 
-      // 010 뒤에 숫자가 8자리일 때와 그 외의 경우에 따라 '-'를 추가
-      const formattedPhoneNumber = numbersOnly.replace(/(\d{3})(\d{4})(\d{0,4})/, (match, p1, p2, p3) => {
-        return p3 ? `${p1}-${p2}-${p3}` : p1.length === 3 ? `${p1}-${p2}` : `${p1}-${p2}`;
-      });
+  //     // 010 뒤에 숫자가 8자리일 때와 그 외의 경우에 따라 '-'를 추가
+  //     const formattedPhoneNumber = numbersOnly.replace(/(\d{3})(\d{4})(\d{0,4})/, (match, p1, p2, p3) => {
+  //       return p3 ? `${p1}-${p2}-${p3}` : p1.length === 3 ? `${p1}-${p2}` : `${p1}-${p2}`;
+  //     });
     
-      setValue('htel', formattedPhoneNumber);
-    },
-  }
+  //     setValue('htel', formattedPhoneNumber);
+  //   },
+  // }
 
   const cancelHandler = () => {
     alert('회원정보 수정에서 다시 등록하실 수 있습니다.');
@@ -69,16 +65,24 @@ const KakaoHtelAdd = () => {
 
   }
 
+
+  const handleToggle = () => {
+
+    setEmailToggle(!emailToggle);
+
+  }
+
+
   return (
     <section className="bg-gray-200 mx-w-md w-full">
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
         <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
             <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
-              추가정보항목(전화번호)
+              추가정보항목(수신동의)
             </h1>      
             <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit(onSubmit)}>
-              <div>
+              {/* <div>
                 <label htmlFor="phone-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                 </label>
                 <div className="relative">
@@ -106,6 +110,25 @@ const KakaoHtelAdd = () => {
                 <p id="helper-text-explanation" className="mt-2 text-sm text-gray-500 dark:text-gray-400">
                   공모주 정보를 카카오톡으로 받아보실 수 있어요!
                 </p>
+              </div> */}
+              <div>
+                <label htmlFor="alarm" className="block text-sm font-medium text-white">알림설정</label>
+                <div className="flex items-center mb-2">
+                  <span className="mr-3 text-sm font-medium text-gray-300">E-Mail</span>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      value="Y"
+                      className="sr-only peer"
+                      onChange={handleToggle}
+                      id="email_yn"
+                    />
+                    <div className="w-11 h-6 peer-focus:outline-none peer-focus:ring-4peer-focus:ring-blue-800 rounded-full peer bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all border-gray-600 peer-checked:bg-blue-600"></div>
+                  </label>
+                </div>
+                <p className="text-xs font-light text-gray-400">
+                  즐겨찾기 한 공모주 정보를 받아보실 수 있습니다!
+                </p>
               </div>
               <button
                 type="submit"
@@ -128,4 +151,4 @@ const KakaoHtelAdd = () => {
   )
 }
 
-export default KakaoHtelAdd;
+export default KakaoAddInfo;

@@ -430,6 +430,7 @@ router.post(`/kakao/login`, (req, res, next) => {
 
       return res.json({
         kakaoLoginSuccess : true,
+        newUser: false,
         userData:{
           id: user[0].id,
           name: user[0].name,
@@ -471,6 +472,7 @@ router.post(`/kakao/login`, (req, res, next) => {
       
       return res.json({
         kakaoLoginSuccess : true,
+        newUser: true,
         userData:{
           id: userData.id,
           name: userData.properties.nickname,
@@ -488,42 +490,42 @@ router.post(`/kakao/login`, (req, res, next) => {
 })
 
 
-// router.post('/kakao/addTel', auth, (req, res, next) => {
+router.post('/kakao/addInfo', auth, (req, res, next) => {
 
 
-//   let body = req.body;
+  let body = req.body;
 
-//   if(!body.htel){
-//     return res.json({
-//       success: false,
-//       message: '필수 입력값이 누락되었습니다.'
-//     })
-//   }
+  if(!body.email_yn){
+    return res.json({
+      success: false,
+      message: '필수 입력값이 누락되었습니다.'
+    })
+  }
 
 
-//   let selectSnsUser = 
-//   `
-//     UPDATE sns_users
-//     SET htel = ?
-//     WHERE id = ?  
-//   `
+  let selectSnsUser = 
+  `
+    UPDATE sns_users
+    SET email_yn = ?
+    WHERE id = ?  
+  `
 
-//   db.query(selectSnsUser, [body.htel, req.user.id], (err, result) => {
+  db.query(selectSnsUser, [body.email_yn, req.user.id], (err, result) => {
 
-//     if(err){
-//       return next(err);
-//     }
+    if(err){
+      return next(err);
+    }
 
-//     return res.json({
-//       success: true,
-//       message: '전화번호가 등록되었습니다.'
-//     })
+    return res.json({
+      success: true,
+      message: '수신 동의 여부가 등록되었습니다.'
+    })
 
-//   })
+  })
   
 
 
-// })
+})
 
 //개인정보 수정 비밀번호 확인 로직
 router.post(`/checkPwd`, auth, async (req, res, next) => {
@@ -1208,7 +1210,8 @@ router.post('/updateUser', auth, async (req, res, next) => {
         UPDATE
           users
         SET
-          password=?
+          password=?,
+          update_dt=NOW()
         WHERE
           id=?
       `

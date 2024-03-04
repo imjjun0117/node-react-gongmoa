@@ -19,6 +19,51 @@ function queryAsync(sql, values) {
   });
 }
 
+router.post('/isMenuValid', async (req, res, next) => {
+
+  let body = req.body;
+
+  if(!body.menu_path){
+    return res.json({
+      success: false,
+      msg: '잘못된 접근입니다.'
+    })
+  }
+
+  const selectDepth = 
+  `
+    SELECT
+      use_yn
+    FROM 
+      admin_menu
+    WHERE 
+      path=?
+  `
+
+  const menu = await queryAsync(selectDepth, [body.menu_path]);
+  
+  if(menu.length === 0){
+    return res.json({
+      success:false,
+      msg: '잘못된 접근입니다.'
+    })
+  }
+
+  let success = true;
+  let msg = '';
+
+
+  if(menu[0].use_yn === 'N'){
+    success = false;
+    msg = '해당 메뉴는 사용 불가 메뉴입니다.'
+  }
+
+  return res.json({
+    success,
+    msg
+  })
+
+})
 
 router.get('/menu', async (req, res, next) => {
 

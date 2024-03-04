@@ -11,6 +11,7 @@ dotenv.config();
 router.use('/admin_menu', require('./admin_menu'));
 router.use('/user_menu', require('./user_menu'));
 router.use('/ipo', require('./ipo'));
+router.use('/user', require('./user'));
 
 // Promise를 반환하는 query 함수를 사용하여 쿼리 실행(동기실행)
 function queryAsync(sql, values) {

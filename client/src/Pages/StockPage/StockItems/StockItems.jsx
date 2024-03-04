@@ -9,8 +9,6 @@ const StockItems = ({stocks}) => {
 
   useEffect( ()=> {
 
-    console.log(stocks);
-
     if(JSON.parse(sessionStorage.getItem('reload')) === 'Y' && targetId){
 
       const targetDiv = document.getElementById(targetId);

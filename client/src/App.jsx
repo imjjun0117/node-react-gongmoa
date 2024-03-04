@@ -14,12 +14,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { authUser } from './action/userAction';
 import KakaoRedirectHandler from './Pages/LoginPage/Kakao/KakaoRedirectHandler';
-import KakaoHtelAdd from './Pages/LoginPage/Kakao/KakaoHtelAdd';
 import StockCalendar from './Pages/StockCalendar';
 import CheckPassword from './Pages/AccountPage/CheckPassword/CheckPassword';
 import AccountPage from './Pages/AccountPage/index';
 import FindPassword from './Pages/FindPassword/index';
 import UpdatePassword from './Pages/FindPassword/UpdatePassword/UpdatePassword';
+import KakaoAddInfo from './Pages/LoginPage/Kakao/KakaoAddInfo';
 
 
 function Layout() {
@@ -69,7 +69,7 @@ function App(){
         <Route path="/stocks/calendar" element={<StockCalendar/>}/>
         <Route element={<ProtectedRoutes isAuth={isAuth}/>}>
           {/* 로그인한 사람만 갈 수 있는 경로 */}
-          <Route path="/kakao/addTel" element={<KakaoHtelAdd/>}/>
+          <Route path="/kakao/addInfo" element={<KakaoAddInfo/>}/>
           <Route path="/users/checkPwd" element={<CheckPassword/>}/>
           <Route path="/users/account" element={<AccountPage/>}/>
         </Route>

@@ -50,7 +50,7 @@ const DraggableRow = ({ id, index, moveRow, children, use_yn }) => {
   );
 };
 
-export function UserMenu({fetchRoutes}) {
+export function UserMenu() {
 
   const [searchParams, setSearchParams] = useSearchParams();
   const pCode = searchParams.get('p_code');
@@ -88,8 +88,7 @@ export function UserMenu({fetchRoutes}) {
           setMenuList(res.data.menu_list);
           setParentName(res.data.p_name);
           setTotalRowNum(res.data.totalRowNum);
-  
-          fetchRoutes();
+
 
           setDataStatus(true);
 
@@ -180,24 +179,6 @@ export function UserMenu({fetchRoutes}) {
     setSearchParams(currentParams);
 
   }
-
-  if(!dataStatus){
-    return (
-      <div className="mt-48 mb-8 flex flex-col gap-12 ">
-        <Card>
-            <CardHeader variant="gradient" color="gray" className="mb-8 p-6">
-              <Typography variant="h6" color="white">
-                사용자 메뉴 관리
-              </Typography>
-            </CardHeader>
-            <CardBody className="overflow-x-scroll px-0 pt-0 pb-2">
-              <LoadingBar/>
-          </CardBody>
-        </Card>
-      </div>
-    )
-  }
-
 
   return (
     <div className="mt-48 mb-8 flex flex-col gap-12">
@@ -338,6 +319,26 @@ export function UserMenu({fetchRoutes}) {
               )}
             </tbody>
           </table>
+          {
+            !dataStatus && (
+  
+                  <div className='flex justify-center w-full my-10'>
+                    <span>
+                      <LoadingBar/>
+                    </span>
+                  </div>
+                
+            )
+          }
+          {
+            dataStatus && menuList.length === 0 &&
+            (
+              <span className='flex justify-center mt-5 font-semibold text-gray-400 text-sm'>
+                해당하는 메뉴가 존재하지 않습니다.
+              </span>
+
+            )
+          }
             </DndProvider>
           <div className='flex justify-end mt-5 mr-8'>
             <Button size="md" className='mr-4' onClick={() => {setOrder()}}>

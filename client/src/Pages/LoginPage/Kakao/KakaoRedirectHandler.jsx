@@ -52,7 +52,13 @@ const KakaoRedirectHandler = () => {
           localStorage.setItem('kakaoToken', access_token);
 
           if(res.payload.kakaoLoginSuccess){
-            navigate('/');
+
+            if(res.payload.newUser){
+              navigate('/kakao/addInfo');
+            }else{
+              navigate('/');
+            }
+
           }
 
         });

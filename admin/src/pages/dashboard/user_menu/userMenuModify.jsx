@@ -13,7 +13,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import LoadingBar from '@/layouts/loadingBar';
 
-export function UserMenuModify({fetchRoutes}) {
+export function UserMenuModify() {
 
   const [searchParams] = useSearchParams();
   const act = searchParams.get('act');
@@ -122,8 +122,7 @@ export function UserMenuModify({fetchRoutes}) {
         submitStatus = true;
 
         if(res.data.success){
-          
-          fetchRoutes();
+        
           navigate(`/aoslwj7110/user_menu?p_code=${pCode ? pCode : ''}`)
         }
   
