@@ -865,7 +865,10 @@ router.post('/updateUser', auth, async (req, res, next) => {
   })
 
   router.post('/delete', auth, (req, res, next) => {
-
+    /**
+    * #swagger.tags = ['사용자/Users']
+    * #swagger.summary = '회원탈퇴 로직'
+    */
     let id = req.user.id;
     
 

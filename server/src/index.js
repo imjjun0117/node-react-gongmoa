@@ -11,7 +11,7 @@ const { cleanEmailCode, sendNotify } = require('./email/email.js');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger_output.json');
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, { explorer: true }));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 dotenv.config();
 app.use(cors());

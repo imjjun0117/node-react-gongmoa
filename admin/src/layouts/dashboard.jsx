@@ -21,6 +21,7 @@ import UserMenuModify from '@/pages/dashboard/user_menu/userMenuModify';
 import UserList from '@/pages/dashboard/user_list/userList';
 import UserModify from '@/pages/dashboard/user_list/userModify';
 import SendEmail from '@/pages/dashboard/send_email/sendEmail';
+import Main from '@/pages/dashboard/main';
 
 export function Dashboard() {
   const [controller, dispatch] = useMaterialTailwindController();
@@ -89,7 +90,7 @@ export function Dashboard() {
           <Cog6ToothIcon className="h-5 w-5" />
         </IconButton>
         <Routes>
-          <Route exact path="/" element={<Home/>} />
+          <Route exact path="/" element={<Main/>} />
           <Route path="/admin_menu">
             <Route index element={<AdminMenu fetchRoutes={fetchRoutes}/>}/>
             <Route path="/admin_menu/modify" element={<AdminMenuModify fetchRoutes={fetchRoutes}/>} />

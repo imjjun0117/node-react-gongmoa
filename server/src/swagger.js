@@ -9,9 +9,9 @@ const doc = {
     title: '공모아 API 문서',
     description: '공모아 서버 API관련 문서입니다.',
   },
-  host: 'localhost:8080', // API 서버의 호스트
+  host: 'https://gongmoa.site/api', // API 서버의 호스트
   basePath: '/',
-  schemes: ['http', 'https'],
+  schemes: ['https'],
   consumes: ['application/json'],
   produces: ['application/json'],
 };

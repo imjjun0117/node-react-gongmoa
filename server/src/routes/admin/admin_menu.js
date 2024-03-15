@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../../databases/config/mysql');
 const dotenv = require('dotenv');
+const { authAdminGuest } = require('../../middleware/auth');
 
 
 dotenv.config();
@@ -22,7 +23,7 @@ function queryAsync(sql, values) {
 router.post('/isMenuValid', async (req, res, next) => {
 
   /** 
-  * #swagger.tags = ['관리자/Menu']
+  * #swagger.tags = ['관리자/AdminMenu']
   * #swagger.summary = '관리자 메뉴 불러올때 사용여부 확인 로직'
   */
 
@@ -73,7 +74,7 @@ router.post('/isMenuValid', async (req, res, next) => {
 router.get('/menu', async (req, res, next) => {
 
   /** 
-  * #swagger.tags = ['관리자/Menu']
+  * #swagger.tags = ['관리자/AdminMenu']
   * #swagger.summary = '관리자 메뉴 불러오기 로직'
   */
 
@@ -137,8 +138,8 @@ router.get('/menu', async (req, res, next) => {
 router.get('/adminMenuList', async (req, res, next) => {
 
    /** 
-  * #swagger.tags = ['관리자/Menu']
-  * #swagger.summary = '관리자 메뉴 수정 - 리스트 불러오기 로직'
+  * #swagger.tags = ['관리자/AdminMenu']
+  * #swagger.summary = '관리자 메뉴 관리 - 리스트 불러오기 로직'
   */
 
   let body = req.query;
@@ -240,11 +241,11 @@ router.get('/adminMenuList', async (req, res, next) => {
 
 })
 
-router.post('/setAdminMenuStatus', async (req, res, next) => {
+router.post('/setAdminMenuStatus', authAdminGuest, async (req, res, next) => {
 
    /** 
-  * #swagger.tags = ['관리자/Menu']
-  * #swagger.summary = '관리자 메뉴 수정 - 상태변경 로직'
+  * #swagger.tags = ['관리자/AdminMenu']
+  * #swagger.summary = '관리자 메뉴 관리 - 상태변경 로직'
   */
 
   let body = req.body;
@@ -283,8 +284,8 @@ router.post('/setAdminMenuStatus', async (req, res, next) => {
 router.get('/getAdminMenuCode', async (req, res, next) => {
 
   /** 
-  * #swagger.tags = ['관리자/Menu']
-  * #swagger.summary = '관리자 메뉴 수정 - 부모코드 조회 로직'
+  * #swagger.tags = ['관리자/AdminMenu']
+  * #swagger.summary = '관리자 메뉴 관리 - 부모코드 조회 로직'
   */
 
   let params = req.query;
@@ -347,8 +348,8 @@ router.get('/getAdminMenuCode', async (req, res, next) => {
 router.get('/getAdminMenuDetail', async (req, res, next) => {
 
   /** 
-  * #swagger.tags = ['관리자/Menu']
-  * #swagger.summary = '관리자 메뉴 수정 - 상세 조회 로직'
+  * #swagger.tags = ['관리자/AdminMenu']
+  * #swagger.summary = '관리자 메뉴 관리 - 상세 조회 로직'
   */
 
   let params = req.query;
@@ -387,11 +388,11 @@ router.get('/getAdminMenuDetail', async (req, res, next) => {
 })
 
 //관리자 메뉴 수정 로직
-router.post('/modifyAdminMenu', async (req, res, next) => {
+router.post('/modifyAdminMenu', authAdminGuest, authAdminGuest, async (req, res, next) => {
 
   /** 
-  * #swagger.tags = ['관리자/Menu']
-  * #swagger.summary = '관리자 메뉴 수정 - 메뉴 수정 로직'
+  * #swagger.tags = ['관리자/AdminMenu']
+  * #swagger.summary = '관리자 메뉴 관리 - 메뉴 수정 로직'
   */
 
   
@@ -514,11 +515,11 @@ router.post('/modifyAdminMenu', async (req, res, next) => {
 
 
 //관리자 메뉴코드 순서변경 로직
-router.post('/setAdminMenuOrder', (req, res, next) => {
+router.post('/setAdminMenuOrder',authAdminGuest, authAdminGuest, (req, res, next) => {
 
    /** 
-  * #swagger.tags = ['관리자/Menu']
-  * #swagger.summary = '관리자 메뉴 수정 - 메뉴 순서변경 로직'
+  * #swagger.tags = ['관리자/AdminMenu']
+  * #swagger.summary = '관리자 메뉴 관리 - 메뉴 순서변경 로직'
   */
 
   let body = req.body;

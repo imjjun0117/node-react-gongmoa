@@ -185,6 +185,7 @@ const authAdmin = async(req, res, next) => {
         users
       WHERE
         del_yn = 'N'
+        AND admin_yn = 'Y'
         AND id=?
     `
 
@@ -214,5 +215,66 @@ const authAdmin = async(req, res, next) => {
 
 }
 
+const authAdminGuest = async(req, res, next) => {
 
-module.exports = {auth, authAdmin};
+  let token = req.headers.authorization;
+  token = token?.replaceAll('Bearer', '');
+  
+  if(!token){
+    return res.sendStatus(401);
+  }
+
+  //전달받은 토큰 파싱
+  try{
+    
+    const decoded = await decodeJwt(token);
+  
+    if(!decoded._id){
+      return res.sendStatus(401);
+    }
+  
+    let selectUser = 
+    `
+      SELECT 
+        id,
+        email,
+        name,
+        admin_yn,
+        admin_auth
+      FROM
+        users
+      WHERE
+        del_yn = 'N'
+        AND admin_yn = 'Y'
+        AND id=?
+    `
+
+  
+    db.query(selectUser, [decoded._id], async(err, user) => {
+  
+      if(err){
+        return next(err);
+      }
+  
+      if(user[0].admin_auth !== '001'){
+        return res.json({
+          success: false,
+          msg: '권한이 없습니다.'
+        })
+      }
+      
+      return next();
+
+    })  
+
+  }catch(error){
+
+    next(error);
+  }
+
+
+}
+
+
+
+module.exports = {auth, authAdmin, authAdminGuest};

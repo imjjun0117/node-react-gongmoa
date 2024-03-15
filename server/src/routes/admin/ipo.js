@@ -3,6 +3,7 @@ const router = express.Router();
 const db = require('../../databases/config/mysql');
 const dotenv = require('dotenv');
 const ipoParsing = require('../../databases');
+const { authAdminGuest } = require('../../middleware/auth');
 
 dotenv.config();
 
@@ -20,6 +21,11 @@ function queryAsync(sql, values) {
 }
 
 router.get('/ipoList', async(req, res, next) => {
+
+  /** 
+  * #swagger.tags = ['관리자/Stocks']
+  * #swagger.summary = '공모주 관리 - 공모주 불러오기'
+  */
 
   let query = req.query;
 
@@ -162,8 +168,13 @@ try{
 })
 
 
-router.post('/setIpoStatus', async (req, res, next) => {
+router.post('/setIpoStatus', authAdminGuest, async (req, res, next) => {
 
+  /** 
+  * #swagger.tags = ['관리자/Stocks']
+  * #swagger.summary = '공모주 관리 - 공모주 상태변경'
+  */
+  
   let body = req.body;
 
   if(!body.value || !body.ipo_id || !body.type) {
@@ -231,6 +242,10 @@ router.post('/setIpoStatus', async (req, res, next) => {
 
 router.get("/getIpoDetail", async (req, res, next) => {
 
+ /** 
+  * #swagger.tags = ['관리자/Stocks']
+  * #swagger.summary = '공모주 관리 - 공모주 상세 불러오기'
+  */
 
   let query = req.query;
 
@@ -319,7 +334,12 @@ router.get("/getIpoDetail", async (req, res, next) => {
 
 
 //공모주 수정
-router.post('/modifyIpoDetail', async(req, res, next) => {
+router.post('/modifyIpoDetail', authAdminGuest, async(req, res, next) => {
+
+  /** 
+  * #swagger.tags = ['관리자/Stocks']
+  * #swagger.summary = '공모주 관리 - 공모주 상세 수정하기'
+  */
 
   let body = req.body;
 
@@ -636,7 +656,12 @@ try{
 
 
 //공모주 불러오기
-router.post('/loadIpo', async (req, res, next) => {
+router.post('/loadIpo', authAdminGuest, async (req, res, next) => {
+
+   /** 
+    * #swagger.tags = ['관리자/Stocks']
+    * #swagger.summary = '공모주 불러오기 - 공모주 업데이트 관련 로직'
+    */
 
     let body = req.body;
 
