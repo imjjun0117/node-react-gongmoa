@@ -45,12 +45,12 @@ const emailSend = async(req, res) => {
     if(err){
 
       res.json({success: false, msg: '메일 전송 중 오류가 발생했습니다.'});
-      smtpTransport.close();
+      // smtpTransport.close();
       
     }else{
   
       res.json({ success: true, msg: '메일 전송에 성공하였습니다.', data: data });
-      smtpTransport.close();
+      // smtpTransport.close();
 
     }
 
@@ -82,9 +82,6 @@ const emailNotify = async(body) => {
       console.log(err)
       
     }
-    
-    smtpTransport.close();
-
 
   })
 

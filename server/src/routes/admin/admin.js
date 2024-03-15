@@ -28,6 +28,12 @@ function queryAsync(sql, values) {
 
 router.get('/auth', authAdmin, (req, res, next) => {
 
+
+  /** 
+  * #swagger.tags = ['관리자/Admins']
+  * #swagger.summary = '관리자 권한 확인 로직'
+  */
+
   const user = req.user;
 
   return res.json({
@@ -48,6 +54,12 @@ router.get('/auth', authAdmin, (req, res, next) => {
 
 // 관리자 로그인 관련 로직
 router.post('/login', (req, res, next) => {
+
+
+  /** 
+  * #swagger.tags = ['관리자/Admins']
+  * #swagger.summary = '관리자 로그인 관련 로직'
+  */
 
   let userInfo = req.body;
 
@@ -127,6 +139,11 @@ router.post('/login', (req, res, next) => {
 
 //관리자 로그아웃 관련 로직
 router.post('/logout', authAdmin, (req, res, next) => {
+
+  /** 
+  * #swagger.tags = ['관리자/Admins']
+  * #swagger.summary = '관리자 로그아웃 관련 로직'
+  */
 
   try{
 

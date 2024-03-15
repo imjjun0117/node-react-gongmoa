@@ -6,9 +6,12 @@ const cors = require('cors');
 const schedule = require('node-schedule');
 const ipoParsing = require('./databases/index.js');
 const {setStSub, setEndSub, setStForecast, setEndForecast} = require('./databases/ipoNotify.js');
-
 const dotenv = require('dotenv');
 const { cleanEmailCode, sendNotify } = require('./email/email.js');
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./swagger_output.json');
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, { explorer: true }));
 
 dotenv.config();
 app.use(cors());

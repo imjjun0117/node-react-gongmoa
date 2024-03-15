@@ -19,7 +19,10 @@ function queryAsync(sql, values) {
 }
 
 router.get('/', async (req, res, next) => {
-
+    /** 
+    * #swagger.tags = ['사용자/Menu']
+    * #swagger.summary = '공모아 메뉴 불러오기 관련 로직'
+    */
   let rtnMenu =  [];
 
   const selectOneDepth = `

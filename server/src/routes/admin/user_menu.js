@@ -21,6 +21,10 @@ function queryAsync(sql, values) {
 
 router.get('/menu', async (req, res, next) => {
 
+  /** 
+  * #swagger.tags = ['관리자/Menu']
+  * #swagger.summary = '사용자 메뉴 불러오기 관련 로직'
+  */
   let rtnMenu =  [];
 
   const selectOneDepth = `
@@ -77,6 +81,11 @@ router.get('/menu', async (req, res, next) => {
 });
 
 router.get('/userMenuList', async (req, res, next) => {
+
+  /** 
+  * #swagger.tags = ['관리자/Menu']
+  * #swagger.summary = '사용자 메뉴 관리 - 리스트 불러오기 관련 로직'
+  */
 
   let body = req.query;
 
@@ -179,6 +188,11 @@ router.get('/userMenuList', async (req, res, next) => {
 
 router.post('/setUserMenuStatus', async (req, res, next) => {
 
+  /** 
+  * #swagger.tags = ['관리자/Menu']
+  * #swagger.summary = '사용자 메뉴 관리 - 상태변경 관련 로직'
+  */
+
   let body = req.body;
 
   let updateStatus = 
@@ -214,6 +228,11 @@ router.post('/setUserMenuStatus', async (req, res, next) => {
 //메뉴 등록시에 가장 큰 메뉴 코드 반환
 router.get('/getUserMenuCode', async (req, res, next) => {
 
+  /** 
+  * #swagger.tags = ['관리자/Menu']
+  * #swagger.summary = '사용자 메뉴 관리 - 부모 코드 불러오기'
+  */
+  
   let params = req.query;
 
   //1뎁스, 2뎁스 이외일 경우
@@ -273,6 +292,11 @@ router.get('/getUserMenuCode', async (req, res, next) => {
 //메뉴 등록시 디테일
 router.get('/getUserMenuDetail', async (req, res, next) => {
 
+  /** 
+  * #swagger.tags = ['관리자/Menu']
+  * #swagger.summary = '사용자 메뉴 관리 - 상세 불러오기'
+  */
+
   let params = req.query;
 
   if(!params.code){
@@ -310,6 +334,11 @@ router.get('/getUserMenuDetail', async (req, res, next) => {
 
 //관리자 메뉴 수정 로직
 router.post('/modifyUserMenu', async (req, res, next) => {
+
+  /** 
+  * #swagger.tags = ['관리자/Menu']
+  * #swagger.summary = '사용자 메뉴 관리 - 수정관련 로직'
+  */
 
   try{
 
@@ -431,6 +460,11 @@ router.post('/modifyUserMenu', async (req, res, next) => {
 
 //관리자 메뉴코드 순서변경 로직
 router.post('/setUserMenuOrder', (req, res, next) => {
+
+  /** 
+  * #swagger.tags = ['관리자/Menu']
+  * #swagger.summary = '사용자 메뉴 관리 - 순서변경 로직'
+  */
 
   let body = req.body;
   let parentCode = body.parentCode ? body.parentCode : '';

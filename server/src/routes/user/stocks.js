@@ -4,7 +4,10 @@ const db = require('../../databases/config/mysql.js');
 
 //공모주 리스트 
 router.get('/', (req, res, next) => {
-
+  /**
+    * #swagger.tags = ['사용자/Stocks']
+    * #swagger.summary = '메인 페이지 공모주 불러오기 관련 로직'
+    */
   let body = req.query;
   let value = [];
   body.keyword && value.push(body.keyword);
@@ -155,6 +158,11 @@ router.get('/', (req, res, next) => {
 
 router.get(`/calendar`, (req, res, next) => {
 
+  /**
+    * #swagger.tags = ['사용자/Stocks']
+    * #swagger.summary = '캘린더 페이지 공모주 불러오기 관련 로직'
+    */
+
   let body = req.query;
 
   let condition =   `
@@ -221,6 +229,11 @@ router.get(`/calendar`, (req, res, next) => {
 //공모주 상세페이지 조회
 router.get('/:stockId', (req, res, next) => {
   
+  /**
+    * #swagger.tags = ['사용자/Stocks']
+    * #swagger.summary = '공모주 상세 불러오기 관련 로직'
+    */
+
   let params = req.params;
 
   let selectQuery = 

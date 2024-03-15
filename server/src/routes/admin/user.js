@@ -21,7 +21,10 @@ function queryAsync(sql, values) {
 }
 
 router.get('/', async (req, res, next) => {
-
+  /** 
+    * #swagger.tags = ['관리자/Users']
+    * #swagger.summary = '관리자 회원 검색 관련 로직'
+    */
   let query = req.query;
 
   if(!query.type || !query.user_type){
@@ -101,6 +104,11 @@ router.get('/', async (req, res, next) => {
 //회원 상태 변경
 router.post('/setStatus', async (req, res, next) => {
 
+   /** 
+    * #swagger.tags = ['관리자/Users']
+    * #swagger.summary = '관리자 회원 상태변경 로직'
+    */
+
   let body = req.body;
   
   let updateStatus = `
@@ -171,6 +179,11 @@ router.post('/setStatus', async (req, res, next) => {
 
 router.get('/getUserDetail', async (req, res, next) => {
 
+  /** 
+    * #swagger.tags = ['관리자/Users']
+    * #swagger.summary = '관리자 회원 상세 불러오기 로직'
+    */
+
   let query = req.query;
   let id = query.id;
 
@@ -227,6 +240,11 @@ router.get('/getUserDetail', async (req, res, next) => {
 
 router.post('/modifyPassword', async (req, res, next) => {
   
+   /** 
+    * #swagger.tags = ['관리자/Users']
+    * #swagger.summary = '관리자 회원 비밀번호 변경 관련 로직'
+    */
+
   let password = req.body.password;
   let id = req.body.id;
 

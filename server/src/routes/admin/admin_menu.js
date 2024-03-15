@@ -21,6 +21,11 @@ function queryAsync(sql, values) {
 
 router.post('/isMenuValid', async (req, res, next) => {
 
+  /** 
+  * #swagger.tags = ['관리자/Menu']
+  * #swagger.summary = '관리자 메뉴 불러올때 사용여부 확인 로직'
+  */
+
   let body = req.body;
 
   if(!body.menu_path){
@@ -66,6 +71,11 @@ router.post('/isMenuValid', async (req, res, next) => {
 })
 
 router.get('/menu', async (req, res, next) => {
+
+  /** 
+  * #swagger.tags = ['관리자/Menu']
+  * #swagger.summary = '관리자 메뉴 불러오기 로직'
+  */
 
   let rtnMenu =  [];
 
@@ -125,6 +135,11 @@ router.get('/menu', async (req, res, next) => {
 
 
 router.get('/adminMenuList', async (req, res, next) => {
+
+   /** 
+  * #swagger.tags = ['관리자/Menu']
+  * #swagger.summary = '관리자 메뉴 수정 - 리스트 불러오기 로직'
+  */
 
   let body = req.query;
 
@@ -227,6 +242,11 @@ router.get('/adminMenuList', async (req, res, next) => {
 
 router.post('/setAdminMenuStatus', async (req, res, next) => {
 
+   /** 
+  * #swagger.tags = ['관리자/Menu']
+  * #swagger.summary = '관리자 메뉴 수정 - 상태변경 로직'
+  */
+
   let body = req.body;
 
   let updateStatus = 
@@ -261,6 +281,11 @@ router.post('/setAdminMenuStatus', async (req, res, next) => {
 
 //메뉴 등록시에 가장 큰 메뉴 코드 반환
 router.get('/getAdminMenuCode', async (req, res, next) => {
+
+  /** 
+  * #swagger.tags = ['관리자/Menu']
+  * #swagger.summary = '관리자 메뉴 수정 - 부모코드 조회 로직'
+  */
 
   let params = req.query;
 
@@ -321,6 +346,11 @@ router.get('/getAdminMenuCode', async (req, res, next) => {
 //메뉴 등록시 디테일
 router.get('/getAdminMenuDetail', async (req, res, next) => {
 
+  /** 
+  * #swagger.tags = ['관리자/Menu']
+  * #swagger.summary = '관리자 메뉴 수정 - 상세 조회 로직'
+  */
+
   let params = req.query;
 
   if(!params.code){
@@ -359,6 +389,12 @@ router.get('/getAdminMenuDetail', async (req, res, next) => {
 //관리자 메뉴 수정 로직
 router.post('/modifyAdminMenu', async (req, res, next) => {
 
+  /** 
+  * #swagger.tags = ['관리자/Menu']
+  * #swagger.summary = '관리자 메뉴 수정 - 메뉴 수정 로직'
+  */
+
+  
   try{
 
     let body = req.body;
@@ -479,6 +515,11 @@ router.post('/modifyAdminMenu', async (req, res, next) => {
 
 //관리자 메뉴코드 순서변경 로직
 router.post('/setAdminMenuOrder', (req, res, next) => {
+
+   /** 
+  * #swagger.tags = ['관리자/Menu']
+  * #swagger.summary = '관리자 메뉴 수정 - 메뉴 순서변경 로직'
+  */
 
   let body = req.body;
   let parentCode = body.parentCode ? body.parentCode : '';

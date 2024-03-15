@@ -1,0 +1,2164 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "공모아 API 문서",
+    "description": "공모아 서버 API관련 문서입니다.",
+    "version": "1.0.0"
+  },
+  "host": "localhost:8080",
+  "basePath": "/",
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/isMenuValid": {
+      "post": {
+        "tags": [
+          "관리자/Menu"
+        ],
+        "summary": "관리자 메뉴 불러올때 사용여부 확인 로직",
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "menu_path": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/menu": {
+      "get": {
+        "tags": [
+          "관리자/Menu"
+        ],
+        "summary": "사용자 메뉴 불러오기 관련 로직",
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/adminMenuList": {
+      "get": {
+        "tags": [
+          "관리자/Menu"
+        ],
+        "summary": "관리자 메뉴 수정 - 리스트 불러오기 로직",
+        "description": "",
+        "parameters": [
+          {
+            "name": "pg",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "pp",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "parentCode",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/setAdminMenuStatus": {
+      "post": {
+        "tags": [
+          "관리자/Menu"
+        ],
+        "summary": "관리자 메뉴 수정 - 상태변경 로직",
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "example": "any"
+                },
+                "menu_code": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/getAdminMenuCode": {
+      "get": {
+        "tags": [
+          "관리자/Menu"
+        ],
+        "summary": "관리자 메뉴 수정 - 부모코드 조회 로직",
+        "description": "",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/getAdminMenuDetail": {
+      "get": {
+        "tags": [
+          "관리자/Menu"
+        ],
+        "summary": "관리자 메뉴 수정 - 상세 조회 로직",
+        "description": "",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/modifyAdminMenu": {
+      "post": {
+        "tags": [
+          "관리자/Menu"
+        ],
+        "summary": "관리자 메뉴 수정 - 메뉴 수정 로직",
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "act": {
+                  "example": "any"
+                },
+                "menu_code": {
+                  "example": "any"
+                },
+                "menu_name": {
+                  "example": "any"
+                },
+                "menu_path": {
+                  "example": "any"
+                },
+                "use_yn": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/setAdminMenuOrder": {
+      "post": {
+        "tags": [
+          "관리자/Menu"
+        ],
+        "summary": "관리자 메뉴 수정 - 메뉴 순서변경 로직",
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "parentCode": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/auth": {
+      "get": {
+        "tags": [
+          "사용자/Users"
+        ],
+        "summary": "회원 로그인 권한 확인관련 미들웨어",
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "remember",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "tags": [
+          "사용자/Users"
+        ],
+        "summary": "회원 로그인관련 로직",
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "example": "any"
+                },
+                "password": {
+                  "example": "any"
+                },
+                "remember": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/logout": {
+      "post": {
+        "tags": [
+          "사용자/Users"
+        ],
+        "summary": "회원 로그아웃관련 로직",
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "remember",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/admin_menu/isMenuValid": {
+      "post": {
+        "tags": [
+          "관리자/Menu"
+        ],
+        "summary": "관리자 메뉴 불러올때 사용여부 확인 로직",
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "menu_path": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/admin_menu/menu": {
+      "get": {
+        "tags": [
+          "관리자/Menu"
+        ],
+        "summary": "관리자 메뉴 불러오기 로직",
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/admin_menu/adminMenuList": {
+      "get": {
+        "tags": [
+          "관리자/Menu"
+        ],
+        "summary": "관리자 메뉴 수정 - 리스트 불러오기 로직",
+        "description": "",
+        "parameters": [
+          {
+            "name": "pg",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "pp",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "parentCode",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/admin_menu/setAdminMenuStatus": {
+      "post": {
+        "tags": [
+          "관리자/Menu"
+        ],
+        "summary": "관리자 메뉴 수정 - 상태변경 로직",
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "example": "any"
+                },
+                "menu_code": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/admin_menu/getAdminMenuCode": {
+      "get": {
+        "tags": [
+          "관리자/Menu"
+        ],
+        "summary": "관리자 메뉴 수정 - 부모코드 조회 로직",
+        "description": "",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/admin_menu/getAdminMenuDetail": {
+      "get": {
+        "tags": [
+          "관리자/Menu"
+        ],
+        "summary": "관리자 메뉴 수정 - 상세 조회 로직",
+        "description": "",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/admin_menu/modifyAdminMenu": {
+      "post": {
+        "tags": [
+          "관리자/Menu"
+        ],
+        "summary": "관리자 메뉴 수정 - 메뉴 수정 로직",
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "act": {
+                  "example": "any"
+                },
+                "menu_code": {
+                  "example": "any"
+                },
+                "menu_name": {
+                  "example": "any"
+                },
+                "menu_path": {
+                  "example": "any"
+                },
+                "use_yn": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/admin_menu/setAdminMenuOrder": {
+      "post": {
+        "tags": [
+          "관리자/Menu"
+        ],
+        "summary": "관리자 메뉴 수정 - 메뉴 순서변경 로직",
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "parentCode": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/user_menu/menu": {
+      "get": {
+        "tags": [
+          "관리자/Menu"
+        ],
+        "summary": "사용자 메뉴 불러오기 관련 로직",
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/user_menu/userMenuList": {
+      "get": {
+        "tags": [
+          "관리자/Menu"
+        ],
+        "summary": "사용자 메뉴 관리 - 리스트 불러오기 관련 로직",
+        "description": "",
+        "parameters": [
+          {
+            "name": "pg",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "pp",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "parentCode",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/user_menu/setUserMenuStatus": {
+      "post": {
+        "tags": [
+          "관리자/Menu"
+        ],
+        "summary": "사용자 메뉴 관리 - 상태변경 관련 로직",
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "example": "any"
+                },
+                "menu_code": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/user_menu/getUserMenuCode": {
+      "get": {
+        "tags": [
+          "관리자/Menu"
+        ],
+        "summary": "사용자 메뉴 관리 - 부모 코드 불러오기",
+        "description": "",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/user_menu/getUserMenuDetail": {
+      "get": {
+        "tags": [
+          "관리자/Menu"
+        ],
+        "summary": "사용자 메뉴 관리 - 상세 불러오기",
+        "description": "",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/user_menu/modifyUserMenu": {
+      "post": {
+        "tags": [
+          "관리자/Menu"
+        ],
+        "summary": "사용자 메뉴 관리 - 수정관련 로직",
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "act": {
+                  "example": "any"
+                },
+                "menu_code": {
+                  "example": "any"
+                },
+                "menu_name": {
+                  "example": "any"
+                },
+                "menu_path": {
+                  "example": "any"
+                },
+                "use_yn": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/user_menu/setUserMenuOrder": {
+      "post": {
+        "tags": [
+          "관리자/Menu"
+        ],
+        "summary": "사용자 메뉴 관리 - 순서변경 로직",
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "parentCode": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/ipo/ipoList": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "pp",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "pg",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "use_yn",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "keyword",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "stock_type",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "listed_type",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/ipo/setIpoStatus": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "example": "any"
+                },
+                "ipo_id": {
+                  "example": "any"
+                },
+                "type": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/ipo/getIpoDetail": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "ipoId",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/ipo/modifyIpoDetail": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "ipo_id": {
+                  "example": "any"
+                },
+                "corp_nm": {
+                  "example": "any"
+                },
+                "st_sub": {
+                  "example": "any"
+                },
+                "end_sub": {
+                  "example": "any"
+                },
+                "weekly_company": {
+                  "example": "any"
+                },
+                "total_stock": {
+                  "example": "any"
+                },
+                "face_price": {
+                  "example": "any"
+                },
+                "stock_code": {
+                  "example": "any"
+                },
+                "stock_type": {
+                  "example": "any"
+                },
+                "listed_type": {
+                  "example": "any"
+                },
+                "sector": {
+                  "example": "any"
+                },
+                "act": {
+                  "example": "any"
+                },
+                "list_dt": {
+                  "example": "any"
+                },
+                "payment_dt": {
+                  "example": "any"
+                },
+                "refund_dt": {
+                  "example": "any"
+                },
+                "st_forecast_dt": {
+                  "example": "any"
+                },
+                "end_forecast_dt": {
+                  "example": "any"
+                },
+                "confirmed_price": {
+                  "example": "any"
+                },
+                "st_hope_price": {
+                  "example": "any"
+                },
+                "end_hope_price": {
+                  "example": "any"
+                },
+                "comp_ratio": {
+                  "example": "any"
+                },
+                "update_yn": {
+                  "example": "any"
+                },
+                "use_yn": {
+                  "example": "any"
+                },
+                "corp_rep": {
+                  "example": "any"
+                },
+                "corp_type": {
+                  "example": "any"
+                },
+                "corp_addr": {
+                  "example": "any"
+                },
+                "corp_hp": {
+                  "example": "any"
+                },
+                "corp_tel": {
+                  "example": "any"
+                },
+                "largest_share_holder": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/ipo/loadIpo": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "update_st_num": {
+                  "example": "any"
+                },
+                "update_end_num": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/user/": {
+      "get": {
+        "tags": [
+          "관리자/Users"
+        ],
+        "summary": "관리자 회원 검색 관련 로직",
+        "description": "",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "user_type",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "keyword",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/user/setStatus": {
+      "post": {
+        "tags": [
+          "관리자/Users"
+        ],
+        "summary": "관리자 회원 상태변경 로직",
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "example": "any"
+                },
+                "id": {
+                  "example": "any"
+                },
+                "type": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/user/getUserDetail": {
+      "get": {
+        "tags": [
+          "관리자/Users"
+        ],
+        "summary": "관리자 회원 상세 불러오기 로직",
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/user/modifyPassword": {
+      "post": {
+        "tags": [
+          "관리자/Users"
+        ],
+        "summary": "관리자 회원 비밀번호 변경 관련 로직",
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "password": {
+                  "example": "any"
+                },
+                "id": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/ipoList": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "pp",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "pg",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "use_yn",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "keyword",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "stock_type",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "listed_type",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/setIpoStatus": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "example": "any"
+                },
+                "ipo_id": {
+                  "example": "any"
+                },
+                "type": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/getIpoDetail": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "ipoId",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/modifyIpoDetail": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "ipo_id": {
+                  "example": "any"
+                },
+                "corp_nm": {
+                  "example": "any"
+                },
+                "st_sub": {
+                  "example": "any"
+                },
+                "end_sub": {
+                  "example": "any"
+                },
+                "weekly_company": {
+                  "example": "any"
+                },
+                "total_stock": {
+                  "example": "any"
+                },
+                "face_price": {
+                  "example": "any"
+                },
+                "stock_code": {
+                  "example": "any"
+                },
+                "stock_type": {
+                  "example": "any"
+                },
+                "listed_type": {
+                  "example": "any"
+                },
+                "sector": {
+                  "example": "any"
+                },
+                "act": {
+                  "example": "any"
+                },
+                "list_dt": {
+                  "example": "any"
+                },
+                "payment_dt": {
+                  "example": "any"
+                },
+                "refund_dt": {
+                  "example": "any"
+                },
+                "st_forecast_dt": {
+                  "example": "any"
+                },
+                "end_forecast_dt": {
+                  "example": "any"
+                },
+                "confirmed_price": {
+                  "example": "any"
+                },
+                "st_hope_price": {
+                  "example": "any"
+                },
+                "end_hope_price": {
+                  "example": "any"
+                },
+                "comp_ratio": {
+                  "example": "any"
+                },
+                "update_yn": {
+                  "example": "any"
+                },
+                "use_yn": {
+                  "example": "any"
+                },
+                "corp_rep": {
+                  "example": "any"
+                },
+                "corp_type": {
+                  "example": "any"
+                },
+                "corp_addr": {
+                  "example": "any"
+                },
+                "corp_hp": {
+                  "example": "any"
+                },
+                "corp_tel": {
+                  "example": "any"
+                },
+                "largest_share_holder": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/loadIpo": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "update_st_num": {
+                  "example": "any"
+                },
+                "update_end_num": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/userMenuList": {
+      "get": {
+        "tags": [
+          "관리자/Menu"
+        ],
+        "summary": "사용자 메뉴 관리 - 리스트 불러오기 관련 로직",
+        "description": "",
+        "parameters": [
+          {
+            "name": "pg",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "pp",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "parentCode",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/setUserMenuStatus": {
+      "post": {
+        "tags": [
+          "관리자/Menu"
+        ],
+        "summary": "사용자 메뉴 관리 - 상태변경 관련 로직",
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "example": "any"
+                },
+                "menu_code": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/getUserMenuCode": {
+      "get": {
+        "tags": [
+          "관리자/Menu"
+        ],
+        "summary": "사용자 메뉴 관리 - 부모 코드 불러오기",
+        "description": "",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/getUserMenuDetail": {
+      "get": {
+        "tags": [
+          "관리자/Menu"
+        ],
+        "summary": "사용자 메뉴 관리 - 상세 불러오기",
+        "description": "",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/modifyUserMenu": {
+      "post": {
+        "tags": [
+          "관리자/Menu"
+        ],
+        "summary": "사용자 메뉴 관리 - 수정관련 로직",
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "act": {
+                  "example": "any"
+                },
+                "menu_code": {
+                  "example": "any"
+                },
+                "menu_name": {
+                  "example": "any"
+                },
+                "menu_path": {
+                  "example": "any"
+                },
+                "use_yn": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/setUserMenuOrder": {
+      "post": {
+        "tags": [
+          "관리자/Menu"
+        ],
+        "summary": "사용자 메뉴 관리 - 순서변경 로직",
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "parentCode": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/": {
+      "get": {
+        "tags": [
+          "사용자/Stocks"
+        ],
+        "summary": "메인 페이지 공모주 불러오기 관련 로직",
+        "description": "",
+        "parameters": [
+          {
+            "name": "keyword",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "menuType",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "setBookmark",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/setStatus": {
+      "post": {
+        "tags": [
+          "관리자/Users"
+        ],
+        "summary": "관리자 회원 상태변경 로직",
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "value": {
+                  "example": "any"
+                },
+                "id": {
+                  "example": "any"
+                },
+                "type": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/getUserDetail": {
+      "get": {
+        "tags": [
+          "관리자/Users"
+        ],
+        "summary": "관리자 회원 상세 불러오기 로직",
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/modifyPassword": {
+      "post": {
+        "tags": [
+          "관리자/Users"
+        ],
+        "summary": "관리자 회원 비밀번호 변경 관련 로직",
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "password": {
+                  "example": "any"
+                },
+                "id": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/calendar": {
+      "get": {
+        "tags": [
+          "사용자/Stocks"
+        ],
+        "summary": "캘린더 페이지 공모주 불러오기 관련 로직",
+        "description": "",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "setBookmark",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "str_dt",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "end_dt",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "bookmark",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/{stockId}": {
+      "get": {
+        "tags": [
+          "사용자/Stocks"
+        ],
+        "summary": "공모주 상세 불러오기 관련 로직",
+        "description": "",
+        "parameters": [
+          {
+            "name": "stockId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/register": {
+      "post": {
+        "tags": [
+          "사용자/Users"
+        ],
+        "summary": "회원 가입관련 로직",
+        "description": "회원 가입 로직입니다.",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "password": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/bookmark": {
+      "post": {
+        "tags": [
+          "사용자/Users"
+        ],
+        "summary": "회원 즐겨찾기 등록관련 로직",
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "remember",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "사용자/Users"
+        ],
+        "summary": "회원 즐겨찾기 불러오기관련 로직",
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "remember",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/kakao/login": {
+      "post": {
+        "tags": [
+          "사용자/Kakao"
+        ],
+        "summary": "카카오 로그인관련 로직",
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "userData": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/kakao/addInfo": {
+      "post": {
+        "tags": [
+          "사용자/Kakao"
+        ],
+        "summary": "카카오 추가 정보등록 관련 로직",
+        "description": "카카오 회원관련하여 추가 정보를 등록합니다.(이메일 수신여부)",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "remember",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email_yn": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/checkPwd": {
+      "post": {
+        "tags": [
+          "사용자/Users"
+        ],
+        "summary": "회원 정보 수정 비밀번호 확인 관련 로직",
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "remember",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "password": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/updateUser": {
+      "post": {
+        "tags": [
+          "사용자/Users"
+        ],
+        "summary": "회원정보 수정관련 로직",
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "remember",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/updateKakao": {
+      "post": {
+        "tags": [
+          "사용자/Kakao"
+        ],
+        "summary": "소셜회원 정보수정 관련 로직",
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "remember",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/delete": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "remember",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/readNotify": {
+      "post": {
+        "tags": [
+          "사용자/Users"
+        ],
+        "summary": "회원 알림 읽음처리 관련 로직",
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "remember",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/sendCode": {
+      "post": {
+        "tags": [
+          "사용자/Users"
+        ],
+        "summary": "회원 이메일 인증코드 전송 관련 로직",
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "example": "any"
+                },
+                "html": {
+                  "example": "any"
+                },
+                "subject": {
+                  "example": "any"
+                },
+                "data": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/codeChk": {
+      "post": {
+        "tags": [
+          "사용자/Users"
+        ],
+        "summary": "회원 이메일 인증코드 확인 관련 로직",
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "example": "any"
+                },
+                "code": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/findPwd": {
+      "post": {
+        "tags": [
+          "사용자/Users"
+        ],
+        "summary": "회원 비밀번호 찾기 관련 로직",
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "example": "any"
+                },
+                "subject": {
+                  "example": "any"
+                },
+                "html": {
+                  "example": "any"
+                },
+                "data": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/updatePwd": {
+      "post": {
+        "tags": [
+          "사용자/Users"
+        ],
+        "summary": "회원 비밀번호 수정 관련 로직",
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "example": "any"
+                },
+                "token": {
+                  "example": "any"
+                },
+                "password": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  }
+}

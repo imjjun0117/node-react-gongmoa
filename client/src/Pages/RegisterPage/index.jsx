@@ -254,7 +254,7 @@ const RegisterPage = () => {
                     {...register('email',userEmail)}
                   />
                 </div>
-                <div className='w-[27%]'>
+                <div className='w-[30%]'>
                   <label htmlFor="auth" className="block mb-2 text-sm font-medium text-gray-900">
                     &nbsp;
                   </label>

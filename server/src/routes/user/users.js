@@ -12,6 +12,10 @@ const { authMail, findPassword } = require('../../email/templates/mail_template'
 dotenv.config();
 
 router.get('/auth', auth, (req, res, next) => {
+  /**
+    * #swagger.tags = ['사용자/Users']
+    * #swagger.summary = '회원 로그인 권한 확인관련 미들웨어'
+    */
 
   const user = req.user;
   
@@ -35,9 +39,12 @@ router.get('/auth', auth, (req, res, next) => {
 
 })
 
-//회원가입관련 로직
 router.post('/register', enc, (req, res, next) => {
-
+   /**
+    * #swagger.tags = ['사용자/Users']
+    * #swagger.summary = '회원 가입관련 로직'
+    * #swagger.description = '회원 가입 로직입니다.'
+    */
   let userInfo = {...req.body};
 
   if(!userInfo.email || !userInfo.name || !userInfo.password || !userInfo.code || !userInfo.email_yn){
@@ -198,6 +205,10 @@ router.post('/register', enc, (req, res, next) => {
 
 //로그인관련 로직
 router.post('/login', (req, res, next) => {
+  /**
+    * #swagger.tags = ['사용자/Users']
+    * #swagger.summary = '회원 로그인관련 로직'
+    */
 
   let userInfo = req.body;
 
@@ -276,6 +287,11 @@ router.post('/login', (req, res, next) => {
 //회원 로그아웃 관련 로직
 router.post('/logout', auth, (req, res, next) => {
 
+  /**
+    * #swagger.tags = ['사용자/Users']
+    * #swagger.summary = '회원 로그아웃관련 로직'
+    */
+
   try{
 
     return res.sendStatus(200);
@@ -287,6 +303,11 @@ router.post('/logout', auth, (req, res, next) => {
 })
 
 router.post('/bookmark', auth, (req, res, next) => {
+
+  /**
+    * #swagger.tags = ['사용자/Users']
+    * #swagger.summary = '회원 즐겨찾기 등록관련 로직'
+    */
 
   let body = req.body;
   let user = req.user;
@@ -383,6 +404,11 @@ router.post('/bookmark', auth, (req, res, next) => {
 
 router.get('/bookmark', auth, (req, res, next) => {
 
+  /**
+    * #swagger.tags = ['사용자/Users']
+    * #swagger.summary = '회원 즐겨찾기 불러오기관련 로직'
+    */
+
   let selectBookMark = 
   `
     SELECT ipo_id
@@ -407,6 +433,11 @@ router.get('/bookmark', auth, (req, res, next) => {
 })
 
 router.post(`/kakao/login`, (req, res, next) => {
+
+   /**
+    * #swagger.tags = ['사용자/Kakao']
+    * #swagger.summary = '카카오 로그인관련 로직'
+    */
 
   const userData = req.body.userData;
 
@@ -492,6 +523,11 @@ router.post(`/kakao/login`, (req, res, next) => {
 
 router.post('/kakao/addInfo', auth, (req, res, next) => {
 
+  /**
+    * #swagger.tags = ['사용자/Kakao']
+    * #swagger.summary = '카카오 추가 정보등록 관련 로직'
+    * #swagger.description = '카카오 회원관련하여 추가 정보를 등록합니다.(이메일 수신여부)'
+    */
 
   let body = req.body;
 
@@ -529,6 +565,11 @@ router.post('/kakao/addInfo', auth, (req, res, next) => {
 
 //개인정보 수정 비밀번호 확인 로직
 router.post(`/checkPwd`, auth, async (req, res, next) => {
+
+  /**
+    * #swagger.tags = ['사용자/Users']
+    * #swagger.summary = '회원 정보 수정 비밀번호 확인 관련 로직'
+    */
 
   let body = req.body;
 
@@ -581,6 +622,11 @@ router.post(`/checkPwd`, auth, async (req, res, next) => {
 
 //회원수정관련 로직
 router.post('/updateUser', auth, async (req, res, next) => {
+
+    /**
+    * #swagger.tags = ['사용자/Users']
+    * #swagger.summary = '회원정보 수정관련 로직'
+    */
 
   let userInfo = {...req.body};
 
@@ -751,6 +797,11 @@ router.post('/updateUser', auth, async (req, res, next) => {
 
   router.post(`/updateKakao`, auth, (req, res, next) => {
 
+    /**
+    * #swagger.tags = ['사용자/Kakao']
+    * #swagger.summary = '소셜회원 정보수정 관련 로직'
+    */
+
     let userInfo = {...req.body};
     
     let selectUser = 
@@ -888,6 +939,11 @@ router.post('/updateUser', auth, async (req, res, next) => {
 
   router.post('/readNotify', auth, (req, res, next) => {
 
+    /**
+    * #swagger.tags = ['사용자/Users']
+    * #swagger.summary = '회원 알림 읽음처리 관련 로직'
+    */
+
     if(!req.body || !req.user.id){
       return res.json({
         success: false,
@@ -962,6 +1018,11 @@ router.post('/updateUser', auth, async (req, res, next) => {
   //이메일 본인인증
   router.post(`/sendCode`, (req, res, next) => {
 
+    /**
+    * #swagger.tags = ['사용자/Users']
+    * #swagger.summary = '회원 이메일 인증코드 전송 관련 로직'
+    */
+
     let body = req.body;
 
     if(!body.email){
@@ -988,59 +1049,89 @@ router.post('/updateUser', auth, async (req, res, next) => {
         WHERE email=?
       `
 
+    try{
 
-    db.query(selectUser, [body.email], (err, user) => {
 
-      if(err){
-        return next(err);
-      }
-
-      if(user[0]){
-        return res.json({
-          success: false,
-          message: "해당 이메일로 가입된 정보가 존재합니다."
-        })
-      }//end if
-
-      //인증코드 생성
-      let code = generateRandomCode();
-    
-      let setCode = 
-      `
-        INSERT INTO 
-        email_code
-        (
-          email,
-          code,
-          reg_dt,
-          expired_dt
-        )
-        VALUES
-        (
-          ?,
-          ?,
-          DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s'),
-          DATE_FORMAT(NOW() + INTERVAL 5 MINUTE, '%Y-%m-%d %H:%i:%s')
-        )
-      
-      `
+      db.query(selectUser, [body.email], (err, user) => {
   
-      db.query(setCode, [body.email, code], (err2) => {
+        if(err){
+          return next(err);
+        }
   
-        if(err2){
-          return next(err2);
+        if(user[0]){
+          return res.json({
+            success: false,
+            message: "해당 이메일로 가입된 정보가 존재합니다."
+          })
         }//end if
-        
-        //이메일 템플릿 생성
-        let html = authMail.replaceAll('%%%@@%%%', code);
-    
-        body.html = html;
-        body.subject = '공모아에서 인증번호 발신입니다.'
-        
-        emailSend(req, res);
   
+        let deleteEmailCode = 
+        `
+          DELETE 
+          FROM email_code
+          WHERE 
+            email=?
+        `
+
+        db.query(deleteEmailCode, [body.email], (err_delete_email) => {
+
+          if(err_delete_email){
+            return res.json({
+              success: false,
+              message: "서버에서 에러가 발생했습니다.\n잠시후 다시 시도해주세요."
+            })
+          }
+          
+          //인증코드 생성
+          let code = generateRandomCode();
+        
+          let setCode = 
+          `
+            INSERT INTO 
+            email_code
+            (
+              email,
+              code,
+              reg_dt,
+              expired_dt
+            )
+            VALUES
+            (
+              ?,
+              ?,
+              DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s'),
+              DATE_FORMAT(NOW() + INTERVAL 5 MINUTE, '%Y-%m-%d %H:%i:%s')
+            )
+          
+          `
+          
+          db.query(setCode, [body.email, code], async(err2) => {
+      
+            if(err2){
+              return next(err2);
+            }//end if
+            
+            //이메일 템플릿 생성
+            let html = authMail.replaceAll('%%%@@%%%', code);
+        
+            body.html = html;
+            body.subject = '공모아에서 인증번호 발신입니다.'
+  
+            await emailSend(req, res);
+      
+          })
+
+        })
+
       })
-    })
+
+    }catch(err){
+      console.error('이메일 전송 시도중 에러가 발생했습니다.',err)
+      return res.json({
+        success: false,
+        message: "서버에서 에러가 발생했습니다.\n잠시후 다시 시도해주세요."
+      })
+    }
 
 
   })
@@ -1049,6 +1140,11 @@ router.post('/updateUser', auth, async (req, res, next) => {
   //이메일 코드 확인
   router.post(`/codeChk`, (req, res, next) => {
     
+    /**
+    * #swagger.tags = ['사용자/Users']
+    * #swagger.summary = '회원 이메일 인증코드 확인 관련 로직'
+    */
+
     let body = req.body;
     
 
@@ -1105,6 +1201,11 @@ router.post('/updateUser', auth, async (req, res, next) => {
   //회원 비밀번호 찾기 로직
   router.post(`/findPwd`, (req, res, next) => {
 
+    /**
+    * #swagger.tags = ['사용자/Users']
+    * #swagger.summary = '회원 비밀번호 찾기 관련 로직'
+    */
+
     let body = req.body;
 
     if(!body.email){
@@ -1157,6 +1258,11 @@ router.post('/updateUser', auth, async (req, res, next) => {
 
 
   router.post('/updatePwd', async(req, res, next) => {
+
+    /**
+    * #swagger.tags = ['사용자/Users']
+    * #swagger.summary = '회원 비밀번호 수정 관련 로직'
+    */
 
     let body = req.body;
 

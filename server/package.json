@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "swagger": "node ./src/swagger.js"
   },
   "author": "",
   "license": "ISC",
@@ -25,5 +26,9 @@
     "npm": "^10.2.5",
     "redis": "^4.6.13",
     "xml2js": "^0.6.2"
+  },
+  "devDependencies": {
+    "swagger-autogen": "^2.23.7",
+    "swagger-ui-express": "^5.0.0"
   }
 }
