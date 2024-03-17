@@ -33,14 +33,14 @@
 - Library: `node-schedule`, `nodemailer`
 - Database: `MySQL`
 - Security: `jwt`
-- API Document: `springdoc-openapi-ui(Swagger)`
+- API Document: `swagger-ui-express`, `swagger-autogen`
 
 **프론트엔드**
 
 - React:  `Vite`, `Redux`
 - Server: `Nginx`
 - Library: `react-redux`, `react-persist`, `react-toolkit`, `react-hook-form`
-- API Document: `springdoc-openapi-ui(Swagger)`
+- API Document: `swagger-ui-express`, `swagger-autogen`
 - etc: `Tailwind CSS`
 
 
