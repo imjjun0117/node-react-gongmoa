@@ -21,11 +21,6 @@
 
 ### 💻 사용 도구
 
-- DNS 세팅 : `가비아`
-- SSL 인증서 : `certbot` 
-- ServerComputer: `AWS EC2`, `Ubuntu Server 22.04 LTS`
-- dev Tool: `SQLGate`, `putty`, `FileZilla` `Postman`, `Visual Studio Code`, `macOs`
-
 **백엔드**
 
 - Express: `Nodejs v18.13.0`
@@ -42,10 +37,16 @@
 - Library: `react-redux`, `react-persist`, `react-toolkit`, `react-hook-form`
 - etc: `Tailwind CSS`
 
-
 **공모주 데이터 크롤링**
 
 - 크롤러: `Cheerio 1.0.0`, `iconv`, `Mysql`
+
+**ETC**
+
+- DNS 세팅 : `가비아`
+- SSL 인증서 : `certbot` 
+- ServerComputer: `AWS EC2`, `Ubuntu Server 22.04 LTS`
+- dev Tool: `SQLGate`, `putty`, `FileZilla` `Postman`, `Visual Studio Code`, `macOs`
 
 <br/>
 
