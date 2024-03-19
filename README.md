@@ -40,7 +40,6 @@
 - React:  `Vite`, `Redux`
 - Server: `Nginx`
 - Library: `react-redux`, `react-persist`, `react-toolkit`, `react-hook-form`
-- API Document: `swagger-ui-express`, `swagger-autogen`
 - etc: `Tailwind CSS`
 
 
