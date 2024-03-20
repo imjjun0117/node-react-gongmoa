@@ -64,8 +64,11 @@
   - Detail: 청약을 진행하는 주간사 정보와 최대 청약 개수를 확인할 수 있습니다.
   - Calendar: 지정된 기간에 청약, 환불, 상장 일정을 확인할 수 있고 로그인한 유저는 관심종목만 확인할 수 있습니다.
   - Notice: 매일 장이 시작되기 전에 관심종목에 관한 정보가 알림을 통해 전달됩니다.
-- AUTH: 카카오 OAuth로 로그인 및 신규가입합니다. 
-  - 추후 커뮤니티, 보유 증권사 목록, 공모주 별점 등 기능 도입예정
+- AUTH
+  - 미들웨어 사용하여 사용자 권한(jwt) 유효성 확인합니다.
+  - 카카오 OAuth로 로그인 및 신규가입합니다.
+    
+- 추후 커뮤니티, 보유 증권사 목록, 공모주 별점 등 기능 도입예정
 <!--   - SwaggerLink : http://server.dbsg.co.kr:8080/swagger-ui/index.html
 ![image](https://user-images.githubusercontent.com/10378777/223958261-832ce4fd-a0cb-4c4d-a88b-d1d50e4f14c7.png) -->
 
