@@ -54,7 +54,11 @@
 
 
 ## 📖 프로젝트 상세 정보
-### 🛠 서비스 아키텍처
+### 🛠 API 설계
+![image](https://github.com/imjjun0117/node-react-gongmoa/assets/84663172/c7763670-04f7-42e9-a3b0-d8f7ad5a3058)
+
+### 🛠 ERD
+![image](https://github.com/imjjun0117/node-react-gongmoa/assets/84663172/e00c39b7-5b76-472b-a9b4-e7838a05537a)
 
 
 <br/>
