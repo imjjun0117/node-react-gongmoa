@@ -11,7 +11,7 @@ import RegisterPage from './Pages/RegisterPage';
 import ProtectedRoutes from './components/ProtectedRoutes';
 import NotAuthRoutes from './components/NotAuthRoutes';
 import { useDispatch, useSelector } from 'react-redux';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { authUser } from './action/userAction';
 import KakaoRedirectHandler from './Pages/LoginPage/Kakao/KakaoRedirectHandler';
 import StockCalendar from './Pages/StockCalendar';
@@ -21,6 +21,7 @@ import FindPassword from './Pages/FindPassword/index';
 import UpdatePassword from './Pages/FindPassword/UpdatePassword/UpdatePassword';
 import KakaoAddInfo from './Pages/LoginPage/Kakao/KakaoAddInfo';
 
+import ReactGA from 'react-ga4';
 
 function Layout() {
   return (
@@ -51,13 +52,33 @@ function App(){
   const {pathname} = useLocation();
   const dispatch = useDispatch();
 
+  const GA_ID = import.meta.env.VITE_GA_TRACKING_ID;
+  const[initialized, setInitialLized] = useState(false);
+
+  useEffect(() => {
+
+    //구글 애널리틱스 초기화
+    if(GA_ID){
+      ReactGA.initialize(GA_ID);
+      setInitialLized(true);
+    }
+    
+  },[]);
+
   useEffect(() => {
   
     if(isAuth){
       dispatch(authUser());
     }
 
-  },[isAuth, pathname, dispatch])
+    console.log(pathname);
+    
+    if(initialized){
+      ReactGA.set({ page: pathname });
+      ReactGA.send("pageview");
+    }
+
+  },[isAuth, pathname, dispatch, initialized])
 
   // ScrollRestoration();
 

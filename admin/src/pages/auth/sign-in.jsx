@@ -6,12 +6,16 @@ import {
 } from "@material-tailwind/react";
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 export function SignIn() {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const email = searchParams.get('email') ? searchParams.get('email') : '';
+  const password = searchParams.get('password') ? searchParams.get('password') : '';
 
   const {
     register, 
@@ -73,6 +77,7 @@ export function SignIn() {
               labelProps={{
                 className: "before:content-none after:content-none",
               }}
+              defaultValue={email}
               {...register('email', userEmail)}
             />
             {
@@ -95,6 +100,7 @@ export function SignIn() {
               labelProps={{
                 className: "before:content-none after:content-none",
               }}
+              defaultValue={password}
               {...register('password', userPassword)}
             />
             {
